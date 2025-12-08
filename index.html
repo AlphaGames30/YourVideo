@@ -47,6 +47,13 @@
           const snapshot = await uploadBytes(storageRef, file);
           const url = await getDownloadURL(snapshot.ref);
 
+          <section id="admin-panel" style="display:none; padding:20px; background:#222; border-radius:10px;">
+    <h3>Ajouter une vidéo (Admin)</h3>
+    <input type="text" id="new-title" placeholder="Titre de la vidéo">
+    <input type="text" id="new-url" placeholder="Lien MP4">
+    <button onclick="autoUploadToGithub()">Envoyer sur le site</button>
+</section>
+
           // 2. Enregistrement des infos dans Firestore
           await addDoc(collection(db, "videos"), {
               title: title,
