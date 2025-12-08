@@ -1,63 +1,23 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>MyTube Cloud</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <header>
-        <h1>MyTube Cloud</h1>
-        <div id="admin-tools" style="display:none;">
-            <input type="text" id="admin-input" placeholder="Nouvel admin">
-            <button onclick="addNewAdmin()">Promouvoir</button>
-        </div>
-    </header>
+:root { --bg: #0f0f0f; --card: #1e1e1e; --text: #fff; --accent: #ff0000; }
+body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; }
 
-    <main>
-        <div id="upload-box">
-            <input type="text" id="v-title" placeholder="Titre">
-            <input type="file" id="v-file" accept="video/mp4">
-            <button onclick="handleUpload()">Publier sur le Cloud</button>
-        </div>
+header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; sticky top: 0; background: var(--bg); z-index: 100; }
+.logo { font-size: 20px; font-weight: bold; color: var(--accent); }
+.search-bar input { width: 300px; padding: 8px; border-radius: 20px 0 0 20px; border: 1px solid #333; background: #000; color: #fff; }
 
-        <div id="video-grid"></div>
-    </main>
+.main-container { display: flex; }
+.sidebar { width: 200px; padding: 10px; height: 100vh; position: sticky; top: 60px; }
+.sidebar li { padding: 12px; cursor: pointer; border-radius: 10px; }
+.sidebar li:hover { background: #272727; }
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-      import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-      import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
+.feed { flex: 1; padding: 20px; }
+.video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.video-card { background: var(--card); border-radius: 12px; overflow: hidden; }
+.video-card video { width: 100%; aspect-ratio: 16/9; }
 
-      const firebaseConfig = {
-        // COLLE TA CONFIGURATION ICI
-      };
+.shorts-row { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; }
+.short-card { width: 180px; height: 300px; background: #333; border-radius: 15px; flex-shrink: 0; }
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-      const storage = getStorage(app);
-
-      // Exposer les fonctions au window pour le HTML
-      window.handleUpload = async () => {
-          const file = document.getElementById('v-file').files[0];
-          const title = document.getElementById('v-title').value;
-
-          // 1. Upload du fichier vidéo dans Storage
-          const storageRef = ref(storage, 'videos/' + file.name);
-          const snapshot = await uploadBytes(storageRef, file);
-          const url = await getDownloadURL(snapshot.ref);
-
-          // 2. Enregistrement des infos dans Firestore
-          await addDoc(collection(db, "videos"), {
-              title: title,
-              url: url,
-              likes: 0,
-              owner: "edonis.imbert@gmail.com"
-          });
-
-          alert("Vidéo publiée avec succès !");
-          location.reload();
-      };
-    </script>
-</body>
-</html>
+.admin-panel { background: #222; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--accent); }
+input { margin-bottom: 10px; display: block; width: 100%; }
+.badge-admin { background: var(--accent); padding: 2px 8px; border-radius: 5px; font-size: 10px; }
