@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyTube - Danew Edition</title>
+    <title>MyTube - Final Danew</title>
     <style>
-        /* --- DESIGN YOUTUBE DARK (STYLE IMAGE 2) --- */
+        /* --- DESIGN & COULEURS --- */
         :root {
             --bg: #0f0f0f;
             --header: #0f0f0f;
@@ -15,7 +15,7 @@
             --blue: #3ea6ff;
             --red: #ff0000;
         }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, sans-serif; overflow-x: hidden; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, Arial, sans-serif; overflow-x: hidden; }
         
         /* HEADER */
         header {
@@ -24,7 +24,6 @@
             border-bottom: 1px solid #222;
         }
         .logo { font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; }
-        .logo span { color: white; letter-spacing: -1px; }
         .logo::before { content: '▶'; color: var(--red); font-size: 24px; margin-right: 5px; }
         
         .search-box { display: flex; flex: 1; max-width: 500px; margin: 0 10px; }
@@ -43,45 +42,54 @@
 
         /* LAYOUT */
         .container { display: flex; height: calc(100vh - 60px); }
+        .sidebar { width: 220px; background: var(--bg); padding: 10px; overflow-y: auto; display: none; }
+        @media(min-width: 768px) { .sidebar { display: block; } }
         
-        /* SIDEBAR */
-        .sidebar { width: 220px; background: var(--bg); padding: 10px; overflow-y: auto; display: none; } /* Caché sur mobile par défaut */
-        @media(min-width: 768px) { .sidebar { display: block; } } /* Visible sur tablette/PC */
-        
-        .nav-item { padding: 10px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 15px; margin-bottom: 5px; }
+        .nav-item { padding: 10px; border-radius: 10px; cursor: pointer; margin-bottom: 5px; }
         .nav-item:hover { background: var(--hover); }
 
-        /* VIDEOS */
+        /* GRILLE VIDÉOS */
         .content { flex: 1; padding: 20px; overflow-y: auto; }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
         
-        .video-card { cursor: pointer; }
-        .thumb { width: 100%; aspect-ratio: 16/9; background: #333; border-radius: 12px; object-fit: cover; }
+        .video-card { cursor: pointer; transition: transform 0.2s; }
+        .video-card:hover { transform: scale(1.02); }
+        
+        .thumb-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #333; }
+        .thumb { width: 100%; height: 100%; object-fit: cover; }
+        .play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 40px; opacity: 0.8; text-shadow: 0 0 10px black; }
+
         .info { display: flex; gap: 10px; margin-top: 10px; }
         .avatar-small { width: 36px; height: 36px; border-radius: 50%; background: #555; }
-        .details h4 { margin: 0 0 5px 0; font-size: 16px; line-height: 1.2; }
+        .details h4 { margin: 0 0 5px 0; font-size: 16px; line-height: 1.2; color: #fff; }
         .details p { margin: 0; color: var(--sec-text); font-size: 14px; }
         
-        .sub-btn {
-            background: white; color: black; border: none; padding: 5px 12px; border-radius: 18px; 
-            font-weight: bold; font-size: 12px; margin-top: 5px; cursor: pointer;
+        /* BOUTONS D'ACTION (Like / Sub) */
+        .actions-bar { display: flex; gap: 10px; margin-top: 8px; }
+        .action-pill {
+            background: #272727; color: white; border: none; padding: 4px 10px; border-radius: 12px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px;
         }
-        .sub-btn.active { background: #333; color: var(--sec-text); }
+        .action-pill:hover { background: #3f3f3f; }
+        .liked { color: var(--blue); }
 
-        /* PROFIL (STYLE IMAGE 1) */
-        .profile-view { display: none; padding: 0 20px; }
-        .banner { height: 150px; background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%); border-radius: 15px; }
-        .profile-head { display: flex; margin-top: -40px; padding: 0 20px; align-items: flex-end; }
-        .avatar-big { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--bg); background: #555; }
-        .profile-txt { margin-left: 20px; margin-bottom: 10px; }
-        .action-btn { background: var(--hover); color: white; border: none; padding: 8px 16px; border-radius: 18px; margin-top: 10px; cursor: pointer; }
+        /* PLAYER MODAL (LECTEUR VIDÉO) */
+        .player-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 500; justify-content: center; align-items: center; flex-direction: column; }
+        .video-wrapper { width: 90%; max-width: 1000px; aspect-ratio: 16/9; background: #000; position: relative; }
+        video { width: 100%; height: 100%; outline: none; }
+        .close-player { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; z-index: 510; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 5px; }
 
-        /* POPUPS */
+        /* AUTRES MODALS (Upload / Login) */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; }
         .modal-box { background: #212121; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; position: relative; }
         .close { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; }
-        input[type="text"], input[type="email"], input[type="password"] { width: 100%; padding: 10px; margin: 10px 0; background: #121212; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
+        input { width: 100%; padding: 10px; margin: 10px 0; background: #121212; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
         .btn-blue { width: 100%; padding: 10px; background: var(--blue); color: black; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+        /* PROFIL */
+        .profile-view { display: none; padding: 0 20px; }
+        .banner { height: 150px; background: linear-gradient(90deg, #b92b27, #1565C0); border-radius: 15px; }
+        .profile-head { display: flex; margin-top: -40px; padding: 0 20px; align-items: flex-end; }
+        .avatar-big { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--bg); background: #555; }
     </style>
 </head>
 <body>
@@ -113,112 +121,134 @@
             <div id="profileView" class="profile-view">
                 <div class="banner"></div>
                 <div class="profile-head">
-                    <img src="https://via.placeholder.com/100" class="avatar-big" id="pAvatar">
-                    <div class="profile-txt">
-                        <h1 style="margin:0; font-size: 24px;" id="pName">Nom</h1>
-                        <p style="color:var(--sec-text); margin:5px 0;" id="pBio">Description...</p>
-                        <button class="action-btn" onclick="app.editBio()">PERSONNALISER LA BIO</button>
+                    <img src="https://via.placeholder.com/100" class="avatar-big">
+                    <div style="margin-left: 20px;">
+                        <h1 id="pName">Nom</h1>
+                        <p id="pBio" style="color:#aaa;">Bio...</p>
+                        <button class="action-pill" onclick="app.editBio()">✎ Personnaliser</button>
                     </div>
                 </div>
-                <h3>Vidéos</h3>
+                <h3>Mes Vidéos</h3>
                 <div id="pVideos" class="video-grid"></div>
             </div>
         </main>
     </div>
 
+    <div id="playerModal" class="player-overlay">
+        <div class="close-player" onclick="app.closePlayer()">❌ FERMER</div>
+        <div class="video-wrapper">
+            <video id="mainVideoPlayer" controls autoplay></video>
+        </div>
+        <h2 id="playerTitle" style="color: white; margin-top: 10px;"></h2>
+    </div>
+
     <div id="modalUpload" class="modal">
         <div class="modal-box">
             <span class="close" onclick="app.closeModals()">&times;</span>
-            <h2>Créer une vidéo</h2>
-            <input type="text" id="upTitle" placeholder="Titre">
-            <input type="text" id="upUrl" placeholder="Lien MP4">
-            <input type="text" id="upThumb" placeholder="Lien Image Miniature">
-            <button class="btn-blue" onclick="app.publish()">PUBLIER</button>
+            <h2>Publier une vidéo</h2>
+            <input type="text" id="upTitle" placeholder="Titre de la vidéo">
+            <input type="text" id="upUrl" placeholder="Lien direct MP4 (ex: discord, imgur...)">
+            <input type="text" id="upThumb" placeholder="Lien Miniature (Image JPG/PNG)">
+            <button class="btn-blue" onclick="app.publish()">PUBLIER MAINTENANT</button>
+            <p style="font-size:12px; color:#777; margin-top:10px;">* La vidéo sera sauvegardée dans votre navigateur.</p>
         </div>
     </div>
 
     <div id="modalLogin" class="modal">
         <div class="modal-box">
             <span class="close" onclick="app.closeModals()">&times;</span>
-            <h2 style="color:#3ea6ff;">Connexion Google</h2>
-            <input type="email" id="logEmail" placeholder="Email">
-            <div id="logStep2" style="display:none;">
-                <input type="text" id="logName" placeholder="Votre Nom">
-                <input type="password" placeholder="Mot de passe">
-            </div>
-            <button id="logBtnAction" class="btn-blue" onclick="app.doLogin()">Suivant</button>
+            <h2 style="color:#3ea6ff;">Connexion</h2>
+            <input type="text" id="logName" placeholder="Votre Pseudo">
+            <button class="btn-blue" onclick="app.doLogin()">Entrer</button>
         </div>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ---
-        // METTRE TON TOKEN GITHUB ICI ENTRE LES GUILLEMETS
+        // CONFIGURATION
+        // Token GitHub facultatif (si vide, ça marche quand même en local)
         const GITHUB_TOKEN = "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"; 
         const REPO = "AlphaGames30/YourVideo";
-        
-        // --- 2. DONNÉES LOCALES (Pour que ça marche même sans internet) ---
-        const localData = {
-            user: JSON.parse(localStorage.getItem('mt_user')),
-            subs: JSON.parse(localStorage.getItem('mt_subs')) || [],
-            videos: [
-                {id: 1, title: "Minecraft Survival #1", author: "Alpha_edo", thumb: "https://via.placeholder.com/300x170/ff0000/fff", url: "#"},
-                {id: 2, title: "Tuto JavaScript", author: "CodeMaster", thumb: "https://via.placeholder.com/300x170/0000ff/fff", url: "#"}
-            ]
-        };
 
-        // --- 3. L'APPLICATION (Objet "app") ---
         const app = {
-            
-            init: function() {
-                this.updateAuthUI();
-                this.loadVideos(); // Charger depuis GitHub ou Local
+            data: {
+                user: JSON.parse(localStorage.getItem('mt_user')),
+                videos: JSON.parse(localStorage.getItem('mt_videos')) || [],
+                subs: JSON.parse(localStorage.getItem('mt_subs')) || []
             },
 
-            // Navigation
+            init: function() {
+                // Ajouter des vidéos par défaut si vide
+                if (this.data.videos.length === 0) {
+                    this.data.videos = [
+                        { id: 1, title: "Bienvenue sur MyTube", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "", author: "Admin", likes: 10 },
+                        { id: 2, title: "Test Vidéo", url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", thumb: "", author: "Test", likes: 5 }
+                    ];
+                    this.save();
+                }
+                this.updateAuthUI();
+                this.goHome();
+            },
+
+            save: function() {
+                localStorage.setItem('mt_videos', JSON.stringify(this.data.videos));
+                localStorage.setItem('mt_user', JSON.stringify(this.data.user));
+                localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
+            },
+
+            // --- NAVIGATION ---
             goHome: function() {
                 document.getElementById('profileView').style.display = 'none';
                 document.getElementById('videoGrid').style.display = 'grid';
-                this.render(localData.videos);
+                this.render(this.data.videos);
             },
             
             goProfile: function() {
-                if(!localData.user) return alert("Connecte-toi d'abord !");
+                if(!this.data.user) return alert("Connecte-toi d'abord !");
                 document.getElementById('videoGrid').style.display = 'none';
                 document.getElementById('profileView').style.display = 'block';
+                document.getElementById('pName').innerText = this.data.user.name;
+                document.getElementById('pBio').innerText = this.data.user.bio || "Pas de description.";
                 
-                document.getElementById('pName').innerText = localData.user.name;
-                document.getElementById('pBio').innerText = localData.user.bio || "Pas de bio.";
-                
-                // Mes vidéos
-                const myVids = localData.videos.filter(v => v.author === localData.user.name);
+                const myVids = this.data.videos.filter(v => v.author === this.data.user.name);
                 this.render(myVids, 'pVideos');
             },
 
             goSubs: function() {
-                document.getElementById('profileView').style.display = 'none';
-                document.getElementById('videoGrid').style.display = 'grid';
-                const subVids = localData.videos.filter(v => localData.subs.includes(v.author));
-                if(subVids.length === 0) alert("Aucun abonnement ou pas de vidéos.");
-                this.render(subVids);
+                this.goHome();
+                const subVids = this.data.videos.filter(v => this.data.subs.includes(v.author));
+                if(subVids.length === 0) alert("Aucun abonnement.");
+                else this.render(subVids);
             },
 
-            // Affichage
+            // --- AFFICHAGE ---
             render: function(list, targetId = 'videoGrid') {
                 const grid = document.getElementById(targetId);
                 grid.innerHTML = "";
+                
                 list.forEach(v => {
-                    const isSub = localData.subs.includes(v.author);
+                    // Image par défaut si pas de miniature
+                    const thumbSrc = v.thumb && v.thumb.startsWith('http') ? v.thumb : 'https://via.placeholder.com/300x170/000000/FFFFFF/?text=MyTube+Video';
+                    const isSub = this.data.subs.includes(v.author);
+                    
                     grid.innerHTML += `
                         <div class="video-card">
-                            <img src="${v.thumb}" class="thumb" onclick="alert('Lecture de : ${v.title}')">
+                            <div class="thumb-container" onclick="app.playVideo('${v.url}', '${v.title}')">
+                                <img src="${thumbSrc}" class="thumb">
+                                <div class="play-icon">▶</div>
+                            </div>
                             <div class="info">
                                 <div class="avatar-small"></div>
                                 <div class="details">
                                     <h4>${v.title}</h4>
                                     <p>${v.author}</p>
-                                    <button class="sub-btn ${isSub ? 'active' : ''}" onclick="app.toggleSub('${v.author}')">
-                                        ${isSub ? 'ABONNÉ' : "S'ABONNER"}
-                                    </button>
+                                    <div class="actions-bar">
+                                        <button class="action-pill" onclick="app.like(${v.id})">
+                                            👍 ${v.likes || 0}
+                                        </button>
+                                        <button class="action-pill ${isSub ? 'liked' : ''}" onclick="app.toggleSub('${v.author}')">
+                                            ${isSub ? 'Abonné' : "S'abonner"}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -226,130 +256,117 @@
                 });
             },
 
-            // Actions Boutons
-            search: function() {
-                const query = document.getElementById('searchInput').value.toLowerCase();
-                const found = localData.videos.filter(v => v.title.toLowerCase().includes(query));
-                this.goHome();
-                this.render(found);
+            // --- ACTIONS ---
+            playVideo: function(url, title) {
+                if (!url) return alert("Erreur: Lien vidéo manquant");
+                const player = document.getElementById('playerModal');
+                const videoEl = document.getElementById('mainVideoPlayer');
+                
+                document.getElementById('playerTitle').innerText = title;
+                videoEl.src = url;
+                player.style.display = 'flex';
+                videoEl.play();
+            },
+
+            closePlayer: function() {
+                const player = document.getElementById('playerModal');
+                const videoEl = document.getElementById('mainVideoPlayer');
+                videoEl.pause();
+                videoEl.src = ""; // Stop le chargement
+                player.style.display = 'none';
+            },
+
+            like: function(id) {
+                const vid = this.data.videos.find(v => v.id === id);
+                if (vid) {
+                    vid.likes = (vid.likes || 0) + 1;
+                    this.save();
+                    this.goHome(); // Rafraichir pour voir le nouveau chiffre
+                }
             },
 
             toggleSub: function(author) {
-                if(localData.subs.includes(author)) {
-                    localData.subs = localData.subs.filter(s => s !== author);
+                if(this.data.subs.includes(author)) {
+                    this.data.subs = this.data.subs.filter(s => s !== author);
                 } else {
-                    localData.subs.push(author);
-                    alert("Tu es abonné à " + author);
+                    this.data.subs.push(author);
                 }
-                localStorage.setItem('mt_subs', JSON.stringify(localData.subs));
-                this.goHome(); // Rafraichir
+                this.save();
+                this.goHome();
             },
 
-            editBio: function() {
-                const txt = prompt("Nouvelle bio :");
-                if(txt) {
-                    localData.user.bio = txt;
-                    localStorage.setItem('mt_user', JSON.stringify(localData.user));
-                    this.goProfile();
-                }
-            },
-
-            // Modals
+            // --- PUBLICATION & LOGIN ---
             openUpload: function() { 
-                if(!localData.user) return alert("Connecte-toi !");
+                if(!this.data.user) return alert("Connecte-toi pour publier !");
                 document.getElementById('modalUpload').style.display = 'flex'; 
             },
             openLogin: function() { document.getElementById('modalLogin').style.display = 'flex'; },
-            closeModals: function() { 
-                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
+            closeModals: function() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); },
+
+            publish: function() {
+                const title = document.getElementById('upTitle').value;
+                const url = document.getElementById('upUrl').value;
+                const thumb = document.getElementById('upThumb').value;
+
+                if(!title || !url) return alert("Il faut au moins un Titre et un Lien vidéo !");
+
+                const newVideo = {
+                    id: Date.now(),
+                    title: title,
+                    url: url,
+                    thumb: thumb,
+                    author: this.data.user.name,
+                    likes: 0
+                };
+
+                // SAUVEGARDE LOCALE (IMMÉDIATE)
+                this.data.videos.unshift(newVideo); // Ajoute au début
+                this.save();
+                
+                alert("Vidéo publiée avec succès !");
+                this.closeModals();
+                this.goHome();
+                
+                // Tentative GitHub (Bonus, silencieux si échec)
+                if(GITHUB_TOKEN) this.syncToGithub(); 
             },
 
-            // Connexion
             doLogin: function() {
-                const email = document.getElementById('logEmail').value;
-                const step2 = document.getElementById('logStep2');
-                const btn = document.getElementById('logBtnAction');
-
-                if(step2.style.display === 'none') {
-                    if(!email) return alert("Mets un email !");
-                    step2.style.display = 'block';
-                    btn.innerText = "Se connecter";
-                } else {
-                    const name = document.getElementById('logName').value;
-                    if(!name) return alert("Mets un nom !");
-                    
-                    localData.user = { name: name, email: email, bio: "Salut !" };
-                    localStorage.setItem('mt_user', JSON.stringify(localData.user));
-                    this.closeModals();
+                const name = document.getElementById('logName').value;
+                if(name) {
+                    this.data.user = { name: name, bio: "Hey ! Bienvenue sur ma chaîne." };
+                    this.save();
                     this.updateAuthUI();
-                    alert("Bienvenue " + name);
+                    this.closeModals();
                 }
             },
 
             updateAuthUI: function() {
                 const btn = document.getElementById('loginBtn');
-                if(localData.user) {
-                    btn.innerHTML = `👤 ${localData.user.name}`;
-                    btn.style.borderColor = "transparent";
+                if(this.data.user) {
+                    btn.innerText = "👤 " + this.data.user.name;
+                    btn.style.border = "none";
+                }
+            },
+            
+            editBio: function() {
+                const b = prompt("Nouvelle description :");
+                if(b) {
+                    this.data.user.bio = b;
+                    this.save();
+                    this.goProfile();
                 }
             },
 
-            // Publication (GitHub + Local)
-            publish: async function() {
-                const title = document.getElementById('upTitle').value;
-                const url = document.getElementById('upUrl').value;
-                const thumb = document.getElementById('upThumb').value;
-
-                if(!title) return alert("Titre obligatoire");
-
-                const newVid = {
-                    id: Date.now(), title: title, url: url, thumb: thumb || "https://via.placeholder.com/300", author: localData.user.name
-                };
-
-                // 1. Ajouter localement tout de suite (pour que tu le voies)
-                localData.videos.push(newVid);
-                this.closeModals();
-                this.goHome();
-                alert("Vidéo ajoutée (Local) ! Envoi vers GitHub en cours...");
-
-                // 2. Essayer d'envoyer à GitHub
-                try {
-                    const get = await fetch(`https://api.github.com/repos/${REPO}/contents/videos.json`);
-                    const data = await get.json();
-                    const content = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                    
-                    content.push(newVid);
-
-                    await fetch(`https://api.github.com/repos/${REPO}/contents/videos.json`, {
-                        method: "PUT",
-                        headers: { "Authorization": `token ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            message: "Add video",
-                            content: btoa(unescape(encodeURIComponent(JSON.stringify(content)))),
-                            sha: data.sha
-                        })
-                    });
-                    alert("Sauvegardé sur GitHub avec succès !");
-                } catch(e) {
-                    console.error(e);
-                    alert("Erreur GitHub (Vérifie le Token), mais la vidéo est visible pour toi.");
-                }
-            },
-
-            loadVideos: async function() {
-                try {
-                    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/videos.json`);
-                    if(res.ok) {
-                        const data = await res.json();
-                        localData.videos = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                        this.goHome();
-                    }
-                } catch(e) { console.log("Mode hors ligne ou erreur repo"); this.goHome(); }
+            search: function() {
+                const q = document.getElementById('searchInput').value.toLowerCase();
+                const res = this.data.videos.filter(v => v.title.toLowerCase().includes(q));
+                this.render(res);
             }
         };
 
-        // Lancement
+        // Démarrage
         app.init();
     </script>
 </body>
-</html>
+</html> 
