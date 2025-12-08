@@ -21,3 +21,13 @@ header { display: flex; justify-content: space-between; align-items: center; pad
 .admin-panel { background: #222; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--accent); }
 input { margin-bottom: 10px; display: block; width: 100%; }
 .badge-admin { background: var(--accent); padding: 2px 8px; border-radius: 5px; font-size: 10px; }
+
+/* Fenêtre Modale */
+.modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+.modal-content { background: #222; margin: 10% auto; padding: 20px; width: 300px; border-radius: 10px; }
+.close { float: right; cursor: pointer; font-size: 24px; }
+
+/* Profil */
+.profile-header { text-align: center; padding: 40px; border-bottom: 1px solid #333; }
+.large-avatar { width: 120px; border-radius: 50%; }
+.video-card img { width: 100%; cursor: pointer; border-radius: 8px; }
