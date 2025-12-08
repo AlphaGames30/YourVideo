@@ -3,106 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyTube Cloud - Edonis</title>
+    <title>MyTube - Clone</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
         <div class="header-left">
             <span class="logo">▶ MyTube</span>
-            <div id="admin-tools" style="display:none;">
-                <span class="badge-admin">ADMIN</span>
-            </div>
         </div>
         <div class="search-bar">
             <input type="text" id="search-input" placeholder="Rechercher une vidéo...">
             <button onclick="searchVideo()">🔍</button>
         </div>
         <div class="header-right">
-            <button class="btn-login" onclick="loginGoogle()">Connexion</button>
+            <button class="icon-btn" onclick="openUploadModal()">➕</button>
+            <button class="btn-login" id="profile-btn" onclick="showProfile()">Connexion</button>
         </div>
     </header>
 
     <div class="main-container">
         <nav class="sidebar">
             <ul>
-                <li onclick="location.reload()">🏠 Accueil</li>
+                <li onclick="showHome()">🏠 Accueil</li>
                 <li>📱 Shorts</li>
-                <li>📺 Abonnements</li>
+                <li onclick="showSubscribed()">📺 Abonnements</li>
                 <hr>
-                <li>🕒 Historique</li>
-                <li>👤 Ma Chaîne</li>
+                <li onclick="showHistory()">🕒 Historique</li>
+                <li onclick="showMyChannel()">👤 Ma Chaîne</li>
             </ul>
         </nav>
 
-        <main class="feed">
-            <section id="upload-box" class="admin-panel">
-                <h3>Publier un fichier MP4 (Cloud)</h3>
-                <input type="text" id="v-title" placeholder="Titre de la vidéo">
-                <input type="file" id="v-file" accept="video/mp4">
-                <button id="btn-upload">🚀 Publier sur Firebase</button>
-            </section>
-
-            <section id="admin-panel" class="admin-panel" style="display:none;">
-                <h3>Ajouter via lien direct (GitHub Sync)</h3>
-                <input type="text" id="new-title" placeholder="Titre">
-                <input type="text" id="new-url" placeholder="Lien MP4 direct">
-                <button onclick="autoUploadToGithub()">💾 Sauvegarder sur GitHub</button>
-            </section>
-
-            <h2 class="section-title">Shorts</h2>
-            <div id="shorts-grid" class="shorts-row"></div>
-
-            <h2 class="section-title">Vidéos suggérées</h2>
+        <main class="feed" id="main-feed">
             <div id="video-grid" class="video-grid"></div>
         </main>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
+    <div id="upload-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeUploadModal()">&times;</span>
+            <h3>Créer une vidéo</h3>
+            <input type="text" id="v-title" placeholder="Titre">
+            <input type="text" id="v-url" placeholder="Lien MP4 direct">
+            <input type="text" id="v-thumb" placeholder="Lien de la Miniature (Image)">
+            <button onclick="autoUploadToGithub()">🚀 Publier sur GitHub</button>
+        </div>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "TA_CLE",
-            authDomain: "TON_DOMAIN",
-            projectId: "TON_ID",
-            storageBucket: "TON_BUCKET",
-            appId: "TON_APP_ID"
-        };
+    <div id="profile-view" style="display:none;">
+        <div class="profile-header">
+            <img src="default-avatar.png" id="p-avatar" class="large-avatar">
+            <h2 id="p-name">Nom de la chaîne</h2>
+            <p id="p-desc">Aucune description.</p>
+            <button onclick="editDescription()">Personnaliser la description</button>
+        </div>
+        <div id="p-videos" class="video-grid">
+            <p>Aucune vidéo pour le moment.</p>
+        </div>
+    </div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-
-        // Upload Firebase
-        document.getElementById('btn-upload').addEventListener('click', async () => {
-            const file = document.getElementById('v-file').files[0];
-            const title = document.getElementById('v-title').value;
-            if (!file || !title) return alert("Remplis tout !");
-
-            const storageRef = ref(storage, 'videos/' + file.name);
-            const snapshot = await uploadBytes(storageRef, file);
-            const url = await getDownloadURL(snapshot.ref);
-
-            await addDoc(collection(db, "videos"), {
-                title: title,
-                url: url,
-                likes: 0,
-                type: "long"
-            });
-            alert("Publié !");
-        });
-
-        // Lecture en temps réel Firebase
-        onSnapshot(query(collection(db, "videos")), (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                if (change.type === "added") {
-                    renderVideo(change.doc.data());
-                }
-            });
-        });
-    </script>
     <script src="app.js"></script>
 </body>
 </html>
