@@ -2,69 +2,107 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>MyTube Cloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTube Cloud - Edonis</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>MyTube Cloud</h1>
-        <div id="admin-tools" style="display:none;">
-            <input type="text" id="admin-input" placeholder="Nouvel admin">
-            <button onclick="addNewAdmin()">Promouvoir</button>
+        <div class="header-left">
+            <span class="logo">▶ MyTube</span>
+            <div id="admin-tools" style="display:none;">
+                <span class="badge-admin">ADMIN</span>
+            </div>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Rechercher une vidéo...">
+            <button onclick="searchVideo()">🔍</button>
+        </div>
+        <div class="header-right">
+            <button class="btn-login" onclick="loginGoogle()">Connexion</button>
         </div>
     </header>
 
-    <main>
-        <div id="upload-box">
-            <input type="text" id="v-title" placeholder="Titre">
-            <input type="file" id="v-file" accept="video/mp4">
-            <button onclick="handleUpload()">Publier sur le Cloud</button>
-        </div>
+    <div class="main-container">
+        <nav class="sidebar">
+            <ul>
+                <li onclick="location.reload()">🏠 Accueil</li>
+                <li>📱 Shorts</li>
+                <li>📺 Abonnements</li>
+                <hr>
+                <li>🕒 Historique</li>
+                <li>👤 Ma Chaîne</li>
+            </ul>
+        </nav>
 
-        <div id="video-grid"></div>
-    </main>
+        <main class="feed">
+            <section id="upload-box" class="admin-panel">
+                <h3>Publier un fichier MP4 (Cloud)</h3>
+                <input type="text" id="v-title" placeholder="Titre de la vidéo">
+                <input type="file" id="v-file" accept="video/mp4">
+                <button id="btn-upload">🚀 Publier sur Firebase</button>
+            </section>
+
+            <section id="admin-panel" class="admin-panel" style="display:none;">
+                <h3>Ajouter via lien direct (GitHub Sync)</h3>
+                <input type="text" id="new-title" placeholder="Titre">
+                <input type="text" id="new-url" placeholder="Lien MP4 direct">
+                <button onclick="autoUploadToGithub()">💾 Sauvegarder sur GitHub</button>
+            </section>
+
+            <h2 class="section-title">Shorts</h2>
+            <div id="shorts-grid" class="shorts-row"></div>
+
+            <h2 class="section-title">Vidéos suggérées</h2>
+            <div id="video-grid" class="video-grid"></div>
+        </main>
+    </div>
 
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-      import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-      import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
 
-      const firebaseConfig = {
-        // COLLE TA CONFIGURATION ICI
-      };
+        const firebaseConfig = {
+            apiKey: "TA_CLE",
+            authDomain: "TON_DOMAIN",
+            projectId: "TON_ID",
+            storageBucket: "TON_BUCKET",
+            appId: "TON_APP_ID"
+        };
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-      const storage = getStorage(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
 
-      // Exposer les fonctions au window pour le HTML
-      window.handleUpload = async () => {
-          const file = document.getElementById('v-file').files[0];
-          const title = document.getElementById('v-title').value;
+        // Upload Firebase
+        document.getElementById('btn-upload').addEventListener('click', async () => {
+            const file = document.getElementById('v-file').files[0];
+            const title = document.getElementById('v-title').value;
+            if (!file || !title) return alert("Remplis tout !");
 
-          // 1. Upload du fichier vidéo dans Storage
-          const storageRef = ref(storage, 'videos/' + file.name);
-          const snapshot = await uploadBytes(storageRef, file);
-          const url = await getDownloadURL(snapshot.ref);
+            const storageRef = ref(storage, 'videos/' + file.name);
+            const snapshot = await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(snapshot.ref);
 
-          <section id="admin-panel" style="display:none; padding:20px; background:#222; border-radius:10px;">
-    <h3>Ajouter une vidéo (Admin)</h3>
-    <input type="text" id="new-title" placeholder="Titre de la vidéo">
-    <input type="text" id="new-url" placeholder="Lien MP4">
-    <button onclick="autoUploadToGithub()">Envoyer sur le site</button>
-</section>
+            await addDoc(collection(db, "videos"), {
+                title: title,
+                url: url,
+                likes: 0,
+                type: "long"
+            });
+            alert("Publié !");
+        });
 
-          // 2. Enregistrement des infos dans Firestore
-          await addDoc(collection(db, "videos"), {
-              title: title,
-              url: url,
-              likes: 0,
-              owner: "edonis.imbert@gmail.com"
-          });
-
-          alert("Vidéo publiée avec succès !");
-          location.reload();
-      };
+        // Lecture en temps réel Firebase
+        onSnapshot(query(collection(db, "videos")), (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                    renderVideo(change.doc.data());
+                }
+            });
+        });
     </script>
+    <script src="app.js"></script>
 </body>
 </html>
