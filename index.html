@@ -3,61 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyTube - Clone</title>
+    <title>MyTube</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <header>
-        <div class="header-left">
-            <span class="logo">▶ MyTube</span>
+        <div class="logo" onclick="loadPage('home')">
+            <span>MyTube</span>
         </div>
-        <div class="search-bar">
-            <input type="text" id="search-input" placeholder="Rechercher une vidéo...">
-            <button onclick="searchVideo()">🔍</button>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Rechercher">
+            <button onclick="handleSearch()">🔍</button>
         </div>
-        <div class="header-right">
-            <button class="icon-btn" onclick="openUploadModal()">➕</button>
-            <button class="btn-login" id="profile-btn" onclick="showProfile()">Connexion</button>
+
+        <div class="header-icons">
+            <button onclick="openUploadModal()">➕</button>
+            
+            <button id="authBtn" class="btn-login" onclick="handleAuthClick()">
+                👤 <span>Se connecter</span>
+            </button>
         </div>
     </header>
 
-    <div class="main-container">
+    <div class="main-body">
         <nav class="sidebar">
-            <ul>
-                <li onclick="showHome()">🏠 Accueil</li>
-                <li>📱 Shorts</li>
-                <li onclick="showSubscribed()">📺 Abonnements</li>
-                <hr>
-                <li onclick="showHistory()">🕒 Historique</li>
-                <li onclick="showMyChannel()">👤 Ma Chaîne</li>
-            </ul>
+            <div class="nav-link" onclick="loadPage('home')">🏠 <span>Accueil</span></div>
+            <div class="nav-link">📱 <span>Shorts</span></div>
+            <div class="nav-link" onclick="loadPage('subs')">📺 <span>Abonnements</span></div>
+            <hr style="border-color: #333; width: 100%;">
+            <div class="nav-link" onclick="loadPage('profile')">👤 <span>Ma Chaîne</span></div>
         </nav>
 
-        <main class="feed" id="main-feed">
-            <div id="video-grid" class="video-grid"></div>
+        <main class="content" id="mainContent">
+            <div id="videoGrid" class="video-grid"></div>
         </main>
     </div>
 
-    <div id="upload-modal" class="modal">
+    <div id="uploadModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeUploadModal()">&times;</span>
-            <h3>Créer une vidéo</h3>
-            <input type="text" id="v-title" placeholder="Titre">
-            <input type="text" id="v-url" placeholder="Lien MP4 direct">
-            <input type="text" id="v-thumb" placeholder="Lien de la Miniature (Image)">
-            <button onclick="autoUploadToGithub()">🚀 Publier sur GitHub</button>
+            <span class="close" onclick="closeModal('uploadModal')">&times;</span>
+            <h2>Créer une vidéo</h2>
+            <div class="input-group">
+                <label>Titre</label>
+                <input type="text" id="upTitle" placeholder="Titre de la vidéo">
+            </div>
+            <div class="input-group">
+                <label>Lien du fichier (MP4)</label>
+                <input type="text" id="upUrl" placeholder="https://...">
+            </div>
+            <div class="input-group">
+                <label>Miniature (Image URL)</label>
+                <input type="text" id="upThumb" placeholder="https://...">
+            </div>
+            <button class="btn-primary" onclick="submitVideo()">PUBLIER</button>
         </div>
     </div>
 
-    <div id="profile-view" style="display:none;">
-        <div class="profile-header">
-            <img src="default-avatar.png" id="p-avatar" class="large-avatar">
-            <h2 id="p-name">Nom de la chaîne</h2>
-            <p id="p-desc">Aucune description.</p>
-            <button onclick="editDescription()">Personnaliser la description</button>
-        </div>
-        <div id="p-videos" class="video-grid">
-            <p>Aucune vidéo pour le moment.</p>
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2 style="color: #3ea6ff;">G Connexion</h2>
+            <p>Accéder à MyTube</p>
+            <div class="input-group">
+                <input type="email" id="loginEmail" placeholder="Adresse e-mail">
+            </div>
+            <div class="input-group" id="passGroup" style="display:none;">
+                <input type="password" id="loginPass" placeholder="Mot de passe">
+            </div>
+            <div class="input-group" id="nameGroup" style="display:none;">
+                <input type="text" id="loginName" placeholder="Comment voulez-vous vous appeler ?">
+            </div>
+            <button id="loginNextBtn" class="btn-primary" onclick="loginStep()">Suivant</button>
         </div>
     </div>
 
