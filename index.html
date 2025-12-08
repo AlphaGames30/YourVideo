@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>MyTube Cloud</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>MyTube Cloud</h1>
+        <div id="admin-tools" style="display:none;">
+            <input type="text" id="admin-input" placeholder="Nouvel admin">
+            <button onclick="addNewAdmin()">Promouvoir</button>
+        </div>
+    </header>
+
+    <main>
+        <div id="upload-box">
+            <input type="text" id="v-title" placeholder="Titre">
+            <input type="file" id="v-file" accept="video/mp4">
+            <button onclick="handleUpload()">Publier sur le Cloud</button>
+        </div>
+
+        <div id="video-grid"></div>
+    </main>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+      import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+      import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
+
+      const firebaseConfig = {
+        // COLLE TA CONFIGURATION ICI
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const storage = getStorage(app);
+
+      // Exposer les fonctions au window pour le HTML
+      window.handleUpload = async () => {
+          const file = document.getElementById('v-file').files[0];
+          const title = document.getElementById('v-title').value;
+
+          // 1. Upload du fichier vidéo dans Storage
+          const storageRef = ref(storage, 'videos/' + file.name);
+          const snapshot = await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(snapshot.ref);
+
+          // 2. Enregistrement des infos dans Firestore
+          await addDoc(collection(db, "videos"), {
+              title: title,
+              url: url,
+              likes: 0,
+              owner: "edonis.imbert@gmail.com"
+          });
+
+          alert("Vidéo publiée avec succès !");
+          location.reload();
+      };
+    </script>
+</body>
+</html>
