@@ -188,10 +188,20 @@
 
 
     <script>
-        // CONFIGURATION
-        const GITHUB_TOKEN = "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";
-        const REPO = "AlphaGames30/YourVideo";
-        // L'image d'avatar par défaut ne devrait pas être bloquée
+        // --- CONFIGURATION ---
+        // ATTENTION: REMPLACER LE TEXTE VIDE PAR VOTRE Jeton Personnel GitHub (EXPOSÉ AU PUBLIC)
+        const GITHUB_TOKEN = "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"; 
+        
+        // URL RAW de votre Gist videos.json
+        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/55dc4daff127bd08206e7f20c64a95a9971a5f7b/video.json";
+        
+        // ID de votre Gist (doit être extrait de l'URL du Gist. Ex: 5248424f9cc79feb78c0560faad87c92)
+        const GIST_ID = "5248424f9cc79feb78c0560faad87c92"; 
+        
+        // Nom du fichier dans le Gist
+        const GIST_FILE_NAME = "video.json";
+        
+        // Images par défaut
         const DEFAULT_AVATAR = 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Placeholder_square.svg/36px-Placeholder_square.svg.png'; 
 
         let registeredUsers = JSON.parse(localStorage.getItem('mt_users_db')) || {};
@@ -206,41 +216,82 @@
             },
 
             init: function() {
-                if (this.data.videos.length === 0) {
-                    this.data.videos = [
-                        { 
-                            id: 1, 
-                            title: "Bienvenue sur MyTube", 
-                            url: "https://www.w3schools.com/html/mov_bbb.mp4", 
-                            // Lien d'image simple et public pour la miniature
-                            thumb: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Placeholder_square.svg/300px-Placeholder_square.svg.png", 
-                            author: "Admin", 
-                            likes: 10, 
-                            dislikes: 0 
-                        },
-                        { 
-                            id: 2, 
-                            title: "Test Vidéo", 
-                            url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", 
-                            // Autre lien d'image simple et public pour la miniature
-                            thumb: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/YouTube_Logo_2017.svg/300px-YouTube_Logo_2017.svg.png", 
-                            author: "Test", 
-                            likes: 5, 
-                            dislikes: 0 
-                        }
-                    ];
-                    this.save();
+                this.loadVideosFromGist().then(() => {
+                    this.updateAuthUI();
+                    this.goHome();
+                });
+            },
+            
+            // --- FONCTION DE CHARGEMENT DU GIST ---
+            loadVideosFromGist: async function() {
+                try {
+                    const response = await fetch(GIST_URL);
+                    if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+                    
+                    const data = await response.json();
+                    
+                    // Remplace les vidéos locales par les vidéos du Gist
+                    this.data.videos = data;
+                    console.log("Données chargées depuis Gist.");
+                    this.save(); // Sauvegarde localement après le chargement du Gist
+                } catch (error) {
+                    console.error("Échec du chargement du Gist:", error);
+                    alert("Impossible de charger les vidéos du serveur (Gist). Affichage des données locales.");
+                    
+                    // Charge les données par défaut si le Gist échoue et qu'il n'y a pas de données locales.
+                    if (this.data.videos.length === 0) {
+                        this.data.videos = [
+                            { id: 1, title: "Bienvenue sur MyTube", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Placeholder_square.svg/300px-Placeholder_square.svg.png", author: "Admin", likes: 10, dislikes: 0 },
+                            { id: 2, title: "Test Vidéo", url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", thumb: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/YouTube_Logo_2017.svg/300px-YouTube_Logo_2017.svg.png", author: "Test", likes: 5, dislikes: 0 }
+                        ];
+                    }
                 }
-                this.updateAuthUI();
-                this.goHome();
+            },
+            
+            // --- FONCTION DE MISE À JOUR DU GIST ---
+            updateGist: async function(newVideoList) {
+                if (!GITHUB_TOKEN) {
+                    console.warn("GITHUB_TOKEN non configuré. Les modifications ne seront pas sauvegardées sur le Gist.");
+                    return;
+                }
+                
+                const url = `https://api.github.com/gists/${GIST_ID}`;
+                
+                const payload = {
+                    description: "Mise à jour vidéo MyTube",
+                    files: {
+                        [GIST_FILE_NAME]: {
+                            content: JSON.stringify(newVideoList, null, 2)
+                        }
+                    }
+                };
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Échec de la mise à jour du Gist: ${response.statusText}`);
+                    }
+                    console.log("Gist mis à jour avec succès!");
+                } catch (error) {
+                    console.error("Erreur lors de la mise à jour du Gist:", error);
+                    alert("ERREUR: Impossible de sauvegarder les changements sur GitHub. Vérifiez le Jeton et le GIST_ID.");
+                }
             },
 
             save: function() {
-                localStorage.setItem('mt_videos', JSON.stringify(this.data.videos));
                 localStorage.setItem('mt_user', JSON.stringify(this.data.user));
                 localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
                 localStorage.setItem('mt_users_db', JSON.stringify(registeredUsers));
                 localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
+                // Les vidéos NE SONT PLUS SAUVEGARDÉES ici, elles sont gérées par le Gist
             },
 
             // --- NAVIGATION ---
@@ -256,7 +307,7 @@
                 document.getElementById('videoGrid').style.display = 'none';
                 document.getElementById('profileView').style.display = 'block';
 
-                const userAvatar = this.data.user.avatar || DEFAULT_AVATAR.replace('36px', '100px'); // Utilise le grand placeholder
+                const userAvatar = this.data.user.avatar || DEFAULT_AVATAR.replace('36px', '100px');
                 document.getElementById('profileAvatar').src = userAvatar;
                 document.getElementById('pName').innerText = this.data.user.name;
                 document.getElementById('pBio').innerText = this.data.user.bio || "Pas de description.";
@@ -281,12 +332,10 @@
                 
                 if (!newName) return alert("Le nom de chaîne ne peut pas être vide.");
 
-                // Met à jour l'utilisateur actuel
                 this.data.user.name = newName;
                 this.data.user.avatar = newAvatar;
                 this.data.user.bio = newBio;
                 
-                // Met à jour la base de données des utilisateurs enregistrés
                 registeredUsers[this.data.user.email] = this.data.user;
 
                 this.save();
@@ -303,12 +352,10 @@
                 grid.innerHTML = "";
 
                 list.forEach(v => {
-                    // Utilise un placeholder si la miniature n'est pas un lien HTTPS
                     const thumbSrc = (v.thumb && v.thumb.startsWith('http')) ? v.thumb : DEFAULT_AVATAR.replace('36px', '300px');
                     const isSub = this.data.subs.includes(v.author);
                     const userVote = this.data.votes[v.id];
 
-                    // Cherche l'avatar de l'auteur dans registeredUsers
                     let authorAvatar = DEFAULT_AVATAR;
                     for (const email in registeredUsers) {
                         if (registeredUsers[email].name === v.author) {
@@ -346,7 +393,7 @@
                 });
             },
 
-            handleVote: function(id, type) {
+            handleVote: async function(id, type) {
                 if(!this.data.user) return alert("Connecte-toi pour voter !");
 
                 const vid = this.data.videos.find(v => v.id === id);
@@ -356,20 +403,17 @@
                 let change = false;
 
                 if (currentVote === type) {
-                    // Clic sur le même bouton : Annuler le vote
                     this.data.votes[id] = 'none';
                     vid[type + 's'] = Math.max(0, vid[type + 's'] - 1);
                     change = true;
 
                 } else if (currentVote && currentVote !== 'none') {
-                    // Clic sur l'autre bouton : Changer de vote
                     vid[currentVote + 's'] = Math.max(0, vid[currentVote + 's'] - 1); 
                     vid[type + 's'] = (vid[type + 's'] || 0) + 1; 
                     this.data.votes[id] = type;
                     change = true;
 
                 } else {
-                    // Premier vote
                     vid[type + 's'] = (vid[type + 's'] || 0) + 1;
                     this.data.votes[id] = type;
                     change = true;
@@ -377,7 +421,9 @@
 
                 if (change) {
                     this.save();
-                    this.goHome(); 
+                    // Met à jour le Gist après le vote
+                    await this.updateGist(this.data.videos);
+                    this.goHome(); // Rafraîchir
                 }
             },
 
@@ -402,31 +448,13 @@
                 player.style.display = 'none';
             },
             
-            // --- Les autres fonctions (login/logout) sont inchangées. ---
-
-            goSubs: function() {
-                this.goHome();
-                const subVids = this.data.videos.filter(v => this.data.subs.includes(v.author));
-                if(subVids.length === 0) alert("Aucun abonnement.");
-                else this.render(subVids);
-            },
-
-            toggleSub: function(author) {
-                if(this.data.subs.includes(author)) {
-                    this.data.subs = this.data.subs.filter(s => s !== author);
-                } else {
-                    this.data.subs.push(author);
-                }
-                this.save();
-                this.goHome();
-            },
-
+            // --- UPLOAD / PUBLICATION ---
             openUpload: function() {
                 if(!this.data.user) return alert("Connecte-toi pour publier !");
                 document.getElementById('modalUpload').style.display = 'flex';
             },
 
-            publish: function() {
+            publish: async function() {
                 const title = document.getElementById('upTitle').value;
                 const url = document.getElementById('upUrl').value;
                 const thumb = document.getElementById('upThumb').value;
@@ -444,13 +472,15 @@
                 };
 
                 this.data.videos.unshift(newVideo);
-                this.save();
-
-                alert("Vidéo publiée avec succès !");
+                
+                await this.updateGist(this.data.videos); // Met à jour le Gist
+                
+                alert("Vidéo publiée et Gist mis à jour !");
                 this.closeModals();
                 this.goHome();
             },
             
+            // --- AUTHENTIFICATION ---
             doLogout: function() {
                 this.data.user = null;
                 this.save();
@@ -475,6 +505,24 @@
                     btn.style.border = "1px solid var(--blue)";
                     menu.style.display = 'none';
                 }
+            },
+            
+            // --- FONCTIONS SECONDAIRES (Inchagées) ---
+            goSubs: function() {
+                this.goHome();
+                const subVids = this.data.videos.filter(v => this.data.subs.includes(v.author));
+                if(subVids.length === 0) alert("Aucun abonnement.");
+                else this.render(subVids);
+            },
+
+            toggleSub: function(author) {
+                if(this.data.subs.includes(author)) {
+                    this.data.subs = this.data.subs.filter(s => s !== author);
+                } else {
+                    this.data.subs.push(author);
+                }
+                this.save();
+                this.goHome();
             },
             
             closeModals: function() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); },
