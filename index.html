@@ -131,7 +131,9 @@
             <span class="close" onclick="app.closeModals()">&times;</span>
             <h2>Publier une vidéo</h2>
             <input type="text" id="upTitle" placeholder="Titre de la vidéo">
-            <input type="text" id="upUrl" placeholder="Lien direct MP4 (ex: https://...)">
+            
+            <label for="upVideoFile" style="display:block; margin: 10px 0; color:#aaa; font-size:14px;">Sélectionnez le fichier Vidéo (MP4, etc.)</label>
+            <input type="file" id="upVideoFile" accept="video/*" style="background: none; border: none; padding: 0;">
             
             <label for="upThumbFile" style="display:block; margin: 10px 0; color:#aaa; font-size:14px;">Sélectionnez la Miniature (JPG/PNG)</label>
             <input type="file" id="upThumbFile" accept="image/*" style="background: none; border: none; padding: 0;">
@@ -204,9 +206,7 @@
         const GIST_ID = "5248424f9cc79feb78c0560faad87c92"; 
         const GIST_FILE_NAME = "video.json";
         
-        // L'URL du proxy est VIDE, car la méthode Data URI est désormais utilisée
-        // const IMAGE_PROXY_URL = ""; 
-
+        // Base de données des utilisateurs (sauvegardée localement)
         let registeredUsers = JSON.parse(localStorage.getItem('mt_users_db')) || {};
         let currentPin = null;
 
@@ -250,13 +250,12 @@
                     
                     const data = await response.json();
                     this.data.videos = data;
-                    localStorage.setItem('mt_videos', JSON.stringify(data)); // Sauvegarde locale
+                    localStorage.setItem('mt_videos', JSON.stringify(data)); 
                     console.log("Données chargées depuis Gist.");
                 } catch (error) {
                     console.error("Échec du chargement du Gist:", error);
                     alert("Impossible de charger les vidéos du serveur (Gist). Affichage des données locales.");
                     
-                    // Chargement des vidéos de secours si le Gist échoue
                     if (this.data.videos.length === 0) {
                         this.data.videos = [
                             { id: 1, title: "Bienvenue sur MyTube", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "", author: "Admin", likes: 10, dislikes: 0 },
@@ -267,16 +266,15 @@
                 this.save();
             },
             
-            // --- FONCTION DE MISE À JOUR DU GIST ---
+            // --- FONCTION DE MISE À JOUR DU GIST (AVEC DÉBOGAGE) ---
             updateGist: async function(newVideoList) {
                 if (!GITHUB_TOKEN) {
                     console.warn("GITHUB_TOKEN non configuré. Les modifications ne seront pas sauvegardées sur le Gist.");
                     return;
                 }
                 
-                // ⚠️ VERIFICATION CRITIQUE : AFFICHE L'URL UTILISÉE
                 const url = `https://api.github.com/gists/${GIST_ID}`;
-                console.log("URL de l'API Gist utilisée:", url); // <--- AJOUTEZ CETTE LIGNE
+                console.log("URL de l'API Gist utilisée:", url); // <--- LIGNE DE DÉBOGAGE
 
                 const payload = {
                     files: {
@@ -297,18 +295,16 @@
                     });
 
                     if (!response.ok) {
-                        // ⚠️ AFFICHE LE STATUT HTTP D'ERREUR
-                        console.error("Erreur de statut Gist:", response.status, response.statusText); // <--- AJOUTEZ CETTE LIGNE
-                        // Tente de lire le corps de l'erreur pour plus de détails
+                        console.error("Erreur de statut Gist:", response.status, response.statusText); // <--- LIGNE DE DÉBOGAGE
                         const errorBody = await response.json();
-                        console.error("Corps de l'erreur Gist:", errorBody); // <--- AJOUTEZ CETTE LIGNE
+                        console.error("Corps de l'erreur Gist:", errorBody); // <--- LIGNE DE DÉBOGAGE
                         
                         throw new Error(`Échec de la mise à jour du Gist: ${response.statusText}`);
                     }
                     console.log("Gist mis à jour avec succès!");
                 } catch (error) {
                     console.error("Erreur générale lors de la mise à jour du Gist:", error);
-                    alert("ERREUR: Impossible de sauvegarder les changements sur GitHub. Vérifiez le Jeton et le GIST_ID.");
+                    alert("ERREUR: Impossible de sauvegarder les changements sur GitHub. Le Token ou l'ID est probablement incorrect.");
                 }
             },
 
@@ -319,7 +315,7 @@
                 localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
             },
 
-            // --- NAVIGATION ---
+            // --- NAVIGATION et AFFICHAGE (Render) ---
             goHome: function() {
                 document.getElementById('profileView').style.display = 'none';
                 document.getElementById('videoGrid').style.display = 'grid';
@@ -344,37 +340,6 @@
                 this.render(myVids, 'pVideos');
             },
             
-            // --- Personnalisation de Chaîne ---
-            openEditProfile: function() {
-                if(!this.data.user) return;
-                document.getElementById('editName').value = this.data.user.name;
-                document.getElementById('editAvatar').value = this.data.user.avatar || '';
-                document.getElementById('editBio').value = this.data.user.bio || '';
-                document.getElementById('modalEditProfile').style.display = 'flex';
-            },
-
-            saveProfile: function() {
-                const newName = document.getElementById('editName').value;
-                const newAvatar = document.getElementById('editAvatar').value;
-                const newBio = document.getElementById('editBio').value;
-                
-                if (!newName) return alert("Le nom de chaîne ne peut pas être vide.");
-
-                this.data.user.name = newName;
-                this.data.user.avatar = newAvatar.startsWith('http') ? newAvatar : ''; 
-                this.data.user.bio = newBio;
-                
-                registeredUsers[this.data.user.email] = this.data.user;
-
-                this.save();
-                this.updateAuthUI();
-                this.closeModals();
-                this.goProfile();
-                alert("Profil mis à jour !");
-            },
-
-
-            // --- AFFICHAGE / ACTIONS VIDÉO ---
             render: function(list, targetId = 'videoGrid') {
                 const grid = document.getElementById(targetId);
                 grid.innerHTML = "";
@@ -384,22 +349,20 @@
                     let thumbSrc;
                     
                     if (v.thumb && v.thumb.startsWith('data:image/')) {
-                        // MINIATURE EN DATA URI (Intégrée) - GARANTIE D'AFFICHAGE
+                        // MINIATURE EN DATA URI (Intégrée) - AFFICHAGE GARANTI
                         thumbSrc = v.thumb;
                     } else if (v.thumb && v.thumb.startsWith('http')) {
-                        // Si l'utilisateur a quand même mis un lien externe, on l'utilise mais on sait qu'il risque d'être bloqué.
                         thumbSrc = v.thumb; 
                     } 
                     else {
-                        // Miniature manquante ou vide, utilise le placeholder SVG gris
+                        // Placeholder SVG
                         thumbSrc = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='170' viewBox='0 0 300 170'>
                            <rect width='300' height='170' fill='#272727'/>
                            <text x='150' y='85' dominant-baseline='middle' text-anchor='middle' fill='#AAAAAA' font-size='20' font-family='Arial'>MINIATURE MANQUANTE</text>
                         </svg>`.replace(/#/g, '%23');
                     }
 
-
-                    // Avatar Auteur : Si l'auteur a un lien, utilise-le. Sinon, génère l'avatar SVG.
+                    // Avatar Auteur 
                     let authorAvatar = this.generateAvatarUrl(v.author, 36);
                     for (const email in registeredUsers) {
                         if (registeredUsers[email].name === v.author && registeredUsers[email].avatar && registeredUsers[email].avatar.startsWith('http')) {
@@ -440,50 +403,16 @@
                 });
             },
             
-            // ... (Autres fonctions inchangées) ...
-
-            handleVote: async function(id, type) {
-                if(!this.data.user) return alert("Connecte-toi pour voter !");
-
-                const vid = this.data.videos.find(v => v.id === id);
-                if (!vid) return;
-
-                const currentVote = this.data.votes[id];
-                let change = false;
-
-                if (currentVote === type) {
-                    this.data.votes[id] = 'none';
-                    vid[type + 's'] = Math.max(0, vid[type + 's'] - 1);
-                    change = true;
-
-                } else if (currentVote && currentVote !== 'none') {
-                    vid[currentVote + 's'] = Math.max(0, vid[currentVote + 's'] - 1); 
-                    vid[type + 's'] = (vid[type + 's'] || 0) + 1; 
-                    this.data.votes[id] = type;
-                    change = true;
-
-                } else {
-                    vid[type + 's'] = (vid[type + 's'] || 0) + 1;
-                    this.data.votes[id] = type;
-                    change = true;
-                }
-
-                if (change) {
-                    this.save();
-                    await this.updateGist(this.data.videos);
-                    this.goHome(); 
-                }
-            },
-
+            // --- LECTURE VIDÉO ---
             playVideo: function(id, url, title) {
-                if (!url || !url.startsWith('http')) {
-                    return alert("Erreur: Le lien vidéo doit être une URL HTTPS/HTTP directe (format .mp4 idéalement).");
+                if (!url) {
+                    return alert("Erreur: Le lien vidéo est vide.");
                 }
                 const player = document.getElementById('playerModal');
                 const videoEl = document.getElementById('mainVideoPlayer');
 
                 document.getElementById('playerTitle').innerText = title;
-                videoEl.src = url;
+                videoEl.src = url; // Qu'elle soit Data URI ou URL HTTPS
                 player.style.display = 'flex';
                 videoEl.play();
             },
@@ -498,34 +427,53 @@
             
             openUpload: function() {
                 if(!this.data.user) return alert("Connecte-toi pour publier !");
-                // Réinitialise le champ de fichier à l'ouverture
                 document.getElementById('upThumbFile').value = ''; 
+                document.getElementById('upVideoFile').value = ''; 
+                document.getElementById('upTitle').value = ''; 
                 document.getElementById('modalUpload').style.display = 'flex';
             },
 
-            // --- NOUVELLE FONCTION PUBLISH AVEC LECTURE DE FICHIER ---
+            // --- NOUVELLE FONCTION PUBLISH AVEC DOUBLE LECTURE DE FICHIERS ---
             publish: async function() {
                 const title = document.getElementById('upTitle').value;
-                const url = document.getElementById('upUrl').value;
-                const fileInput = document.getElementById('upThumbFile');
+                const thumbInput = document.getElementById('upThumbFile');
+                const videoInput = document.getElementById('upVideoFile');
 
-                if(!title || !url || !fileInput.files.length) {
-                    return alert("Titre, Lien vidéo, et Miniature (fichier image) sont requis !");
+                if (!title || !thumbInput.files.length || !videoInput.files.length) {
+                    return alert("Titre, Miniature, et Fichier Vidéo sont requis !");
                 }
 
-                const file = fileInput.files[0];
+                const thumbFile = thumbInput.files[0];
+                const videoFile = videoInput.files[0];
 
-                const reader = new FileReader();
-                reader.readAsDataURL(file); // Lit le fichier en tant que Data URI
+                if (videoFile.size > 5 * 1024 * 1024) {
+                    return alert("Erreur: Le fichier vidéo est trop volumineux (max 5MB pour le Gist). Pour les grandes vidéos, vous devrez utiliser un lien externe.");
+                }
 
-                reader.onload = async function () {
-                    const thumbDataUri = reader.result; 
+                // Création d'une promesse pour lire la miniature
+                const readThumb = new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(thumbFile);
+                });
+
+                // Création d'une promesse pour lire la vidéo
+                const readVideo = new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(videoFile);
+                });
+                
+                try {
+                    // Attend la lecture des deux fichiers
+                    const [thumbDataUri, videoDataUri] = await Promise.all([readThumb, readVideo]);
 
                     const newVideo = {
                         id: Date.now(),
                         title: title,
-                        url: url,
-                        // Stocke la miniature directement en Data URI dans le Gist
+                        url: videoDataUri, 
                         thumb: thumbDataUri, 
                         author: app.data.user.name,
                         likes: 0,
@@ -534,18 +482,18 @@
 
                     app.data.videos.unshift(newVideo);
                     
-                    await app.updateGist(app.data.videos); // Sauvegarde
+                    await app.updateGist(app.data.videos);
                     
                     alert("Vidéo publiée et Gist mis à jour !");
                     app.closeModals();
                     app.goHome();
-                };
-
-                reader.onerror = function (error) {
-                    console.error('Erreur lors de la lecture du fichier:', error);
-                    alert("Erreur lors du chargement de la miniature. Veuillez essayer une autre image.");
-                };
+                } catch (error) {
+                    console.error("Erreur lors du chargement des fichiers:", error);
+                    alert("Erreur lors du chargement des fichiers. Assurez-vous que les fichiers ne sont pas trop grands.");
+                }
             },
+            
+            // --- Fonctions Auth / Profil (inchangées) ---
             
             doLogout: function() {
                 this.data.user = null;
