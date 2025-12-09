@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyTube - Final Danew</title>
     <style>
-        /* --- CSS YOUTUBE DARK (Le code CSS précédent pour le style est conservé ici) --- */
+        /* --- CSS YOUTUBE DARK (Conservation du style) --- */
         :root {
             --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa;
             --hover: #272727; --blue: #3ea6ff; --red: #ff0000;
@@ -48,8 +48,14 @@
         .close { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; }
         input { width: 100%; padding: 10px; margin: 10px 0; background: #121212; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
         .btn-blue { width: 100%; padding: 10px; background: var(--blue); color: black; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        
-        /* MENU COMPTE DEROULANT */
+
+        /* PROFIL AJOUTÉ */
+        .profile-view { display: none; padding: 0 20px; }
+        .banner { height: 150px; background: linear-gradient(90deg, #b92b27, #1565C0); border-radius: 15px; }
+        .profile-head { display: flex; margin-top: -40px; padding: 0 20px; align-items: flex-end; }
+        .avatar-big { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--bg); background: #555; }
+        /* FIN PROFIL AJOUTÉ */
+
         .account-menu {
             position: absolute; top: 60px; right: 10px; background: #282828; border-radius: 10px; padding: 10px;
             width: 200px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 150; display: none;
@@ -93,8 +99,20 @@
 
         <main class="content">
             <div id="videoGrid" class="video-grid"></div>
+
             <div id="profileView" class="profile-view">
+                <div class="banner"></div>
+                <div class="profile-head">
+                    <img src="https://via.placeholder.com/100" class="avatar-big">
+                    <div style="margin-left: 20px;">
+                        <h1 id="pName">Nom</h1>
+                        <p id="pBio" style="color:#aaa;">Bio...</p>
+                        <button class="action-pill" onclick="app.editBio()">✎ Personnaliser</button>
+                    </div>
                 </div>
+                <h3>Mes Vidéos</h3>
+                <div id="pVideos" class="video-grid"></div>
+            </div>
         </main>
     </div>
 
@@ -125,7 +143,7 @@
             <button class="btn-blue" onclick="app.loginStep(1)">Suivant</button>
         </div>
     </div>
-    
+
     <div id="modalLoginRegister" class="modal">
         <div class="modal-box">
             <span class="close" onclick="app.closeModals()">&times;</span>
@@ -159,21 +177,20 @@
 
     <script>
         // CONFIGURATION
-        const GITHUB_TOKEN = "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"; 
+        const GITHUB_TOKEN = "";
         const REPO = "AlphaGames30/YourVideo";
-        
+
         let registeredUsers = JSON.parse(localStorage.getItem('mt_users_db')) || {};
-        let currentPin = null; 
+        let currentPin = null;
 
         const app = {
             data: {
-                user: JSON.parse(localStorage.getItem('mt_user')), // Utilisateur actuellement connecté
+                user: JSON.parse(localStorage.getItem('mt_user')),
                 videos: JSON.parse(localStorage.getItem('mt_videos')) || [],
                 subs: JSON.parse(localStorage.getItem('mt_subs')) || []
             },
 
             init: function() {
-                // ... (Initialisation des vidéos par défaut) ...
                 if (this.data.videos.length === 0) {
                     this.data.videos = [
                         { id: 1, title: "Bienvenue sur MyTube", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "", author: "Admin", likes: 10, dislikes: 0 },
@@ -191,10 +208,44 @@
                 localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
                 localStorage.setItem('mt_users_db', JSON.stringify(registeredUsers));
             },
-            
+
+            // --- NAVIGATION ---
+            goHome: function() {
+                document.getElementById('profileView').style.display = 'none';
+                document.getElementById('videoGrid').style.display = 'grid';
+                this.render(this.data.videos);
+            },
+
+            /**
+             * FONCTION MA CHAÎNE CORRIGÉE
+             */
+            goProfile: function() {
+                // 1. Vérifie si l'utilisateur est connecté
+                if(!this.data.user) return alert("Connecte-toi d'abord pour voir ta chaîne !");
+
+                // 2. Affiche la vue
+                document.getElementById('videoGrid').style.display = 'none';
+                document.getElementById('profileView').style.display = 'block';
+
+                // 3. Rempli les informations du profil
+                document.getElementById('pName').innerText = this.data.user.name;
+                document.getElementById('pBio').innerText = this.data.user.bio || "Pas de description.";
+
+                // 4. Filtre et affiche les vidéos de l'utilisateur
+                const myVids = this.data.videos.filter(v => v.author === this.data.user.name);
+                this.render(myVids, 'pVideos');
+            },
+
+            goSubs: function() {
+                this.goHome();
+                const subVids = this.data.videos.filter(v => this.data.subs.includes(v.author));
+                if(subVids.length === 0) alert("Aucun abonnement.");
+                else this.render(subVids);
+            },
+
             // --- GESTION DES MODALS ET COMPTE ---
             closeModals: function() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); },
-            
+
             toggleAccountMenu: function() {
                 if(!this.data.user) return this.openLogin();
                 const menu = document.getElementById('accountMenu');
@@ -225,8 +276,7 @@
                     menu.style.display = 'none';
                 }
             },
-            
-            // --- FLUX DE CONNEXION SÉCURISÉ (4 MODALS) ---
+
             openLogin: function() {
                 this.closeModals();
                 document.getElementById('modalLoginEmail').style.display = 'flex';
@@ -238,30 +288,30 @@
                 const email = document.getElementById('logEmail').value.toLowerCase();
                 const existingUser = registeredUsers[email];
 
-                if (step === 1) { // Vérification Email
+                if (step === 1) {
                     if(!email || !email.includes('@')) return alert("Email invalide.");
-                    
+
                     if (existingUser) {
                         document.getElementById('welcomeUser').innerText = `Bienvenue, ${existingUser.name}`;
                         document.getElementById('logPass').value = '';
-                        document.getElementById('modalLoginPass').style.display = 'flex'; // MDP pour connexion
+                        document.getElementById('modalLoginPass').style.display = 'flex';
                     } else {
                         document.getElementById('logNewName').value = '';
                         document.getElementById('logNewPass').value = '';
-                        document.getElementById('modalLoginRegister').style.display = 'flex'; // Création de compte
+                        document.getElementById('modalLoginRegister').style.display = 'flex';
                     }
-                } else if (step === 2) { // Création de compte (Register)
+                } else if (step === 2) {
                     const name = document.getElementById('logNewName').value;
                     const pass = document.getElementById('logNewPass').value;
-                    
+
                     if(!name || pass.length < 3) return alert("Pseudo et MDP (min 3 chars) requis.");
-                    
+
                     registeredUsers[email] = { name: name, password: pass, email: email, bio: "Nouveau sur MyTube !" };
                     this.data.user = registeredUsers[email];
                     this.save();
                     this.updateAuthUI();
                     alert(`Compte créé et connecté ! Bienvenue, ${name}.`);
-                } else if (step === 3) { // Vérification du Mot de Passe
+                } else if (step === 3) {
                     const enteredPass = document.getElementById('logPass').value;
                     if (enteredPass === existingUser.password) {
                         this.data.user = existingUser;
@@ -270,24 +320,22 @@
                         alert(`Connexion réussie !`);
                     } else {
                         alert("Mot de passe incorrect.");
-                        this.openLogin(); // Recommence le flux
+                        this.openLogin();
                     }
                 }
             },
 
-            // --- MOT DE PASSE OUBLIÉ (SIMULATION) ---
             openForgotPassword: function() {
                 this.closeModals();
                 const email = document.getElementById('logEmail').value.toLowerCase();
                 const user = registeredUsers[email];
-                
+
                 if (!user) return alert("Cet email n'existe pas !");
-                
+
                 currentPin = Math.floor(100000 + Math.random() * 900000).toString();
-                
-                // Le message d'alerte simule l'envoi du PIN
+
                 alert(`SIMULATION D'EMAIL : Votre code PIN est : ${currentPin}.`);
-                
+
                 document.getElementById('pinMessage').innerText = `Veuillez entrer le code PIN que vous auriez reçu par email (${email}).`;
                 document.getElementById('modalForgotPass').style.display = 'flex';
             },
@@ -295,11 +343,11 @@
             verifyPin: function() {
                 const enteredPin = document.getElementById('pinCode').value;
                 const email = document.getElementById('logEmail').value.toLowerCase();
-                
+
                 if (enteredPin === currentPin) {
                     const user = registeredUsers[email];
                     alert(`Code vérifié. Votre mot de passe est : ${user.password}`);
-                    currentPin = null; // Invalider le PIN
+                    currentPin = null;
                     this.closeModals();
                     this.openLogin();
                 } else {
@@ -308,16 +356,15 @@
             },
 
 
-            // --- ACTIONS VIDÉO (Inclus Like/Dislike) ---
+            // --- AFFICHAGE / ACTIONS VIDÉO ---
             render: function(list, targetId = 'videoGrid') {
                 const grid = document.getElementById(targetId);
                 grid.innerHTML = "";
-                
+
                 list.forEach(v => {
-                    // ... (logique de rendu simplifiée) ...
                     const thumbSrc = v.thumb && v.thumb.startsWith('http') ? v.thumb : 'https://via.placeholder.com/300x170/000000/FFFFFF/?text=MyTube+Video';
                     const isSub = this.data.subs.includes(v.author);
-                    
+
                     grid.innerHTML += `
                         <div class="video-card">
                             <div class="thumb-container" onclick="app.playVideo('${v.url}', '${v.title}')">
@@ -352,44 +399,88 @@
 
                 const vid = this.data.videos.find(v => v.id === id);
                 if (vid) {
-                    // La logique de vote unique est complexe sans serveur, donc on fait un simple compteur pour l'instant
-                    // Le système ne vérifie pas l'utilisateur, mais incrémente pour simuler l'action
                     if (type === 'like') {
                         vid.likes = (vid.likes || 0) + 1;
                     } else if (type === 'dislike') {
                         vid.dislikes = (vid.dislikes || 0) + 1;
                     }
                     this.save();
-                    this.goHome(); // Rafraichir
+                    this.goHome();
                 }
             },
-            
-            // ... (Autres fonctions : goHome, goProfile, publish, etc., sont conservées) ...
-            
-            // Simuler les autres fonctions pour la clarté :
-            goHome: function() {
-                // ... (code goHome) ...
-            },
-            goProfile: function() {
-                // ... (code goProfile) ...
-            },
+
             playVideo: function(url, title) {
-                // ... (code playVideo) ...
+                if (!url) return alert("Erreur: Lien vidéo manquant");
+                const player = document.getElementById('playerModal');
+                const videoEl = document.getElementById('mainVideoPlayer');
+
+                document.getElementById('playerTitle').innerText = title;
+                videoEl.src = url;
+                player.style.display = 'flex';
+                videoEl.play();
             },
+
             closePlayer: function() {
-                // ... (code closePlayer) ...
+                const player = document.getElementById('playerModal');
+                const videoEl = document.getElementById('mainVideoPlayer');
+                videoEl.pause();
+                videoEl.src = "";
+                player.style.display = 'none';
             },
+
             toggleSub: function(author) {
-                // ... (code toggleSub) ...
+                if(this.data.subs.includes(author)) {
+                    this.data.subs = this.data.subs.filter(s => s !== author);
+                } else {
+                    this.data.subs.push(author);
+                }
+                this.save();
+                this.goHome();
             },
+
+            openUpload: function() {
+                if(!this.data.user) return alert("Connecte-toi pour publier !");
+                document.getElementById('modalUpload').style.display = 'flex';
+            },
+
             publish: function() {
-                // ... (code publish) ...
+                const title = document.getElementById('upTitle').value;
+                const url = document.getElementById('upUrl').value;
+                const thumb = document.getElementById('upThumb').value;
+
+                if(!title || !url) return alert("Il faut au moins un Titre et un Lien vidéo !");
+
+                const newVideo = {
+                    id: Date.now(),
+                    title: title,
+                    url: url,
+                    thumb: thumb,
+                    author: this.data.user.name,
+                    likes: 0,
+                    dislikes: 0
+                };
+
+                this.data.videos.unshift(newVideo);
+                this.save();
+
+                alert("Vidéo publiée avec succès !");
+                this.closeModals();
+                this.goHome();
             },
+
             editBio: function() {
-                // ... (code editBio) ...
+                const b = prompt("Nouvelle description :");
+                if(b) {
+                    this.data.user.bio = b;
+                    this.save();
+                    this.goProfile();
+                }
             },
+
             search: function() {
-                // ... (code search) ...
+                const q = document.getElementById('searchInput').value.toLowerCase();
+                const res = this.data.videos.filter(v => v.title.toLowerCase().includes(q) || v.author.toLowerCase().includes(q));
+                this.render(res);
             }
         };
 
