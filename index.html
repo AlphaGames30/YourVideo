@@ -274,8 +274,10 @@
                     return;
                 }
                 
+                // ⚠️ VERIFICATION CRITIQUE : AFFICHE L'URL UTILISÉE
                 const url = `https://api.github.com/gists/${GIST_ID}`;
-                
+                console.log("URL de l'API Gist utilisée:", url); // <--- AJOUTEZ CETTE LIGNE
+
                 const payload = {
                     files: {
                         [GIST_FILE_NAME]: {
@@ -295,12 +297,18 @@
                     });
 
                     if (!response.ok) {
-                        throw new Error(`Échec de la mise à jour du Gist: ${response.statusText}. Vérifiez l'ID, le Token et ses permissions.`);
+                        // ⚠️ AFFICHE LE STATUT HTTP D'ERREUR
+                        console.error("Erreur de statut Gist:", response.status, response.statusText); // <--- AJOUTEZ CETTE LIGNE
+                        // Tente de lire le corps de l'erreur pour plus de détails
+                        const errorBody = await response.json();
+                        console.error("Corps de l'erreur Gist:", errorBody); // <--- AJOUTEZ CETTE LIGNE
+                        
+                        throw new Error(`Échec de la mise à jour du Gist: ${response.statusText}`);
                     }
                     console.log("Gist mis à jour avec succès!");
                 } catch (error) {
-                    console.error("Erreur lors de la mise à jour du Gist:", error);
-                    alert("ERREUR: Impossible de sauvegarder les changements sur GitHub. Le Token ou l'ID est probablement incorrect.");
+                    console.error("Erreur générale lors de la mise à jour du Gist:", error);
+                    alert("ERREUR: Impossible de sauvegarder les changements sur GitHub. Vérifiez le Jeton et le GIST_ID.");
                 }
             },
 
