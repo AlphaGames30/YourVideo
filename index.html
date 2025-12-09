@@ -196,7 +196,7 @@
         
         // --- NOUVEAU : URL DU PROXY D'IMAGE (utilisé pour contourner les blocages CORS/CSP) ---
         // ATTENTION : REMPLACER PAR VOTRE VRAIE URL DE PROXY (ex: https://mon-proxy.workers.dev/?)
-        const IMAGE_PROXY_URL = "https://my-image-proxy.edonis-imbert.workers.dev/"; 
+        const IMAGE_PROXY_URL = "https://my-image-proxy.edonis-imbert.workers.dev/?url="; 
 
         let registeredUsers = JSON.parse(localStorage.getItem('mt_users_db')) || {};
         let currentPin = null;
