@@ -65,6 +65,9 @@
         .account-info { padding: 10px; border-bottom: 1px solid #3c3c3c; margin-bottom: 10px; }
         .account-menu div { cursor: pointer; padding: 8px 10px; border-radius: 5px; }
         .account-menu div:hover { background: var(--hover); }
+        
+        /* Style pour le bouton désactivé */
+        .btn-blue.disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -130,14 +133,16 @@
         <div class="modal-box">
             <span class="close" onclick="app.closeModals()">&times;</span>
             <h2>Publier une vidéo</h2>
+            <p id="uploadStatus" style="color: #3ea6ff; text-align: center; font-weight: bold; margin: 0;"></p>
             <input type="text" id="upTitle" placeholder="Titre de la vidéo">
             
-            <input type="text" id="upUrl" placeholder="Lien direct MP4/M4V (ex: https://monserveur/video.mp4)">
+            <label for="upVideoFile" style="display:block; margin: 10px 0; color:#aaa; font-size:14px;">Sélectionnez la Vidéo (MP4/M4V)</label>
+            <input type="file" id="upVideoFile" accept="video/mp4,video/x-m4v,video/*" style="background: none; border: none; padding: 0;">
             
             <label for="upThumbFile" style="display:block; margin: 10px 0; color:#aaa; font-size:14px;">Sélectionnez la Miniature (JPG/PNG)</label>
             <input type="file" id="upThumbFile" accept="image/*" style="background: none; border: none; padding: 0;">
 
-            <button class="btn-blue" onclick="app.publish()">PUBLIER MAINTENANT</button>
+            <button class="btn-blue" id="publishBtn" onclick="app.publish()">PUBLIER MAINTENANT</button>
         </div>
     </div>
 
@@ -202,15 +207,15 @@
 
     <script>
         // --- CONFIGURATION CRITIQUE: REMPLISSEZ TOUTES CES LIGNES ! ---
-        // ⚠️ 1. TOKEN: REMPLACER PAR VOTRE VRAI TOKEN AVEC PERMISSION 'gist'
-        const GITHUB_TOKEN = "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"; 
-        
-        // ⚠️ 2. URL: LIEN RAW EXACT (CONFIRMÉ)
+        // CONFIG GIST
+        const GITHUB_TOKEN = "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"; // ⚠️ 1. VOTRE TOKEN GITHUB AVEC PERMISSION 'gist'
         const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/55dc4daff127bd08206e7f20c64a95a9971a5f7b/video.json";
-        
-        // ⚠️ 3. ID: ID EXACT (CONFIRMÉ)
         const GIST_ID = "5248424f9cc79feb78c0560faad87c92"; 
         const GIST_FILE_NAME = "video.json";
+        
+        // CONFIG CLOUDINARY (NOUVEAU)
+        const CLOUDINARY_CLOUD_NAME = "dvbsmh8qq"; // ⚠️ 2. VOTRE NOM DE CLOUD CLOUDINARY (ex: "dxfh3985l")
+        const CLOUDINARY_UPLOAD_PRESET = "mytube_upload"; // ⚠️ 3. LE NOM DE VOTRE PRESET NON SIGNÉ (ex: "mytube_upload")
         // -----------------------------------------------------------------
         
         // Base de données des utilisateurs (sauvegardée localement)
@@ -225,7 +230,6 @@
                 votes: JSON.parse(localStorage.getItem('mt_votes')) || {} 
             },
             
-            // --- FONCTION DE GÉNÉRATION D'AVATAR EN CODE ---
             generateAvatarUrl: function(name, size) {
                 const initial = name ? name[0].toUpperCase() : 'U';
                 let hash = 0;
@@ -249,7 +253,7 @@
                 });
             },
             
-            // --- FONCTION DE CHARGEMENT DU GIST ---
+            // --- FONCTIONS GIST (INCHANGÉES) ---
             loadVideosFromGist: async function() {
                 try {
                     const response = await fetch(GIST_URL);
@@ -261,8 +265,6 @@
                     console.log("Données chargées depuis Gist.");
                 } catch (error) {
                     console.error("Échec du chargement du Gist:", error);
-                    alert("Impossible de charger les vidéos du serveur (Gist). Affichage des données locales.");
-                    
                     if (this.data.videos.length === 0) {
                         this.data.videos = [
                             { id: 1, title: "Bienvenue sur MyTube", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "", author: "Admin", likes: 10, dislikes: 0 },
@@ -273,7 +275,6 @@
                 this.save();
             },
             
-            // --- FONCTION DE MISE À JOUR DU GIST (AVEC DÉBOGAGE) ---
             updateGist: async function(newVideoList) {
                 if (!GITHUB_TOKEN || !GIST_ID) {
                     console.error("ERREUR CRITIQUE: TOKEN ou GIST_ID non configuré. La sauvegarde a échoué.");
@@ -322,14 +323,44 @@
                 localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
             },
 
-            // --- NAVIGATION et AFFICHAGE (Render) ---
+            // --- FONCTION CLOUDINARY (NOUVEAU) ---
+            uploadToCloudinary: async function(file, resourceType) {
+                if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+                    throw new Error("Erreur Cloudinary: CLOUD_NAME ou UPLOAD_PRESET non configuré.");
+                }
+
+                const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`;
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorBody = await response.json();
+                        console.error("Erreur Cloudinary:", errorBody);
+                        throw new Error(`Échec de l'upload Cloudinary: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    return data.secure_url; // Retourne le lien HTTPS sécurisé
+                } catch (error) {
+                    console.error("Erreur générale d'upload Cloudinary:", error);
+                    throw new Error(`Problème de connexion Cloudinary. Vérifiez les consoles.`);
+                }
+            },
+
+            // --- NAVIGATION et AFFICHAGE ---
             goHome: function() {
                 document.getElementById('profileView').style.display = 'none';
                 document.getElementById('videoGrid').style.display = 'grid';
                 this.render(this.data.videos);
             },
 
-            // --- AFFICHAGE DE PROFIL (MIS À JOUR) ---
             goProfile: function() {
                 if(!this.data.user) return alert("Connecte-toi d'abord pour voir ta chaîne !");
 
@@ -340,14 +371,12 @@
                                    ? this.data.user.avatar
                                    : this.generateAvatarUrl(this.data.user.name, 100); 
                                    
-                // NOUVEAU : Affichage de la Bannière (si elle existe)
                 const bannerEl = document.querySelector('#profileView .banner');
                 if (this.data.user.banner && this.data.user.banner.startsWith('data:image/')) {
                     bannerEl.style.backgroundImage = `url(${this.data.user.banner})`;
                     bannerEl.style.backgroundSize = 'cover';
                     bannerEl.style.backgroundColor = 'transparent'; 
                 } else {
-                    // Rétablit le style par défaut
                     bannerEl.style.backgroundImage = 'linear-gradient(90deg, #b92b27, #1565C0)';
                     bannerEl.style.backgroundSize = 'auto';
                 }
@@ -444,9 +473,11 @@
             openUpload: function() {
                 if(!this.data.user) return alert("Connecte-toi pour publier !");
                 document.getElementById('upThumbFile').value = ''; 
+                document.getElementById('upVideoFile').value = ''; 
                 document.getElementById('upTitle').value = ''; 
-                document.getElementById('upUrl').value = '';
                 document.getElementById('modalUpload').style.display = 'flex';
+                document.getElementById('uploadStatus').innerText = ''; 
+                document.getElementById('publishBtn').classList.remove('disabled');
             },
 
             openEditProfile: function() {
@@ -458,37 +489,38 @@
                 document.getElementById('modalEditProfile').style.display = 'flex';
             },
 
-            // --- FONCTION PUBLISH STABLE (Miniature en fichier, Vidéo en lien) ---
+            // --- FONCTION PUBLISH AVEC UPLOAD CLOUDINARY (CRITIQUE) ---
             publish: async function() {
                 const title = document.getElementById('upTitle').value;
-                const url = document.getElementById('upUrl').value;
+                const videoInput = document.getElementById('upVideoFile');
                 const thumbInput = document.getElementById('upThumbFile');
 
-                if (!title || !url || !thumbInput.files.length) {
-                    return alert("Titre, Lien Vidéo, et Miniature sont requis !");
+                if (!title || !videoInput.files.length || !thumbInput.files.length) {
+                    return alert("Titre, Fichier Vidéo, et Miniature sont requis !");
                 }
                 
-                if (!url.startsWith('http')) {
-                    return alert("Le lien vidéo doit être une URL publique (commençant par http ou https).");
-                }
+                document.getElementById('publishBtn').classList.add('disabled');
+                document.getElementById('uploadStatus').innerText = 'Téléversement en cours... Veuillez patienter.';
 
-                const thumbFile = thumbInput.files[0];
-
-                const readThumb = new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(thumbFile);
-                });
-                
                 try {
-                    const thumbDataUri = await readThumb;
+                    // 1. Upload de la miniature (image)
+                    document.getElementById('uploadStatus').innerText = '1/2 Upload de la miniature...';
+                    const thumbnailUrl = await app.uploadToCloudinary(thumbInput.files[0], 'image');
+                    console.log("Miniature Cloudinary URL:", thumbnailUrl);
 
+                    // 2. Upload de la vidéo (video)
+                    document.getElementById('uploadStatus').innerText = '2/2 Upload de la vidéo... (Peut être long)';
+                    const videoUrl = await app.uploadToCloudinary(videoInput.files[0], 'video');
+                    console.log("Vidéo Cloudinary URL:", videoUrl);
+                    
+                    document.getElementById('uploadStatus').innerText = 'Finalisation...';
+
+                    // 3. Création et sauvegarde de la vidéo dans le Gist
                     const newVideo = {
                         id: Date.now(),
                         title: title,
-                        url: url, 
-                        thumb: thumbDataUri,
+                        url: videoUrl, 
+                        thumb: thumbnailUrl, // URL HTTPS stockée (léger)
                         author: app.data.user.name,
                         likes: 0,
                         dislikes: 0
@@ -502,12 +534,15 @@
                     app.closeModals();
                     app.goHome();
                 } catch (error) {
-                    console.error("Erreur lors de la publication:", error);
-                    alert("Erreur de publication. Veuillez vérifier la console du navigateur (F12) pour l'erreur API.");
+                    console.error("Erreur critique de publication:", error);
+                    alert(`Échec de la publication : ${error.message}. Vérifiez la console pour les erreurs Cloudinary ou Gist.`);
+                } finally {
+                    document.getElementById('uploadStatus').innerText = ''; 
+                    document.getElementById('publishBtn').classList.remove('disabled');
                 }
             },
 
-            // --- FONCTION SAVE PROFILE (MIS À JOUR AVEC UPLOAD DE FICHIER) ---
+            // --- FONCTION SAVE PROFILE (L'upload PP/Bannière reste en Data URI pour le LocalStorage) ---
             saveProfile: async function() {
                 if (!app.data.user) return alert("Veuillez vous connecter.");
 
@@ -519,26 +554,19 @@
                 let ppUri = app.data.user.avatar || '';
                 let bannerUri = app.data.user.banner || '';
 
-                // Lecture de la nouvelle Photo de Profil (PP)
+                const readFileAsDataURL = (file) => new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+
                 if (ppFile) {
-                    // Attention: Vérifiez la taille du fichier. S'il est trop gros, le LocalStorage sera dépassé.
-                    ppUri = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(ppFile);
-                    });
+                    ppUri = await readFileAsDataURL(ppFile);
                 }
                 
-                // Lecture de la nouvelle Bannière
                 if (bannerFile) {
-                    // Attention: La bannière est souvent un gros fichier, peut saturer le LocalStorage !
-                    bannerUri = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(bannerFile);
-                    });
+                    bannerUri = await readFileAsDataURL(bannerFile);
                 }
 
                 // Mise à jour de l'utilisateur local
@@ -617,23 +645,20 @@
 
                 const currentVote = this.data.votes[videoId];
 
-                // 1. Reset des votes
                 if (currentVote === 'like') video.likes = Math.max(0, video.likes - 1);
                 if (currentVote === 'dislike') video.dislikes = Math.max(0, video.dislikes - 1);
 
-                // 2. Application du nouveau vote ou suppression
                 if (currentVote === voteType) {
-                    delete this.data.votes[videoId]; // Supprimer le vote
+                    delete this.data.votes[videoId]; 
                 } else {
                     if (voteType === 'like') video.likes = (video.likes || 0) + 1;
                     if (voteType === 'dislike') video.dislikes = (video.dislikes || 0) + 1;
-                    this.data.votes[videoId] = voteType; // Définir le nouveau vote
+                    this.data.votes[videoId] = voteType; 
                 }
                 
-                // Mettre à jour le Gist et l'affichage (important pour le vote)
                 this.save();
                 this.updateGist(this.data.videos).then(() => {
-                    this.render(this.data.videos); // Rafraîchir l'affichage après le vote
+                    this.render(this.data.videos);
                 });
             },
             
