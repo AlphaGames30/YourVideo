@@ -132,8 +132,7 @@
             <h2>Publier une vidéo</h2>
             <input type="text" id="upTitle" placeholder="Titre de la vidéo">
             
-            <label for="upVideoFile" style="display:block; margin: 10px 0; color:#aaa; font-size:14px;">Sélectionnez le fichier Vidéo (MP4, etc.)</label>
-            <input type="file" id="upVideoFile" accept="video/*" style="background: none; border: none; padding: 0;">
+            <input type="text" id="upUrl" placeholder="Lien direct MP4/M4V (ex: https://monserveur/video.mp4)">
             
             <label for="upThumbFile" style="display:block; margin: 10px 0; color:#aaa; font-size:14px;">Sélectionnez la Miniature (JPG/PNG)</label>
             <input type="file" id="upThumbFile" accept="image/*" style="background: none; border: none; padding: 0;">
@@ -195,16 +194,17 @@
 
 
     <script>
-        // --- CONFIGURATION ---
-        // ⚠️ REMPLACER PAR VOTRE VRAI TOKEN AVEC PERMISSION 'gist'
+        // --- CONFIGURATION CRITIQUE: REMPLISSEZ TOUTES CES LIGNES ! ---
+        // ⚠️ 1. TOKEN: REMPLACER PAR VOTRE VRAI TOKEN AVEC PERMISSION 'gist'
         const GITHUB_TOKEN = "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"; 
         
-        // REMPLACER PAR LE LIEN RAW DE VOTRE GIST
+        // ⚠️ 2. URL: REMPLACER PAR LE LIEN RAW DE VOTRE GIST
         const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/55dc4daff127bd08206e7f20c64a95a9971a5f7b/video.json";
         
-        // REMPLACER PAR L'ID DE VOTRE GIST
+        // ⚠️ 3. ID: REMPLACER PAR L'ID DE VOTRE GIST
         const GIST_ID = "5248424f9cc79feb78c0560faad87c92"; 
         const GIST_FILE_NAME = "video.json";
+        // -----------------------------------------------------------------
         
         // Base de données des utilisateurs (sauvegardée localement)
         let registeredUsers = JSON.parse(localStorage.getItem('mt_users_db')) || {};
@@ -268,13 +268,14 @@
             
             // --- FONCTION DE MISE À JOUR DU GIST (AVEC DÉBOGAGE) ---
             updateGist: async function(newVideoList) {
-                if (!GITHUB_TOKEN) {
-                    console.warn("GITHUB_TOKEN non configuré. Les modifications ne seront pas sauvegardées sur le Gist.");
+                if (!GITHUB_TOKEN || !GIST_ID) {
+                    console.error("ERREUR CRITIQUE: TOKEN ou GIST_ID non configuré. La sauvegarde a échoué.");
+                    alert("ERREUR: Veuillez configurer GITHUB_TOKEN et GIST_ID dans le code.");
                     return;
                 }
                 
                 const url = `https://api.github.com/gists/${GIST_ID}`;
-                console.log("URL de l'API Gist utilisée:", url); // <--- LIGNE DE DÉBOGAGE
+                console.log("URL de l'API Gist utilisée:", url); // LIGNE DE DÉBOGAGE
 
                 const payload = {
                     files: {
@@ -295,16 +296,16 @@
                     });
 
                     if (!response.ok) {
-                        console.error("Erreur de statut Gist:", response.status, response.statusText); // <--- LIGNE DE DÉBOGAGE
+                        console.error("Erreur de statut Gist:", response.status, response.statusText); // LIGNE DE DÉBOGAGE
                         const errorBody = await response.json();
-                        console.error("Corps de l'erreur Gist:", errorBody); // <--- LIGNE DE DÉBOGAGE
+                        console.error("Corps de l'erreur Gist:", errorBody); // LIGNE DE DÉBOGAGE
                         
                         throw new Error(`Échec de la mise à jour du Gist: ${response.statusText}`);
                     }
                     console.log("Gist mis à jour avec succès!");
                 } catch (error) {
                     console.error("Erreur générale lors de la mise à jour du Gist:", error);
-                    alert("ERREUR: Impossible de sauvegarder les changements sur GitHub. Le Token ou l'ID est probablement incorrect.");
+                    alert("ERREUR: Impossible de sauvegarder les changements sur GitHub. Vérifiez le Jeton et le GIST_ID.");
                 }
             },
 
@@ -428,53 +429,42 @@
             openUpload: function() {
                 if(!this.data.user) return alert("Connecte-toi pour publier !");
                 document.getElementById('upThumbFile').value = ''; 
-                document.getElementById('upVideoFile').value = ''; 
                 document.getElementById('upTitle').value = ''; 
+                document.getElementById('upUrl').value = '';
                 document.getElementById('modalUpload').style.display = 'flex';
             },
 
-            // --- NOUVELLE FONCTION PUBLISH AVEC DOUBLE LECTURE DE FICHIERS ---
+            // --- FONCTION PUBLISH STABLE (Miniature en fichier, Vidéo en lien) ---
             publish: async function() {
                 const title = document.getElementById('upTitle').value;
+                const url = document.getElementById('upUrl').value;
                 const thumbInput = document.getElementById('upThumbFile');
-                const videoInput = document.getElementById('upVideoFile');
 
-                if (!title || !thumbInput.files.length || !videoInput.files.length) {
-                    return alert("Titre, Miniature, et Fichier Vidéo sont requis !");
+                if (!title || !url || !thumbInput.files.length) {
+                    return alert("Titre, Lien Vidéo, et Miniature sont requis !");
+                }
+                
+                if (!url.startsWith('http')) {
+                    return alert("Le lien vidéo doit être une URL publique (commençant par http ou https).");
                 }
 
                 const thumbFile = thumbInput.files[0];
-                const videoFile = videoInput.files[0];
 
-                if (videoFile.size > 5 * 1024 * 1024) {
-                    return alert("Erreur: Le fichier vidéo est trop volumineux (max 5MB pour le Gist). Pour les grandes vidéos, vous devrez utiliser un lien externe.");
-                }
-
-                // Création d'une promesse pour lire la miniature
                 const readThumb = new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = () => resolve(reader.result);
                     reader.onerror = reject;
                     reader.readAsDataURL(thumbFile);
                 });
-
-                // Création d'une promesse pour lire la vidéo
-                const readVideo = new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(videoFile);
-                });
                 
                 try {
-                    // Attend la lecture des deux fichiers
-                    const [thumbDataUri, videoDataUri] = await Promise.all([readThumb, readVideo]);
+                    const thumbDataUri = await readThumb;
 
                     const newVideo = {
                         id: Date.now(),
                         title: title,
-                        url: videoDataUri, 
-                        thumb: thumbDataUri, 
+                        url: url, 
+                        thumb: thumbDataUri,
                         author: app.data.user.name,
                         likes: 0,
                         dislikes: 0
@@ -482,14 +472,15 @@
 
                     app.data.videos.unshift(newVideo);
                     
-                    await app.updateGist(app.data.videos);
+                    // Tentative de sauvegarde du Gist (qui devrait réussir car la Data URI de la vidéo n'est plus là)
+                    await app.updateGist(app.data.videos); 
                     
-                    alert("Vidéo publiée et Gist mis à jour !");
+                    alert("Vidéo publiée et Gist mis à jour avec succès !");
                     app.closeModals();
                     app.goHome();
                 } catch (error) {
-                    console.error("Erreur lors du chargement des fichiers:", error);
-                    alert("Erreur lors du chargement des fichiers. Assurez-vous que les fichiers ne sont pas trop grands.");
+                    console.error("Erreur lors de la publication:", error);
+                    alert("Erreur de publication. Veuillez vérifier la console du navigateur (F12) pour l'erreur API.");
                 }
             },
             
