@@ -189,13 +189,14 @@
 
     <script>
         // --- CONFIGURATION ---
-        const GITHUB_TOKEN = "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"; 
+        const GITHUB_TOKEN = ""; 
         const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/55dc4daff127bd08206e7f20c64a95a9971a5f7b/video.json";
         const GIST_ID = "5248424f9cc79feb78c0560faad87c92"; 
         const GIST_FILE_NAME = "video.json";
         
-        // Les images par défaut sont maintenant générées en code (SVG Data URI)
-        // Note: Assurez-vous que l'URL des vidéos/miniatures que vous entrez vous-même est HTTPS et un lien direct.
+        // --- NOUVEAU : URL DU PROXY D'IMAGE (utilisé pour contourner les blocages CORS/CSP) ---
+        // ATTENTION : REMPLACER PAR VOTRE VRAIE URL DE PROXY (ex: https://mon-proxy.workers.dev/?)
+        const IMAGE_PROXY_URL = "https://my-image-proxy.edonis-imbert.workers.dev/"; 
 
         let registeredUsers = JSON.parse(localStorage.getItem('mt_users_db')) || {};
         let currentPin = null;
@@ -208,7 +209,7 @@
                 votes: JSON.parse(localStorage.getItem('mt_votes')) || {} 
             },
             
-            // --- FONCTION DE GÉNÉRATION D'AVATAR EN CODE ---
+            // --- FONCTION DE GÉNÉRATION D'AVATAR EN CODE (INCHANGÉE) ---
             generateAvatarUrl: function(name, size) {
                 const initial = name ? name[0].toUpperCase() : 'U';
                 let hash = 0;
@@ -217,7 +218,6 @@
                 }
                 const color = `hsl(${hash % 360}, 60%, 50%)`; 
                 
-                // SVG Data URI pour un avatar (cercle de couleur avec initiales)
                 const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'>
                     <circle cx='${size/2}' cy='${size/2}' r='${size/2}' fill='${color}'/>
                     <text x='50%' y='60%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='${size * 0.5}' font-family='Arial'>${initial}</text>
@@ -225,8 +225,7 @@
                 
                 return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
             },
-            // --- FIN FONCTION DE GÉNÉRATION ---
-
+            
             init: function() {
                 this.loadVideosFromGist().then(() => {
                     this.updateAuthUI();
@@ -234,7 +233,7 @@
                 });
             },
             
-            // --- FONCTION DE CHARGEMENT DU GIST ---
+            // --- FONCTION DE CHARGEMENT DU GIST (INCHANGÉE) ---
             loadVideosFromGist: async function() {
                 try {
                     const response = await fetch(GIST_URL);
@@ -248,9 +247,8 @@
                     alert("Impossible de charger les vidéos du serveur (Gist). Affichage des données locales.");
                     
                     if (this.data.videos.length === 0) {
-                         // Vidéos par défaut avec de faux liens pour tester
                         this.data.videos = [
-                            { id: 1, title: "Bienvenue sur MyTube", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "https://bad-link-test.com/img.jpg", author: "Admin", likes: 10, dislikes: 0 },
+                            { id: 1, title: "Bienvenue sur MyTube", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "", author: "Admin", likes: 10, dislikes: 0 },
                             { id: 2, title: "Test Vidéo", url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", thumb: "", author: "Test", likes: 5, dislikes: 0 }
                         ];
                     }
@@ -258,7 +256,7 @@
                 this.save();
             },
             
-            // --- FONCTION DE MISE À JOUR DU GIST ---
+            // --- FONCTION DE MISE À JOUR DU GIST (INCHANGÉE) ---
             updateGist: async function(newVideoList) {
                 if (!GITHUB_TOKEN) {
                     console.warn("GITHUB_TOKEN non configuré. Les modifications ne seront pas sauvegardées sur le Gist.");
@@ -302,7 +300,7 @@
                 localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
             },
 
-            // --- NAVIGATION ---
+            // --- NAVIGATION (INCHANGÉE) ---
             goHome: function() {
                 document.getElementById('profileView').style.display = 'none';
                 document.getElementById('videoGrid').style.display = 'grid';
@@ -315,7 +313,6 @@
                 document.getElementById('videoGrid').style.display = 'none';
                 document.getElementById('profileView').style.display = 'block';
 
-                // Utilise la fonction de génération pour l'avatar de profil
                 const userAvatar = this.data.user.avatar && this.data.user.avatar.startsWith('http') 
                                    ? this.data.user.avatar
                                    : this.generateAvatarUrl(this.data.user.name, 100); 
@@ -328,7 +325,7 @@
                 this.render(myVids, 'pVideos');
             },
             
-            // --- Personnalisation de Chaîne ---
+            // --- Personnalisation de Chaîne (INCHANGÉE) ---
             openEditProfile: function() {
                 if(!this.data.user) return;
                 document.getElementById('editName').value = this.data.user.name;
@@ -345,7 +342,6 @@
                 if (!newName) return alert("Le nom de chaîne ne peut pas être vide.");
 
                 this.data.user.name = newName;
-                // Accepte un lien si c'est un lien http(s), sinon l'application utilisera le générateur d'avatar.
                 this.data.user.avatar = newAvatar.startsWith('http') ? newAvatar : ''; 
                 this.data.user.bio = newBio;
                 
@@ -366,19 +362,30 @@
 
                 list.forEach(v => {
                     
-                    // --- GESTION DES IMAGES PAR DÉFAUT EN CODE (SVG) ---
-                    // Miniature (Thumb) : Si le lien est invalide ou manquant, utilise le placeholder SVG
-                    const thumbSrc = (v.thumb && v.thumb.startsWith('http') && v.thumb.length > 10) 
-                        ? v.thumb 
-                        : `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='170' viewBox='0 0 300 170'>
+                    // --- GESTION DES MINIATURES EXTERNES AVEC PROXY ---
+                    let thumbSrc;
+                    if (v.thumb && v.thumb.startsWith('http') && v.thumb.length > 10) {
+                        // Si l'URL du proxy est définie, nous l'utilisons pour tous les liens externes
+                        if (IMAGE_PROXY_URL) {
+                            // Encodage de l'URL pour la passer en paramètre du proxy
+                            thumbSrc = IMAGE_PROXY_URL + encodeURIComponent(v.thumb); 
+                        } else {
+                            // Si pas de proxy, on utilise l'URL brute (risque de blocage CORS/CSP)
+                            thumbSrc = v.thumb;
+                        }
+                    } else {
+                        // Sinon, utilise le placeholder SVG intégré
+                        thumbSrc = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='170' viewBox='0 0 300 170'>
                            <rect width='300' height='170' fill='#272727'/>
                            <text x='150' y='85' dominant-baseline='middle' text-anchor='middle' fill='#AAAAAA' font-size='20' font-family='Arial'>MINIATURE MANQUANTE</text>
-                        </svg>`.replace(/#/g, '%23'); 
+                        </svg>`.replace(/#/g, '%23');
+                    }
 
                     // Avatar Auteur : Si l'auteur a un lien dans la DB, utilise-le. Sinon, génère l'avatar SVG.
                     let authorAvatar = this.generateAvatarUrl(v.author, 36);
                     for (const email in registeredUsers) {
                         if (registeredUsers[email].name === v.author && registeredUsers[email].avatar && registeredUsers[email].avatar.startsWith('http')) {
+                            // NOTE: Les PP externes NE SONT PAS envoyées via le proxy ici, car le blocage affecte surtout les images de contenu comme les miniatures.
                             authorAvatar = registeredUsers[email].avatar;
                             break;
                         }
@@ -417,6 +424,8 @@
                     `;
                 });
             },
+            
+            // ... (Autres fonctions inchangées) ...
 
             handleVote: async function(id, type) {
                 if(!this.data.user) return alert("Connecte-toi pour voter !");
@@ -472,7 +481,6 @@
                 player.style.display = 'none';
             },
             
-            // --- UPLOAD / PUBLICATION ---
             openUpload: function() {
                 if(!this.data.user) return alert("Connecte-toi pour publier !");
                 document.getElementById('modalUpload').style.display = 'flex';
@@ -489,7 +497,6 @@
                     id: Date.now(),
                     title: title,
                     url: url,
-                    // Si l'utilisateur ne fournit pas de lien valide, on laisse vide (le SVG le remplacera)
                     thumb: thumb.startsWith('http') ? thumb : '', 
                     author: this.data.user.name,
                     likes: 0,
@@ -505,7 +512,6 @@
                 this.goHome();
             },
             
-            // --- AUTHENTIFICATION ---
             doLogout: function() {
                 this.data.user = null;
                 this.save();
@@ -520,7 +526,6 @@
                 const menu = document.getElementById('accountMenu');
 
                 if(this.data.user) {
-                    // Utilise l'avatar URL s'il existe, sinon génère le SVG pour le bouton
                     const userAvatar = this.data.user.avatar && this.data.user.avatar.startsWith('http') 
                                       ? this.data.user.avatar 
                                       : this.generateAvatarUrl(this.data.user.name, 24); 
@@ -536,7 +541,6 @@
                 }
             },
             
-            // --- FONCTIONS SECONDAIRES (Inchagées) ---
             goSubs: function() {
                 this.goHome();
                 const subVids = this.data.videos.filter(v => this.data.subs.includes(v.author));
