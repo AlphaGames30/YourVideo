@@ -39,7 +39,7 @@
         .action-pill { background: #272727; color: white; border: none; padding: 4px 10px; border-radius: 12px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         .action-pill:hover { background: #3f3f3f; }
         .liked { color: var(--blue); }
-        .disliked { color: var(--red); } /* Nouveau style pour dislike */
+        .disliked { color: var(--red); } 
         .player-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 500; justify-content: center; align-items: center; flex-direction: column; }
         .video-wrapper { width: 90%; max-width: 1000px; aspect-ratio: 16/9; background: #000; position: relative; }
         video { width: 100%; height: 100%; outline: none; }
@@ -103,7 +103,7 @@
             <div id="profileView" class="profile-view">
                 <div class="banner"></div>
                 <div class="profile-head">
-                    <img id="profileAvatar" src="https://via.placeholder.com/100" class="avatar-big">
+                    <img id="profileAvatar" src="https://via.placeholder.com/100/333333/FFFFFF?text=PP" class="avatar-big">
                     <div style="margin-left: 20px;">
                         <h1 id="pName">Nom</h1>
                         <p id="pBio" style="color:#aaa;">Bio...</p>
@@ -146,16 +146,52 @@
         </div>
     </div>
     
-    <div id="modalLoginEmail" class="modal">...</div>
-    <div id="modalLoginRegister" class="modal">...</div>
-    <div id="modalLoginPass" class="modal">...</div>
-    <div id="modalForgotPass" class="modal">...</div>
+    <div id="modalLoginEmail" class="modal">
+        <div class="modal-box">
+            <span class="close" onclick="app.closeModals()">&times;</span>
+            <h2 style="color:#3ea6ff;">1/4 Email</h2>
+            <input type="email" id="logEmail" placeholder="Adresse email">
+            <button class="btn-blue" onclick="app.loginStep(1)">Suivant</button>
+        </div>
+    </div>
+    
+    <div id="modalLoginRegister" class="modal">
+        <div class="modal-box">
+            <span class="close" onclick="app.closeModals()">&times;</span>
+            <h2 style="color:#3ea6ff;">2/4 Création de compte</h2>
+            <input type="text" id="logNewName" placeholder="Pseudo">
+            <input type="password" id="logNewPass" placeholder="Mot de passe">
+            <button class="btn-blue" onclick="app.loginStep(2)">Créer mon compte</button>
+        </div>
+    </div>
+
+    <div id="modalLoginPass" class="modal">
+        <div class="modal-box">
+            <span class="close" onclick="app.closeModals()">&times;</span>
+            <h2 style="color:#3ea6ff;">3/4 Bienvenue</h2>
+            <p id="welcomeUser" style="text-align:center;"></p>
+            <input type="password" id="logPass" placeholder="Mot de passe">
+            <button class="btn-blue" onclick="app.loginStep(3)">Se connecter</button>
+            <p style="text-align:center; margin-top:15px;"><a href="#" onclick="app.openForgotPassword()">Mot de passe oublié ?</a></p>
+        </div>
+    </div>
+
+    <div id="modalForgotPass" class="modal">
+        <div class="modal-box">
+            <span class="close" onclick="app.closeModals()">&times;</span>
+            <h2 style="color:#3ea6ff;">Mot de passe oublié</h2>
+            <p id="pinMessage" style="text-align:center;"></p>
+            <input type="text" id="pinCode" placeholder="Code PIN à 6 chiffres reçu">
+            <button class="btn-blue" onclick="app.verifyPin()">Vérifier le code</button>
+        </div>
+    </div>
 
 
     <script>
         // CONFIGURATION
         const GITHUB_TOKEN = "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";
         const REPO = "AlphaGames30/YourVideo";
+        const DEFAULT_AVATAR = 'https://via.placeholder.com/36/333333/FFFFFF?text=A';
 
         let registeredUsers = JSON.parse(localStorage.getItem('mt_users_db')) || {};
         let currentPin = null;
@@ -165,7 +201,6 @@
                 user: JSON.parse(localStorage.getItem('mt_user')),
                 videos: JSON.parse(localStorage.getItem('mt_videos')) || [],
                 subs: JSON.parse(localStorage.getItem('mt_subs')) || [],
-                // Stocke les votes de l'utilisateur actuel: {video_id: 'like' | 'dislike' | 'none', ...}
                 votes: JSON.parse(localStorage.getItem('mt_votes')) || {} 
             },
 
@@ -186,7 +221,7 @@
                 localStorage.setItem('mt_user', JSON.stringify(this.data.user));
                 localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
                 localStorage.setItem('mt_users_db', JSON.stringify(registeredUsers));
-                localStorage.setItem('mt_votes', JSON.stringify(this.data.votes)); // Sauvegarde des votes
+                localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
             },
 
             // --- NAVIGATION ---
@@ -202,8 +237,7 @@
                 document.getElementById('videoGrid').style.display = 'none';
                 document.getElementById('profileView').style.display = 'block';
 
-                // Utilise la photo de profil de l'utilisateur
-                const userAvatar = this.data.user.avatar || 'https://via.placeholder.com/100';
+                const userAvatar = this.data.user.avatar || 'https://via.placeholder.com/100/333333/FFFFFF?text=PP';
                 document.getElementById('profileAvatar').src = userAvatar;
                 document.getElementById('pName').innerText = this.data.user.name;
                 document.getElementById('pBio').innerText = this.data.user.bio || "Pas de description.";
@@ -239,7 +273,7 @@
                 this.save();
                 this.updateAuthUI();
                 this.closeModals();
-                this.goProfile(); // Rafraîchir la vue
+                this.goProfile();
                 alert("Profil mis à jour !");
             },
 
@@ -255,11 +289,11 @@
                     const isSub = this.data.subs.includes(v.author);
                     const userVote = this.data.votes[v.id];
 
-                    // Cherche l'avatar de l'auteur
-                    let authorAvatar = 'https://via.placeholder.com/36';
+                    // CORRECTION: Cherche l'avatar de l'auteur dans registeredUsers
+                    let authorAvatar = DEFAULT_AVATAR;
                     for (const email in registeredUsers) {
-                        if (registeredUsers[email].name === v.author && registeredUsers[email].avatar) {
-                            authorAvatar = registeredUsers[email].avatar;
+                        if (registeredUsers[email].name === v.author) {
+                            authorAvatar = registeredUsers[email].avatar || DEFAULT_AVATAR;
                             break;
                         }
                     }
@@ -310,8 +344,8 @@
 
                 } else if (currentVote && currentVote !== 'none') {
                     // Clic sur l'autre bouton : Changer de vote
-                    vid[currentVote + 's'] = Math.max(0, vid[currentVote + 's'] - 1); // Retire l'ancien
-                    vid[type + 's'] = (vid[type + 's'] || 0) + 1; // Ajoute le nouveau
+                    vid[currentVote + 's'] = Math.max(0, vid[currentVote + 's'] - 1); 
+                    vid[type + 's'] = (vid[type + 's'] || 0) + 1; 
                     this.data.votes[id] = type;
                     change = true;
 
@@ -324,7 +358,7 @@
 
                 if (change) {
                     this.save();
-                    this.goHome(); // Rafraîchir pour voir les changements
+                    this.goHome(); 
                 }
             },
 
@@ -349,8 +383,8 @@
                 player.style.display = 'none';
             },
             
-            // --- Les autres fonctions (goSubs, toggleSub, publish, search, loginStep, etc.) sont conservées telles quelles pour la clarté. ---
-            
+            // --- Les autres fonctions (login/logout) sont inchangées. ---
+
             goSubs: function() {
                 this.goHome();
                 const subVids = this.data.videos.filter(v => this.data.subs.includes(v.author));
@@ -412,7 +446,8 @@
                 const menu = document.getElementById('accountMenu');
 
                 if(this.data.user) {
-                    btn.innerHTML = `👤 ${this.data.user.name}`;
+                    const userAvatar = this.data.user.avatar || DEFAULT_AVATAR;
+                    btn.innerHTML = `<img src="${userAvatar}" class="avatar-small" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 5px;"> ${this.data.user.name}`;
                     btn.style.border = "none";
                     document.getElementById('menuUserName').innerText = this.data.user.name;
                     document.getElementById('menuUserEmail').innerText = this.data.user.email;
@@ -520,4 +555,5 @@
         app.init();
     </script>
 </body>
+</html>
 </html>
