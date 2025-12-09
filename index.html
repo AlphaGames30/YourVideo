@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyTube - Final Danew</title>
+    <title>MyTube - AlphaGames30</title>
+    
     <style>
         /* --- CSS YOUTUBE DARK (Conservation du style) --- */
         :root {
@@ -50,6 +51,7 @@
         input { width: 100%; padding: 10px; margin: 10px 0; background: #121212; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
         .btn-blue { width: 100%; padding: 10px; background: var(--blue); color: black; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
 
+        /* Styles spécifiques pour le profil */
         .profile-view { display: none; padding: 0 20px; }
         .banner { height: 150px; background: linear-gradient(90deg, #b92b27, #1565C0); border-radius: 15px; }
         .profile-head { display: flex; margin-top: -40px; padding: 0 20px; align-items: flex-end; }
@@ -130,7 +132,10 @@
             <h2>Publier une vidéo</h2>
             <input type="text" id="upTitle" placeholder="Titre de la vidéo">
             <input type="text" id="upUrl" placeholder="Lien direct MP4 (ex: https://...)">
-            <input type="text" id="upThumb" placeholder="Lien Miniature (Image https://...)">
+            
+            <label for="upThumbFile" style="display:block; margin: 10px 0; color:#aaa; font-size:14px;">Sélectionnez la Miniature (JPG/PNG)</label>
+            <input type="file" id="upThumbFile" accept="image/*" style="background: none; border: none; padding: 0;">
+
             <button class="btn-blue" onclick="app.publish()">PUBLIER MAINTENANT</button>
         </div>
     </div>
@@ -140,7 +145,7 @@
             <span class="close" onclick="app.closeModals()">&times;</span>
             <h2>Modifier ma chaîne</h2>
             <input type="text" id="editName" placeholder="Nouveau Nom de chaîne">
-            <input type="text" id="editAvatar" placeholder="Lien de la nouvelle Photo de Profil (PP)">
+            <input type="text" id="editAvatar" placeholder="Lien de la nouvelle Photo de Profil (PP) ou vide">
             <input type="text" id="editBio" placeholder="Nouvelle description (Bio)">
             <button class="btn-blue" onclick="app.saveProfile()">Enregistrer les modifications</button>
         </div>
@@ -189,14 +194,18 @@
 
     <script>
         // --- CONFIGURATION ---
+        // ⚠️ REMPLACER PAR VOTRE VRAI TOKEN AVEC PERMISSION 'gist'
         const GITHUB_TOKEN = "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"; 
+        
+        // REMPLACER PAR LE LIEN RAW DE VOTRE GIST
         const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/55dc4daff127bd08206e7f20c64a95a9971a5f7b/video.json";
+        
+        // REMPLACER PAR L'ID DE VOTRE GIST
         const GIST_ID = "5248424f9cc79feb78c0560faad87c92"; 
         const GIST_FILE_NAME = "video.json";
         
-        // --- NOUVEAU : URL DU PROXY D'IMAGE (utilisé pour contourner les blocages CORS/CSP) ---
-        // ATTENTION : REMPLACER PAR VOTRE VRAIE URL DE PROXY (ex: https://mon-proxy.workers.dev/?)
-        const IMAGE_PROXY_URL = "https://my-image-proxy.edonis-imbert.workers.dev/?url="; 
+        // L'URL du proxy est VIDE, car la méthode Data URI est désormais utilisée
+        // const IMAGE_PROXY_URL = ""; 
 
         let registeredUsers = JSON.parse(localStorage.getItem('mt_users_db')) || {};
         let currentPin = null;
@@ -209,7 +218,7 @@
                 votes: JSON.parse(localStorage.getItem('mt_votes')) || {} 
             },
             
-            // --- FONCTION DE GÉNÉRATION D'AVATAR EN CODE (INCHANGÉE) ---
+            // --- FONCTION DE GÉNÉRATION D'AVATAR EN CODE ---
             generateAvatarUrl: function(name, size) {
                 const initial = name ? name[0].toUpperCase() : 'U';
                 let hash = 0;
@@ -233,7 +242,7 @@
                 });
             },
             
-            // --- FONCTION DE CHARGEMENT DU GIST (INCHANGÉE) ---
+            // --- FONCTION DE CHARGEMENT DU GIST ---
             loadVideosFromGist: async function() {
                 try {
                     const response = await fetch(GIST_URL);
@@ -241,11 +250,13 @@
                     
                     const data = await response.json();
                     this.data.videos = data;
+                    localStorage.setItem('mt_videos', JSON.stringify(data)); // Sauvegarde locale
                     console.log("Données chargées depuis Gist.");
                 } catch (error) {
                     console.error("Échec du chargement du Gist:", error);
                     alert("Impossible de charger les vidéos du serveur (Gist). Affichage des données locales.");
                     
+                    // Chargement des vidéos de secours si le Gist échoue
                     if (this.data.videos.length === 0) {
                         this.data.videos = [
                             { id: 1, title: "Bienvenue sur MyTube", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "", author: "Admin", likes: 10, dislikes: 0 },
@@ -256,7 +267,7 @@
                 this.save();
             },
             
-            // --- FONCTION DE MISE À JOUR DU GIST (INCHANGÉE) ---
+            // --- FONCTION DE MISE À JOUR DU GIST ---
             updateGist: async function(newVideoList) {
                 if (!GITHUB_TOKEN) {
                     console.warn("GITHUB_TOKEN non configuré. Les modifications ne seront pas sauvegardées sur le Gist.");
@@ -284,12 +295,12 @@
                     });
 
                     if (!response.ok) {
-                        throw new Error(`Échec de la mise à jour du Gist: ${response.statusText}`);
+                        throw new Error(`Échec de la mise à jour du Gist: ${response.statusText}. Vérifiez l'ID, le Token et ses permissions.`);
                     }
                     console.log("Gist mis à jour avec succès!");
                 } catch (error) {
                     console.error("Erreur lors de la mise à jour du Gist:", error);
-                    alert("ERREUR: Impossible de sauvegarder les changements sur GitHub. Vérifiez le Jeton et le GIST_ID.");
+                    alert("ERREUR: Impossible de sauvegarder les changements sur GitHub. Le Token ou l'ID est probablement incorrect.");
                 }
             },
 
@@ -300,7 +311,7 @@
                 localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
             },
 
-            // --- NAVIGATION (INCHANGÉE) ---
+            // --- NAVIGATION ---
             goHome: function() {
                 document.getElementById('profileView').style.display = 'none';
                 document.getElementById('videoGrid').style.display = 'grid';
@@ -325,7 +336,7 @@
                 this.render(myVids, 'pVideos');
             },
             
-            // --- Personnalisation de Chaîne (INCHANGÉE) ---
+            // --- Personnalisation de Chaîne ---
             openEditProfile: function() {
                 if(!this.data.user) return;
                 document.getElementById('editName').value = this.data.user.name;
@@ -362,36 +373,32 @@
 
                 list.forEach(v => {
                     
-                    // --- GESTION DES MINIATURES EXTERNES AVEC PROXY ---
                     let thumbSrc;
-                    if (v.thumb && v.thumb.startsWith('http') && v.thumb.length > 10) {
-                        // Si l'URL du proxy est définie, nous l'utilisons pour tous les liens externes
-                        if (IMAGE_PROXY_URL) {
-                            // Encodage de l'URL pour la passer en paramètre du proxy
-                            thumbSrc = IMAGE_PROXY_URL + encodeURIComponent(v.thumb); 
-                        } else {
-                            // Si pas de proxy, on utilise l'URL brute (risque de blocage CORS/CSP)
-                            thumbSrc = v.thumb;
-                        }
-                    } else {
-                        // Sinon, utilise le placeholder SVG intégré
+                    
+                    if (v.thumb && v.thumb.startsWith('data:image/')) {
+                        // MINIATURE EN DATA URI (Intégrée) - GARANTIE D'AFFICHAGE
+                        thumbSrc = v.thumb;
+                    } else if (v.thumb && v.thumb.startsWith('http')) {
+                        // Si l'utilisateur a quand même mis un lien externe, on l'utilise mais on sait qu'il risque d'être bloqué.
+                        thumbSrc = v.thumb; 
+                    } 
+                    else {
+                        // Miniature manquante ou vide, utilise le placeholder SVG gris
                         thumbSrc = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='170' viewBox='0 0 300 170'>
                            <rect width='300' height='170' fill='#272727'/>
                            <text x='150' y='85' dominant-baseline='middle' text-anchor='middle' fill='#AAAAAA' font-size='20' font-family='Arial'>MINIATURE MANQUANTE</text>
                         </svg>`.replace(/#/g, '%23');
                     }
 
-                    // Avatar Auteur : Si l'auteur a un lien dans la DB, utilise-le. Sinon, génère l'avatar SVG.
+
+                    // Avatar Auteur : Si l'auteur a un lien, utilise-le. Sinon, génère l'avatar SVG.
                     let authorAvatar = this.generateAvatarUrl(v.author, 36);
                     for (const email in registeredUsers) {
                         if (registeredUsers[email].name === v.author && registeredUsers[email].avatar && registeredUsers[email].avatar.startsWith('http')) {
-                            // NOTE: Les PP externes NE SONT PAS envoyées via le proxy ici, car le blocage affecte surtout les images de contenu comme les miniatures.
                             authorAvatar = registeredUsers[email].avatar;
                             break;
                         }
                     }
-                    // --- FIN GESTION DES IMAGES ---
-
 
                     const isSub = this.data.subs.includes(v.author);
                     const userVote = this.data.votes[v.id];
@@ -483,33 +490,53 @@
             
             openUpload: function() {
                 if(!this.data.user) return alert("Connecte-toi pour publier !");
+                // Réinitialise le champ de fichier à l'ouverture
+                document.getElementById('upThumbFile').value = ''; 
                 document.getElementById('modalUpload').style.display = 'flex';
             },
 
+            // --- NOUVELLE FONCTION PUBLISH AVEC LECTURE DE FICHIER ---
             publish: async function() {
                 const title = document.getElementById('upTitle').value;
                 const url = document.getElementById('upUrl').value;
-                const thumb = document.getElementById('upThumb').value;
+                const fileInput = document.getElementById('upThumbFile');
 
-                if(!title || !url) return alert("Il faut au moins un Titre et un Lien vidéo !");
+                if(!title || !url || !fileInput.files.length) {
+                    return alert("Titre, Lien vidéo, et Miniature (fichier image) sont requis !");
+                }
 
-                const newVideo = {
-                    id: Date.now(),
-                    title: title,
-                    url: url,
-                    thumb: thumb.startsWith('http') ? thumb : '', 
-                    author: this.data.user.name,
-                    likes: 0,
-                    dislikes: 0
+                const file = fileInput.files[0];
+
+                const reader = new FileReader();
+                reader.readAsDataURL(file); // Lit le fichier en tant que Data URI
+
+                reader.onload = async function () {
+                    const thumbDataUri = reader.result; 
+
+                    const newVideo = {
+                        id: Date.now(),
+                        title: title,
+                        url: url,
+                        // Stocke la miniature directement en Data URI dans le Gist
+                        thumb: thumbDataUri, 
+                        author: app.data.user.name,
+                        likes: 0,
+                        dislikes: 0
+                    };
+
+                    app.data.videos.unshift(newVideo);
+                    
+                    await app.updateGist(app.data.videos); // Sauvegarde
+                    
+                    alert("Vidéo publiée et Gist mis à jour !");
+                    app.closeModals();
+                    app.goHome();
                 };
 
-                this.data.videos.unshift(newVideo);
-                
-                await this.updateGist(this.data.videos);
-                
-                alert("Vidéo publiée et Gist mis à jour !");
-                this.closeModals();
-                this.goHome();
+                reader.onerror = function (error) {
+                    console.error('Erreur lors de la lecture du fichier:', error);
+                    alert("Erreur lors du chargement de la miniature. Veuillez essayer une autre image.");
+                };
             },
             
             doLogout: function() {
