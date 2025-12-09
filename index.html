@@ -191,7 +191,8 @@
         // CONFIGURATION
         const GITHUB_TOKEN = "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";
         const REPO = "AlphaGames30/YourVideo";
-        const DEFAULT_AVATAR = 'https://via.placeholder.com/36/333333/FFFFFF?text=A';
+        // L'image d'avatar par défaut ne devrait pas être bloquée
+        const DEFAULT_AVATAR = 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Placeholder_square.svg/36px-Placeholder_square.svg.png'; 
 
         let registeredUsers = JSON.parse(localStorage.getItem('mt_users_db')) || {};
         let currentPin = null;
@@ -207,8 +208,26 @@
             init: function() {
                 if (this.data.videos.length === 0) {
                     this.data.videos = [
-                        { id: 1, title: "Bienvenue sur MyTube", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "https://via.placeholder.com/300x170/cc0000/fff?text=Bienvenue", author: "Admin", likes: 10, dislikes: 0 },
-                        { id: 2, title: "Test Vidéo", url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", thumb: "https://via.placeholder.com/300x170/0000cc/fff?text=Test+Video", author: "Test", likes: 5, dislikes: 0 }
+                        { 
+                            id: 1, 
+                            title: "Bienvenue sur MyTube", 
+                            url: "https://www.w3schools.com/html/mov_bbb.mp4", 
+                            // Lien d'image simple et public pour la miniature
+                            thumb: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Placeholder_square.svg/300px-Placeholder_square.svg.png", 
+                            author: "Admin", 
+                            likes: 10, 
+                            dislikes: 0 
+                        },
+                        { 
+                            id: 2, 
+                            title: "Test Vidéo", 
+                            url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", 
+                            // Autre lien d'image simple et public pour la miniature
+                            thumb: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/YouTube_Logo_2017.svg/300px-YouTube_Logo_2017.svg.png", 
+                            author: "Test", 
+                            likes: 5, 
+                            dislikes: 0 
+                        }
                     ];
                     this.save();
                 }
@@ -237,7 +256,7 @@
                 document.getElementById('videoGrid').style.display = 'none';
                 document.getElementById('profileView').style.display = 'block';
 
-                const userAvatar = this.data.user.avatar || 'https://via.placeholder.com/100/333333/FFFFFF?text=PP';
+                const userAvatar = this.data.user.avatar || DEFAULT_AVATAR.replace('36px', '100px'); // Utilise le grand placeholder
                 document.getElementById('profileAvatar').src = userAvatar;
                 document.getElementById('pName').innerText = this.data.user.name;
                 document.getElementById('pBio').innerText = this.data.user.bio || "Pas de description.";
@@ -285,11 +304,11 @@
 
                 list.forEach(v => {
                     // Utilise un placeholder si la miniature n'est pas un lien HTTPS
-                    const thumbSrc = (v.thumb && v.thumb.startsWith('http')) ? v.thumb : 'https://via.placeholder.com/300x170/000000/FFFFFF/?text=MyTube+Video';
+                    const thumbSrc = (v.thumb && v.thumb.startsWith('http')) ? v.thumb : DEFAULT_AVATAR.replace('36px', '300px');
                     const isSub = this.data.subs.includes(v.author);
                     const userVote = this.data.votes[v.id];
 
-                    // CORRECTION: Cherche l'avatar de l'auteur dans registeredUsers
+                    // Cherche l'avatar de l'auteur dans registeredUsers
                     let authorAvatar = DEFAULT_AVATAR;
                     for (const email in registeredUsers) {
                         if (registeredUsers[email].name === v.author) {
@@ -555,5 +574,4 @@
         app.init();
     </script>
 </body>
-</html>
 </html>
