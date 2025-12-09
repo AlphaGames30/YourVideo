@@ -146,7 +146,7 @@
         // =========================================================================
         
         // 1. URL DU WORKER CLOUDFLARE (Le lien que vous avez eu à l'étape 1)
-        const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; 
+        const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; // ⬅️ COLLEZ VOTRE URL ICI !
         
         // 2. CONFIG CLOUDINARY (Images/Vidéos)
         const CLOUDINARY_CLOUD_NAME = "dvbsmh8qq"; 
@@ -162,8 +162,8 @@
             data: {
                 user: JSON.parse(localStorage.getItem('mt_user')),
                 videos: JSON.parse(localStorage.getItem('mt_videos')) || [],
-                subs: JSON.parse(localStorage.getItem('mt_subs')) || [],
-                votes: JSON.parse(localStorage.getItem('mt_votes')) || {} 
+                votes: JSON.parse(localStorage.getItem('mt_votes')) || {}, 
+                subs: JSON.parse(localStorage.getItem('mt_subs')) || [], 
             },
             
             init: function() {
@@ -176,13 +176,12 @@
             // --- CHARGEMENT (LECTURE SEULE) ---
             loadVideosFromGist: async function() {
                 try {
-                    // On ajoute un timestamp pour éviter que le navigateur garde une vieille version en cache
                     const response = await fetch(GIST_URL + "?t=" + Date.now());
                     if (!response.ok) throw new Error("Erreur lecture Gist");
                     this.data.videos = await response.json();
                     localStorage.setItem('mt_videos', JSON.stringify(this.data.videos));
                 } catch (error) {
-                    console.error(error);
+                    console.error("Erreur de chargement des vidéos:", error);
                 }
                 this.save();
             },
@@ -190,7 +189,7 @@
             // --- SAUVEGARDE VIA LE WORKER (SÉCURISÉ) ---
             updateGist: async function(newVideoList) {
                 if (WORKER_PROXY_URL.includes("votre-worker")) {
-                    alert("ERREUR: Vous n'avez pas mis l'URL de votre Worker Cloudflare dans le code !");
+                    alert("ERREUR: Vous n'avez pas mis l'URL de votre Worker Cloudflare !");
                     return;
                 }
 
@@ -203,21 +202,69 @@
                 };
 
                 try {
-                    // On envoie les données au Worker, PAS à GitHub directement
-                    const response = await fetch(WORKER_PROXY_URL, {
+                    const response = await fetch(WORKER_PROXY_URL, { 
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
 
                     if (!response.ok) {
-                        alert("Erreur sauvegarde. Le Worker n'a pas réussi à joindre GitHub.");
+                        alert("Erreur sauvegarde. Le Worker n'a pas réussi à joindre GitHub (Code: " + response.status + ")");
                         throw new Error("Worker Error");
                     }
                     console.log("Sauvegarde réussie via Worker !");
                 } catch (error) {
-                    alert("Impossible de sauvegarder. Vérifiez que votre Worker Cloudflare est bien déployé.");
+                    alert("Impossible de sauvegarder. Vérifiez si le Worker est bien déployé et si son URL est correcte.");
                 }
+            },
+
+            // --- GESTION DES VOTES (LIKE/DISLIKE) ---
+            toggleVote: async function(videoId, type) {
+                if (!this.data.user) return alert("Connecte-toi pour voter !");
+                
+                const currentVote = this.data.votes[videoId];
+                const videoIndex = this.data.videos.findIndex(v => v.id == videoId);
+                if (videoIndex === -1) return;
+
+                const v = this.data.videos[videoIndex];
+
+                // 1. Retirer le vote précédent (si existant)
+                if (currentVote === 'like') { v.likes--; }
+                if (currentVote === 'dislike') { v.dislikes--; }
+                
+                // 2. Déterminer le nouveau vote
+                if (currentVote === type) {
+                    // Clic sur le même bouton : ON DÉ-VOTE
+                    delete this.data.votes[videoId];
+                } else {
+                    // Clic sur un autre bouton ou pas de vote : ON VOTE
+                    if (type === 'like') { v.likes++; }
+                    if (type === 'dislike') { v.dislikes++; }
+                    this.data.votes[videoId] = type;
+                }
+
+                this.save();
+                this.render(this.data.videos); 
+                await this.updateGist(this.data.videos);
+            },
+
+            // --- GESTION DES ABONNEMENTS ---
+            toggleSub: async function(authorName) {
+                if (!this.data.user) return alert("Connecte-toi pour t'abonner !");
+
+                const index = this.data.subs.indexOf(authorName);
+                if (index > -1) {
+                    // Déjà abonné -> Désabonnement
+                    this.data.subs.splice(index, 1);
+                    alert(`Vous êtes désabonné de ${authorName}.`);
+                } else {
+                    // Pas abonné -> Abonnement
+                    this.data.subs.push(authorName);
+                    alert(`Vous êtes abonné à ${authorName}.`);
+                }
+
+                this.save();
+                this.render(this.data.videos); 
             },
 
             // --- UPLOAD CLOUDINARY ---
@@ -262,7 +309,8 @@
                         url: videoUrl, 
                         thumb: thumbUrl, 
                         author: this.data.user.name,
-                        likes: 0, dislikes: 0
+                        likes: 0, 
+                        dislikes: 0 
                     };
 
                     this.data.videos.unshift(newVideo);
@@ -279,11 +327,41 @@
                 }
             },
 
+            // --- RENDER (AFFICHAGE) ---
+            render: function(list, target='videoGrid') {
+                const g = document.getElementById(target); g.innerHTML = "";
+                list.forEach(v => {
+                    const t = v.thumb || "https://placehold.co/600x400?text=No+Image";
+                    const isLiked = this.data.votes[v.id] === 'like' ? 'liked' : '';
+                    const isDisliked = this.data.votes[v.id] === 'dislike' ? 'disliked' : '';
+                    const isSubscribed = this.data.subs.includes(v.author);
+                    const subText = isSubscribed ? '✅ Abonné' : '🔔 S\'abonner';
+
+                    g.innerHTML += `
+                    <div class="video-card">
+                        <div class="thumb-container" onclick="app.playVideo('${v.url}', '${v.title.replace(/'/g, "\\'")}')">
+                            <img src="${t}" class="thumb"><div class="play-icon">▶</div>
+                        </div>
+                        <div class="info">
+                            <img src="${this.generateAvatarUrl(v.author, 36)}" class="avatar-small">
+                            <div class="details">
+                                <h4>${v.title}</h4>
+                                <p>${v.author} 
+                                    <button class="action-pill" onclick="event.stopPropagation(); app.toggleSub('${v.author.replace(/'/g, "\\'")}')">${subText}</button>
+                                </p>
+                                <div class="actions-bar">
+                                    <button class="action-pill ${isLiked}" onclick="event.stopPropagation(); app.toggleVote(${v.id}, 'like')">👍 ${v.likes}</button>
+                                    <button class="action-pill ${isDisliked}" onclick="event.stopPropagation(); app.toggleVote(${v.id}, 'dislike')">👎 ${v.dislikes}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            },
+
             // --- AUTRES FONCTIONS (Navigation, Profil, etc.) ---
             saveProfile: async function() {
                 if (!this.data.user) return alert("Connectez-vous.");
-                // ... (code profil identique au précédent, utilisant uploadToCloudinary)
-                // Pour simplifier ici, je garde la structure courte
                 const ppFile = document.getElementById('editPPFile').files[0];
                 const bannerFile = document.getElementById('editBannerFile').files[0];
                 
@@ -307,6 +385,7 @@
                 localStorage.setItem('mt_user', JSON.stringify(this.data.user));
                 localStorage.setItem('mt_users_db', JSON.stringify(registeredUsers));
                 localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
+                localStorage.setItem('mt_subs', JSON.stringify(this.data.subs)); 
             },
             generateAvatarUrl: function(name, size) {
                 return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}'><circle cx='${size/2}' cy='${size/2}' r='${size/2}' fill='#555'/><text x='50%' y='60%' text-anchor='middle' fill='white' font-size='${size/2}'>${name?name[0]:'U'}</text></svg>`;
@@ -321,7 +400,6 @@
                 document.getElementById('videoGrid').style.display = 'none';
                 document.getElementById('profileView').style.display = 'block';
                 
-                // Affichage Avatar/Bannière (gère URL ou DataURI)
                 const u = this.data.user;
                 const av = (u.avatar && u.avatar.startsWith('http')) ? u.avatar : this.generateAvatarUrl(u.name, 100);
                 document.getElementById('profileAvatar').src = av;
@@ -338,21 +416,17 @@
                 
                 this.render(this.data.videos.filter(v => v.author === u.name), 'pVideos');
             },
-            render: function(list, target='videoGrid') {
-                const g = document.getElementById(target); g.innerHTML = "";
-                list.forEach(v => {
-                    // Miniature par défaut si vide
-                    const t = v.thumb || "https://placehold.co/600x400?text=No+Image";
-                    g.innerHTML += `
-                    <div class="video-card">
-                        <div class="thumb-container" onclick="app.playVideo('${v.url}', '${v.title.replace(/'/g, "\\'")}')">
-                            <img src="${t}" class="thumb"><div class="play-icon">▶</div>
-                        </div>
-                        <div class="info">
-                            <div class="details"><h4>${v.title}</h4><p>${v.author}</p></div>
-                        </div>
-                    </div>`;
-                });
+            goSubs: function() {
+                if(!this.data.user) return alert("Connecte-toi pour voir tes abonnements !");
+                document.getElementById('profileView').style.display = 'none';
+                document.getElementById('videoGrid').style.display = 'grid';
+                
+                const filteredVideos = this.data.videos.filter(v => this.data.subs.includes(v.author));
+                this.render(filteredVideos);
+
+                if (filteredVideos.length === 0) {
+                     document.getElementById('videoGrid').innerHTML = '<h3 style="color:#aaa; text-align:center;">Aucune vidéo de vos abonnements.</h3>';
+                }
             },
             playVideo: function(url, title) {
                 const p = document.getElementById('playerModal');
