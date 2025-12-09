@@ -103,7 +103,7 @@
             <div id="profileView" class="profile-view">
                 <div class="banner"></div>
                 <div class="profile-head">
-                    <img id="profileAvatar" src="https://via.placeholder.com/100/333333/FFFFFF?text=PP" class="avatar-big">
+                    <img id="profileAvatar" src="" class="avatar-big">
                     <div style="margin-left: 20px;">
                         <h1 id="pName">Nom</h1>
                         <p id="pBio" style="color:#aaa;">Bio...</p>
@@ -189,20 +189,13 @@
 
     <script>
         // --- CONFIGURATION ---
-        // ATTENTION: REMPLACER LE TEXTE VIDE PAR VOTRE Jeton Personnel GitHub (EXPOSÉ AU PUBLIC)
         const GITHUB_TOKEN = "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"; 
-        
-        // URL RAW de votre Gist videos.json
         const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/55dc4daff127bd08206e7f20c64a95a9971a5f7b/video.json";
-        
-        // ID de votre Gist (doit être extrait de l'URL du Gist. Ex: 5248424f9cc79feb78c0560faad87c92)
         const GIST_ID = "5248424f9cc79feb78c0560faad87c92"; 
-        
-        // Nom du fichier dans le Gist
         const GIST_FILE_NAME = "video.json";
         
-        // Images par défaut
-        const DEFAULT_AVATAR = 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Placeholder_square.svg/36px-Placeholder_square.svg.png'; 
+        // Les images par défaut sont maintenant générées en code (SVG Data URI)
+        // Note: Assurez-vous que l'URL des vidéos/miniatures que vous entrez vous-même est HTTPS et un lien direct.
 
         let registeredUsers = JSON.parse(localStorage.getItem('mt_users_db')) || {};
         let currentPin = null;
@@ -214,6 +207,25 @@
                 subs: JSON.parse(localStorage.getItem('mt_subs')) || [],
                 votes: JSON.parse(localStorage.getItem('mt_votes')) || {} 
             },
+            
+            // --- FONCTION DE GÉNÉRATION D'AVATAR EN CODE ---
+            generateAvatarUrl: function(name, size) {
+                const initial = name ? name[0].toUpperCase() : 'U';
+                let hash = 0;
+                for (let i = 0; i < name.length; i++) {
+                    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                const color = `hsl(${hash % 360}, 60%, 50%)`; 
+                
+                // SVG Data URI pour un avatar (cercle de couleur avec initiales)
+                const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'>
+                    <circle cx='${size/2}' cy='${size/2}' r='${size/2}' fill='${color}'/>
+                    <text x='50%' y='60%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='${size * 0.5}' font-family='Arial'>${initial}</text>
+                </svg>`;
+                
+                return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+            },
+            // --- FIN FONCTION DE GÉNÉRATION ---
 
             init: function() {
                 this.loadVideosFromGist().then(() => {
@@ -229,23 +241,21 @@
                     if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
                     
                     const data = await response.json();
-                    
-                    // Remplace les vidéos locales par les vidéos du Gist
                     this.data.videos = data;
                     console.log("Données chargées depuis Gist.");
-                    this.save(); // Sauvegarde localement après le chargement du Gist
                 } catch (error) {
                     console.error("Échec du chargement du Gist:", error);
                     alert("Impossible de charger les vidéos du serveur (Gist). Affichage des données locales.");
                     
-                    // Charge les données par défaut si le Gist échoue et qu'il n'y a pas de données locales.
                     if (this.data.videos.length === 0) {
+                         // Vidéos par défaut avec de faux liens pour tester
                         this.data.videos = [
-                            { id: 1, title: "Bienvenue sur MyTube", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Placeholder_square.svg/300px-Placeholder_square.svg.png", author: "Admin", likes: 10, dislikes: 0 },
-                            { id: 2, title: "Test Vidéo", url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", thumb: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/YouTube_Logo_2017.svg/300px-YouTube_Logo_2017.svg.png", author: "Test", likes: 5, dislikes: 0 }
+                            { id: 1, title: "Bienvenue sur MyTube", url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "https://bad-link-test.com/img.jpg", author: "Admin", likes: 10, dislikes: 0 },
+                            { id: 2, title: "Test Vidéo", url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", thumb: "", author: "Test", likes: 5, dislikes: 0 }
                         ];
                     }
                 }
+                this.save();
             },
             
             // --- FONCTION DE MISE À JOUR DU GIST ---
@@ -258,7 +268,6 @@
                 const url = `https://api.github.com/gists/${GIST_ID}`;
                 
                 const payload = {
-                    description: "Mise à jour vidéo MyTube",
                     files: {
                         [GIST_FILE_NAME]: {
                             content: JSON.stringify(newVideoList, null, 2)
@@ -291,7 +300,6 @@
                 localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
                 localStorage.setItem('mt_users_db', JSON.stringify(registeredUsers));
                 localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
-                // Les vidéos NE SONT PLUS SAUVEGARDÉES ici, elles sont gérées par le Gist
             },
 
             // --- NAVIGATION ---
@@ -307,7 +315,11 @@
                 document.getElementById('videoGrid').style.display = 'none';
                 document.getElementById('profileView').style.display = 'block';
 
-                const userAvatar = this.data.user.avatar || DEFAULT_AVATAR.replace('36px', '100px');
+                // Utilise la fonction de génération pour l'avatar de profil
+                const userAvatar = this.data.user.avatar && this.data.user.avatar.startsWith('http') 
+                                   ? this.data.user.avatar
+                                   : this.generateAvatarUrl(this.data.user.name, 100); 
+
                 document.getElementById('profileAvatar').src = userAvatar;
                 document.getElementById('pName').innerText = this.data.user.name;
                 document.getElementById('pBio').innerText = this.data.user.bio || "Pas de description.";
@@ -333,7 +345,8 @@
                 if (!newName) return alert("Le nom de chaîne ne peut pas être vide.");
 
                 this.data.user.name = newName;
-                this.data.user.avatar = newAvatar;
+                // Accepte un lien si c'est un lien http(s), sinon l'application utilisera le générateur d'avatar.
+                this.data.user.avatar = newAvatar.startsWith('http') ? newAvatar : ''; 
                 this.data.user.bio = newBio;
                 
                 registeredUsers[this.data.user.email] = this.data.user;
@@ -352,17 +365,29 @@
                 grid.innerHTML = "";
 
                 list.forEach(v => {
-                    const thumbSrc = (v.thumb && v.thumb.startsWith('http')) ? v.thumb : DEFAULT_AVATAR.replace('36px', '300px');
-                    const isSub = this.data.subs.includes(v.author);
-                    const userVote = this.data.votes[v.id];
+                    
+                    // --- GESTION DES IMAGES PAR DÉFAUT EN CODE (SVG) ---
+                    // Miniature (Thumb) : Si le lien est invalide ou manquant, utilise le placeholder SVG
+                    const thumbSrc = (v.thumb && v.thumb.startsWith('http') && v.thumb.length > 10) 
+                        ? v.thumb 
+                        : `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='170' viewBox='0 0 300 170'>
+                           <rect width='300' height='170' fill='#272727'/>
+                           <text x='150' y='85' dominant-baseline='middle' text-anchor='middle' fill='#AAAAAA' font-size='20' font-family='Arial'>MINIATURE MANQUANTE</text>
+                        </svg>`.replace(/#/g, '%23'); 
 
-                    let authorAvatar = DEFAULT_AVATAR;
+                    // Avatar Auteur : Si l'auteur a un lien dans la DB, utilise-le. Sinon, génère l'avatar SVG.
+                    let authorAvatar = this.generateAvatarUrl(v.author, 36);
                     for (const email in registeredUsers) {
-                        if (registeredUsers[email].name === v.author) {
-                            authorAvatar = registeredUsers[email].avatar || DEFAULT_AVATAR;
+                        if (registeredUsers[email].name === v.author && registeredUsers[email].avatar && registeredUsers[email].avatar.startsWith('http')) {
+                            authorAvatar = registeredUsers[email].avatar;
                             break;
                         }
                     }
+                    // --- FIN GESTION DES IMAGES ---
+
+
+                    const isSub = this.data.subs.includes(v.author);
+                    const userVote = this.data.votes[v.id];
 
                     grid.innerHTML += `
                         <div class="video-card">
@@ -421,9 +446,8 @@
 
                 if (change) {
                     this.save();
-                    // Met à jour le Gist après le vote
                     await this.updateGist(this.data.videos);
-                    this.goHome(); // Rafraîchir
+                    this.goHome(); 
                 }
             },
 
@@ -465,7 +489,8 @@
                     id: Date.now(),
                     title: title,
                     url: url,
-                    thumb: thumb,
+                    // Si l'utilisateur ne fournit pas de lien valide, on laisse vide (le SVG le remplacera)
+                    thumb: thumb.startsWith('http') ? thumb : '', 
                     author: this.data.user.name,
                     likes: 0,
                     dislikes: 0
@@ -473,7 +498,7 @@
 
                 this.data.videos.unshift(newVideo);
                 
-                await this.updateGist(this.data.videos); // Met à jour le Gist
+                await this.updateGist(this.data.videos);
                 
                 alert("Vidéo publiée et Gist mis à jour !");
                 this.closeModals();
@@ -495,7 +520,11 @@
                 const menu = document.getElementById('accountMenu');
 
                 if(this.data.user) {
-                    const userAvatar = this.data.user.avatar || DEFAULT_AVATAR;
+                    // Utilise l'avatar URL s'il existe, sinon génère le SVG pour le bouton
+                    const userAvatar = this.data.user.avatar && this.data.user.avatar.startsWith('http') 
+                                      ? this.data.user.avatar 
+                                      : this.generateAvatarUrl(this.data.user.name, 24); 
+                                      
                     btn.innerHTML = `<img src="${userAvatar}" class="avatar-small" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 5px;"> ${this.data.user.name}`;
                     btn.style.border = "none";
                     document.getElementById('menuUserName').innerText = this.data.user.name;
