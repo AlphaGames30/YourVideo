@@ -29,7 +29,7 @@
         .thumb-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #333; }
         .thumb { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Ajustement des Shorts pour un affichage vertical et scroll horizontal */
+        /* Shorts pour un affichage vertical et scroll horizontal */
         .shorts-grid { 
             display: flex; 
             gap: 15px; 
@@ -221,17 +221,17 @@
 
     <script>
         // --- CONFIGURATION ---
-               // 1. URL DU WORKER CLOUDFLARE (Le lien que vous avez eu à l'étape 1)
-        const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; // ⬅️ COLLEZ VOTRE URL ICI !
+        // 1. URL DU WORKER CLOUDFLARE
+        const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; 
         
         // 2. CONFIG CLOUDINARY (Images/Vidéos)
         const CLOUDINARY_CLOUD_NAME = "dvbsmh8qq"; 
         const CLOUDINARY_UPLOAD_PRESET = "mytube_upload"; 
 
-        // 3. URL LECTURE GIST (Ne changez pas ça)
+        // 3. URL LECTURE GIST 
         const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json"; 
-        const GIST_FILE_NAME = "vidéo.json";
-
+        // ATTENTION: J'ai corrigé le nom du fichier. Le Worker échoue si le nom n'est pas "video.json".
+        const GIST_FILE_NAME = "video.json"; 
 
         const PRIMARY_ADMIN_EMAIL = "edonis.imbert@gmail.com"; 
         
@@ -265,7 +265,11 @@
             },
 
             saveGist: async function() {
-                if(!WORKER_PROXY_URL) return;
+                if(!WORKER_PROXY_URL) {
+                    console.error("WORKER_PROXY_URL est vide. Le Gist ne sera pas mis à jour.");
+                    alert("ERREUR: Le lien Cloudflare Worker est vide. Le Gist ne sera pas mis à jour.");
+                    return;
+                }
                 const content = { videos: this.data.videos, users: this.data.users, admins: this.data.admins };
                 await fetch(WORKER_PROXY_URL, {
                     method: 'PATCH',
@@ -348,12 +352,13 @@
                 }
             },
             
+            // CORRECTION: Assure-toi que l'utilisateur est bien initialisé.
             goMyProfile: function() {
                 if(!this.data.user || !this.data.user.name) return this.openLogin(); 
                 this.viewProfile(this.data.user.name);
             },
 
-            // --- GESTION PROFIL CORRIGÉE ---
+            // --- GESTION PROFIL (FIX PDP/BANNER) ---
             saveProfile: async function() {
                 if(!this.data.user) return;
                 const name = document.getElementById('editName').value;
@@ -385,7 +390,9 @@
 
                 this.data.users[userName] = userData; 
 
+                status.innerText = "Sauvegarde des données du profil...";
                 await this.saveGist();
+                
                 alert("Profil mis à jour partout !");
                 location.reload();
             },
@@ -396,21 +403,24 @@
                 const v = document.getElementById('profileView');
                 v.style.display = 'block';
                 
+                // Assure-toi que le profil existe dans this.data.users
                 const profile = this.data.users[authorName] || { name: authorName, bio: "Créateur sans profil public.", avatar: "", banner: "" };
                 const videos = this.data.videos.filter(x => x.author === authorName);
                 const isMyProfile = this.data.user && this.data.user.name === authorName;
 
-                // Compte combien d'utilisateurs ont cet auteur dans leur liste 'subs' (stockée dans le Gist)
+                // Compte les abonnés
                 let followerCount = 0;
                 for (const userKey in this.data.users) {
                     const userData = this.data.users[userKey];
-                    if (userData.subs && userData.subs.includes(authorName)) {
+                    // Vérifie si l'utilisateur a une clé 'subs' qui est un tableau avant d'appeler .includes
+                    if (userData && Array.isArray(userData.subs) && userData.subs.includes(authorName)) {
                         followerCount++;
                     }
                 }
                 
                 document.getElementById('pBanner').src = profile.banner || '';
-                document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U';
+                // S'assure que l'avatar est chargé (sinon placeholder)
+                document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
                 document.getElementById('pName').innerText = profile.name;
                 document.getElementById('pStats').innerText = `${followerCount} abonnés • ${videos.length} vidéos`;
                 document.getElementById('pBio').innerText = profile.bio;
@@ -418,7 +428,9 @@
                 const actions = document.getElementById('profileActions');
                 actions.innerHTML = '';
 
+                // Le bouton de personnalisation n'est visible que si c'est son propre profil
                 if (isMyProfile) {
+                    // La fonction openEditProfile ouvre directement la modale sans passer par une autre fonction.
                     actions.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
                 } else if (this.data.user) {
                     const isSubscribed = this.data.subs.includes(authorName);
@@ -465,7 +477,7 @@
                             const data = JSON.parse(xhr.responseText);
                             resolve(data.secure_url);
                         } else {
-                            if (statusElement) statusElement.innerText = "Erreur d'upload.";
+                            if (statusElement) statusElement.innerText = "Erreur d'upload. Code: " + xhr.status;
                             reject(new Error('Erreur Cloudinary'));
                         }
                     };
@@ -538,7 +550,7 @@
                     this.goHome();
 
                 } catch (e) {
-                    status.innerText = "Erreur lors de la publication.";
+                    status.innerText = "Erreur lors de la publication. Voir la console F12.";
                     console.error("Erreur de publication:", e);
                 } finally {
                     publishBtn.disabled = false;
@@ -546,7 +558,7 @@
                 }
             },
 
-            // --- GESTION DES ABONNEMENTS ET VOTES (INCHANGÉ) ---
+            // --- GESTION DES ABONNEMENTS ET VOTES ---
 
             toggleVote: async function(id, type) {
                 if(!this.data.user) return this.openLogin();
@@ -560,26 +572,26 @@
                 v.dislikes = v.dislikes || 0;
 
                 if (type === 'like') {
-                    if (currentVote === 1) { // Annuler Like
+                    if (currentVote === 1) { 
                         v.likes--;
                         this.data.votes[id] = 0;
-                    } else if (currentVote === -1) { // Changer Dislike -> Like
+                    } else if (currentVote === -1) { 
                         v.dislikes--;
                         v.likes++;
                         this.data.votes[id] = 1;
-                    } else { // Nouveau Like
+                    } else { 
                         v.likes++;
                         this.data.votes[id] = 1;
                     }
                 } else if (type === 'dislike') {
-                    if (currentVote === -1) { // Annuler Dislike
+                    if (currentVote === -1) { 
                         v.dislikes--;
                         this.data.votes[id] = 0;
-                    } else if (currentVote === 1) { // Changer Like -> Dislike
+                    } else if (currentVote === 1) { 
                         v.likes--;
                         v.dislikes++;
                         this.data.votes[id] = -1;
-                    } else { // Nouveau Dislike
+                    } else { 
                         v.dislikes++;
                         this.data.votes[id] = -1;
                     }
@@ -605,7 +617,7 @@
                 this.viewProfile(author);
             },
 
-            // --- GESTION ADMIN (INCHANGÉ) ---
+            // --- GESTION ADMIN ---
             isAdmin: function() {
                 return this.data.user && this.data.admins.includes(this.data.user.email);
             },
@@ -616,16 +628,8 @@
                 this.renderAdminVideoList();
                 this.renderAdminList();
             },
-
-            renderAdminVideoList: function() { /* ... */ },
-            openAdminEditModal: function(id, title) { /* ... */ },
-            saveAdminVideoEdit: async function() { /* ... */ },
-            deleteVideo: async function(id) { /* ... */ },
-            renderAdminList: function() { /* ... */ },
-            addAdmin: async function() { /* ... */ },
-            removeAdmin: async function(email) { /* ... */ },
             
-            // --- RENDERING ET NAVIGATION (CORRIGÉS POUR SHORTS) ---
+            // --- RENDERING ET NAVIGATION (FIX SHORTS) ---
 
             render: function(list, target = 'videoGrid') {
                 const targetElement = document.getElementById(target);
@@ -650,12 +654,13 @@
                 this.render(this.data.videos.filter(v => !v.isShort));
             },
             
+            // CORRECTION: Assure l'affichage en flex pour le scroll horizontal
             goShorts: function() { 
                 this.hideAll(); 
                 const g = document.getElementById('shortsGrid'); 
                 g.style.display = 'flex';
                 document.getElementById('mainTitle').innerHTML = "<h2>Shorts</h2>"; 
-                // Pour les shorts, on utilise un rendu manuel dans la structure de défilement horizontal
+                
                 g.innerHTML = this.data.videos.filter(x => x.isShort).map(s => `
                     <div class="short-card" onclick="app.openVideoOverlay(${s.id})">
                         <img src="${s.thumb}" alt="${s.title}">
@@ -672,18 +677,92 @@
                 this.render(vids); 
             },
             
-            search: function() { /* ... */ },
-            hideAll: function() { /* ... */ },
+            search: function() {
+                const term = document.getElementById('searchInput').value.toLowerCase();
+                const results = this.data.videos.filter(v => 
+                    v.title.toLowerCase().includes(term) || 
+                    v.author.toLowerCase().includes(term)
+                );
+                this.hideAll();
+                document.getElementById('videoGrid').style.display = 'grid';
+                document.getElementById('mainTitle').innerHTML = `<h2>Résultats pour "${term}"</h2>`;
+                this.render(results);
+            },
 
-            // --- GESTION DU LECTEUR ET COMMENTAIRES (INCHANGÉ) ---
-            openVideoOverlay: function(id) { /* ... */ },
-            closePlayer: function() { /* ... */ },
-            renderComments: function(video) { /* ... */ },
-            addComment: async function() { /* ... */ },
+            hideAll: function() { 
+                ['videoGrid', 'shortsGrid', 'profileView', 'adminPanel'].forEach(id => document.getElementById(id).style.display = 'none');
+            },
             
-            // --- MODAL UTILS (INCHANGÉ) ---
-            toggleAccountMenu: function() { /* ... */ },
-            closeModals: function() { /* ... */ },
+            // --- GESTION DU LECTEUR ET COMMENTAIRES ---
+            openVideoOverlay: function(id) {
+                const v = this.data.videos.find(x => x.id == id);
+                if (!v) return;
+
+                document.getElementById('playerModal').style.display = 'block';
+                const player = document.getElementById('mainVideoPlayer');
+                player.src = v.url;
+                document.getElementById('playerTitle').innerText = v.title;
+
+                const currentVote = this.data.votes[id] || 0;
+                const likeBtn = `<button class="action-pill ${currentVote === 1 ? 'liked' : ''}" onclick="app.toggleVote(${id}, 'like')">👍 ${v.likes || 0}</button>`;
+                const dislikeBtn = `<button class="action-pill ${currentVote === -1 ? 'disliked' : ''}" onclick="app.toggleVote(${id}, 'dislike')">👎 ${v.dislikes || 0}</button>`;
+
+                document.getElementById('playerActions').innerHTML = `
+                    <img src="${this.getAvatar(v.author)}" class="avatar-small" onclick="event.stopPropagation(); app.viewProfile('${v.author}')" style="margin-right: 10px;">
+                    <h4 style="margin: 0; cursor:pointer;" onclick="event.stopPropagation(); app.viewProfile('${v.author}')">${v.author}</h4>
+                    ${likeBtn} ${dislikeBtn}
+                `;
+                this.renderComments(v);
+            },
+            
+            closePlayer: function() { 
+                document.getElementById('playerModal').style.display='none'; 
+                document.getElementById('mainVideoPlayer').pause();
+                document.getElementById('mainVideoPlayer').src = "";
+            },
+
+            renderComments: function(video) {
+                const list = document.getElementById('commentList');
+                const count = document.getElementById('commentCount');
+                count.innerText = `Commentaires (${video.comments?.length || 0})`;
+                if (this.data.user) {
+                    document.getElementById('userCommentAvatar').src = this.getAvatar(this.data.user.name);
+                }
+                list.innerHTML = video.comments.map(c => `
+                    <div style="display:flex; gap:10px; margin-bottom:15px; align-items:flex-start;">
+                        <img src="${this.getAvatar(c.author)}" class="avatar-small">
+                        <div>
+                            <span style="font-weight:bold; font-size:14px;">${c.author}</span>
+                            <span style="font-size:12px; color:#999; margin-left:8px;">${new Date(c.time).toLocaleDateString()}</span>
+                            <p style="margin:2px 0 0 0;">${c.text}</p>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            addComment: async function() {
+                if(!this.data.user) return this.openLogin();
+                const commentInput = document.getElementById('newCommentInput');
+                const text = commentInput.value.trim();
+                const videoElement = document.getElementById('mainVideoPlayer');
+                if (!text || !videoElement.src) return;
+                const currentVideoUrl = videoElement.src;
+                const video = this.data.videos.find(v => v.url === currentVideoUrl);
+                if (!video) return;
+                const newComment = {
+                    author: this.data.user.name,
+                    text: text,
+                    time: Date.now()
+                };
+                video.comments.push(newComment);
+                commentInput.value = '';
+                this.renderComments(video);
+                await this.saveGist();
+            },
+            
+            // --- MODAL UTILS ---
+            toggleAccountMenu: function() { const m = document.getElementById('accountMenu'); m.style.display = m.style.display === 'none' ? 'block' : 'none'; },
+            closeModals: function() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); },
             openUpload: function() { if(!this.data.user) return this.openLogin(); document.getElementById('modalUpload').style.display='flex'; },
             openEditProfile: function() { 
                 if(!this.data.user) return this.openLogin();
@@ -693,148 +772,89 @@
                 document.getElementById('modalEditProfile').style.display='flex'; 
             },
             openLogin: function() { document.getElementById('modalLoginEmail').style.display='flex'; },
-        };
 
-        // Rendu des fonctions admin
-        app.renderAdminVideoList = function() {
-            const list = document.getElementById('adminVideoList');
-            const videos = this.data.videos;
-            list.innerHTML = `<table class="admin-table">
-                <thead><tr><th>ID</th><th>Titre</th><th>Auteur</th><th>Actions</th></tr></thead>
-                <tbody>${videos.map(v => `
-                    <tr>
-                        <td>${v.id}</td>
-                        <td id="title-${v.id}">${v.title}</td>
-                        <td>${v.author}</td>
-                        <td>
-                            <button class="action-pill" onclick="app.openAdminEditModal(${v.id}, '${v.title.replace(/'/g, "\\'")}')">✎ Modifier</button>
-                            <button class="action-pill btn-red" onclick="app.deleteVideo(${v.id})">❌ Supprimer</button>
-                        </td>
-                    </tr>
-                `).join('')}</tbody>
-            </table>`;
-        };
-        app.openAdminEditModal = function(id, title) {
-            this.currentEditVideoId = id;
-            document.getElementById('editVideoTitle').value = title;
-            document.getElementById('modalEditVideo').style.display = 'flex';
-        };
-        app.saveAdminVideoEdit = async function() {
-            const newTitle = document.getElementById('editVideoTitle').value;
-            const index = this.data.videos.findIndex(v => v.id == this.currentEditVideoId);
-            if (index > -1 && newTitle.trim()) {
-                this.data.videos[index].title = newTitle.trim();
-                document.getElementById(`title-${this.currentEditVideoId}`).innerText = newTitle.trim();
-                this.closeModals();
+            // Fonctions Admin complètes
+            renderAdminVideoList: function() {
+                const list = document.getElementById('adminVideoList');
+                const videos = this.data.videos;
+                list.innerHTML = `<table class="admin-table">
+                    <thead><tr><th>ID</th><th>Titre</th><th>Auteur</th><th>Actions</th></tr></thead>
+                    <tbody>${videos.map(v => `
+                        <tr>
+                            <td>${v.id}</td>
+                            <td id="title-${v.id}">${v.title}</td>
+                            <td>${v.author}</td>
+                            <td>
+                                <button class="action-pill" onclick="app.openAdminEditModal(${v.id}, '${v.title.replace(/'/g, "\\'")}')">✎ Modifier</button>
+                                <button class="action-pill btn-red" onclick="app.deleteVideo(${v.id})">❌ Supprimer</button>
+                            </td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>`;
+            },
+            openAdminEditModal: function(id, title) {
+                this.currentEditVideoId = id;
+                document.getElementById('editVideoTitle').value = title;
+                document.getElementById('modalEditVideo').style.display = 'flex';
+            },
+            saveAdminVideoEdit: async function() {
+                const newTitle = document.getElementById('editVideoTitle').value;
+                const index = this.data.videos.findIndex(v => v.id == this.currentEditVideoId);
+                if (index > -1 && newTitle.trim()) {
+                    this.data.videos[index].title = newTitle.trim();
+                    document.getElementById(`title-${this.currentEditVideoId}`).innerText = newTitle.trim();
+                    this.closeModals();
+                    await this.saveGist();
+                    alert("Titre de la vidéo mis à jour.");
+                    this.goAdminPanel(); 
+                } else { alert("Titre invalide ou vidéo non trouvée."); }
+            },
+            deleteVideo: async function(id) {
+                if (!confirm("Voulez-vous vraiment supprimer cette vidéo ?")) return;
+                this.data.videos = this.data.videos.filter(v => v.id != id);
                 await this.saveGist();
-                alert("Titre de la vidéo mis à jour.");
+                alert("Vidéo supprimée.");
                 this.goAdminPanel(); 
-            } else { alert("Titre invalide ou vidéo non trouvée."); }
-        };
-        app.deleteVideo = async function(id) {
-            if (!confirm("Voulez-vous vraiment supprimer cette vidéo ?")) return;
-            this.data.videos = this.data.videos.filter(v => v.id != id);
-            await this.saveGist();
-            alert("Vidéo supprimée.");
-            this.goAdminPanel(); 
-        };
-        app.renderAdminList = function() {
-            const list = document.getElementById('adminList');
-            const isPrimary = this.data.user && this.data.user.email === PRIMARY_ADMIN_EMAIL;
-            list.innerHTML = `<table class="admin-table">
-                <thead><tr><th>Email Admin</th><th>Actions</th></tr></thead>
-                <tbody>${this.data.admins.map(email => `
-                    <tr>
-                        <td>${email}</td>
-                        <td>
-                            ${email === PRIMARY_ADMIN_EMAIL ? '⭐ Admin Principal' :
-                                (isPrimary ? `<button class="action-pill btn-red" onclick="app.removeAdmin('${email}')">❌ Retirer</button>` : 'Opération non autorisée')
-                            }
-                        </td>
-                    </tr>
-                `).join('')}</tbody>
-            </table>`;
-        };
-        app.addAdmin = async function() {
-            if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut ajouter des admins.");
-            const newEmail = document.getElementById('newAdminEmail').value.trim();
-            if (newEmail && !this.data.admins.includes(newEmail)) {
-                this.data.admins.push(newEmail);
-                document.getElementById('newAdminEmail').value = '';
+            },
+            renderAdminList: function() {
+                const list = document.getElementById('adminList');
+                const isPrimary = this.data.user && this.data.user.email === PRIMARY_ADMIN_EMAIL;
+                list.innerHTML = `<table class="admin-table">
+                    <thead><tr><th>Email Admin</th><th>Actions</th></tr></thead>
+                    <tbody>${this.data.admins.map(email => `
+                        <tr>
+                            <td>${email}</td>
+                            <td>
+                                ${email === PRIMARY_ADMIN_EMAIL ? '⭐ Admin Principal' :
+                                    (isPrimary ? `<button class="action-pill btn-red" onclick="app.removeAdmin('${email}')">❌ Retirer</button>` : 'Opération non autorisée')
+                                }
+                            </td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>`;
+            },
+            addAdmin: async function() {
+                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut ajouter des admins.");
+                const newEmail = document.getElementById('newAdminEmail').value.trim();
+                if (newEmail && !this.data.admins.includes(newEmail)) {
+                    this.data.admins.push(newEmail);
+                    document.getElementById('newAdminEmail').value = '';
+                    await this.saveGist();
+                    alert(`Admin ${newEmail} ajouté !`);
+                    this.renderAdminList();
+                } else { alert("Email invalide ou déjà admin."); }
+            },
+            removeAdmin: async function(email) {
+                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut retirer des admins.");
+                if (email === PRIMARY_ADMIN_EMAIL) return alert("Impossible de retirer l'Admin Principal.");
+                this.data.admins = this.data.admins.filter(e => e !== email);
                 await this.saveGist();
-                alert(`Admin ${newEmail} ajouté !`);
+                alert(`Admin ${email} retiré.`);
                 this.renderAdminList();
-            } else { alert("Email invalide ou déjà admin."); }
-        };
-        app.removeAdmin = async function(email) {
-            if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut retirer des admins.");
-            if (email === PRIMARY_ADMIN_EMAIL) return alert("Impossible de retirer l'Admin Principal.");
-            this.data.admins = this.data.admins.filter(e => e !== email);
-            await this.saveGist();
-            alert(`Admin ${email} retiré.`);
-            this.renderAdminList();
-        };
-
-        // Rendu des fonctions de lecteur
-        app.openVideoOverlay = function(id) {
-            const v = this.data.videos.find(x => x.id == id);
-            if (!v) return;
-
-            document.getElementById('playerModal').style.display = 'block';
-            const player = document.getElementById('mainVideoPlayer');
-            player.src = v.url;
-            document.getElementById('playerTitle').innerText = v.title;
-
-            const currentVote = this.data.votes[id] || 0;
-            const likeBtn = `<button class="action-pill ${currentVote === 1 ? 'liked' : ''}" onclick="app.toggleVote(${id}, 'like')">👍 ${v.likes || 0}</button>`;
-            const dislikeBtn = `<button class="action-pill ${currentVote === -1 ? 'disliked' : ''}" onclick="app.toggleVote(${id}, 'dislike')">👎 ${v.dislikes || 0}</button>`;
-
-            document.getElementById('playerActions').innerHTML = `
-                <img src="${this.getAvatar(v.author)}" class="avatar-small" onclick="event.stopPropagation(); app.viewProfile('${v.author}')" style="margin-right: 10px;">
-                <h4 style="margin: 0; cursor:pointer;" onclick="event.stopPropagation(); app.viewProfile('${v.author}')">${v.author}</h4>
-                ${likeBtn} ${dislikeBtn}
-            `;
-            this.renderComments(v);
-        };
-        app.renderComments = function(video) {
-            const list = document.getElementById('commentList');
-            const count = document.getElementById('commentCount');
-            count.innerText = `Commentaires (${video.comments?.length || 0})`;
-            if (this.data.user) {
-                document.getElementById('userCommentAvatar').src = this.getAvatar(this.data.user.name);
-            }
-            list.innerHTML = video.comments.map(c => `
-                <div style="display:flex; gap:10px; margin-bottom:15px; align-items:flex-start;">
-                    <img src="${this.getAvatar(c.author)}" class="avatar-small">
-                    <div>
-                        <span style="font-weight:bold; font-size:14px;">${c.author}</span>
-                        <span style="font-size:12px; color:#999; margin-left:8px;">${new Date(c.time).toLocaleDateString()}</span>
-                        <p style="margin:2px 0 0 0;">${c.text}</p>
-                    </div>
-                </div>
-            `).join('');
-        };
-        app.addComment = async function() {
-            if(!this.data.user) return this.openLogin();
-            const commentInput = document.getElementById('newCommentInput');
-            const text = commentInput.value.trim();
-            const videoElement = document.getElementById('mainVideoPlayer');
-            if (!text || !videoElement.src) return;
-            const currentVideoUrl = videoElement.src;
-            const video = this.data.videos.find(v => v.url === currentVideoUrl);
-            if (!video) return;
-            const newComment = {
-                author: this.data.user.name,
-                text: text,
-                time: Date.now()
-            };
-            video.comments.push(newComment);
-            commentInput.value = '';
-            this.renderComments(video);
-            await this.saveGist();
+            },
         };
 
         app.init();
     </script>
 </body>
-    </html>
+</html>
