@@ -239,14 +239,14 @@
 
     <script>
         // --- CONFIGURATION ---
-        // 1. URL DU WORKER CLOUDFLARE
+        // 1. URL DU WORKER CLOUDFLARE (À REMPLACER)
         const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; 
         
-        // 2. CONFIG CLOUDINARY (Images/Vidéos)
+        // 2. CONFIG CLOUDINARY (Images/Vidéos) (À REMPLACER)
         const CLOUDINARY_CLOUD_NAME = "dvbsmh8qq"; 
         const CLOUDINARY_UPLOAD_PRESET = "mytube_upload"; 
 
-        // 3. URL LECTURE GIST 
+        // 3. URL LECTURE GIST (À REMPLACER)
         const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json"; 
         const GIST_FILE_NAME = "video.json"; 
 
@@ -318,7 +318,8 @@
                     localUserCreds[email] = { email, name, pass };
                     localStorage.setItem('mt_user_creds', JSON.stringify(localUserCreds));
                     
-                    this.data.users[name] = { name, email, bio: "Nouveau créateur MyTube", avatar: "", banner: "" };
+                    // Initialisation du profil utilisateur avec des valeurs par défaut
+                    this.data.users[name] = { name, email, bio: "Nouveau créateur MyTube", avatar: "", banner: "", subs: [] };
 
                     this.data.user = localUserCreds[email];
                     this.saveLocal(); 
@@ -431,23 +432,32 @@
                 }
             },
             
-            // --- VUE PROFIL (COMPTEUR ABONNÉS SIMPLIFIÉ) ---
+            // --- VUE PROFIL (CORRECTION COMPTEUR ABONNÉS) ---
             viewProfile: function(authorName) {
                 this.hideAll();
                 const v = document.getElementById('profileView');
                 v.style.display = 'block';
                 
+                // Récupère les données du profil visité
                 const profile = this.data.users[authorName] || { name: authorName, bio: "Créateur sans profil public.", avatar: "", banner: "" };
                 const videos = this.data.videos.filter(x => x.author === authorName);
                 const isMyProfile = this.data.user && this.data.user.name === authorName;
 
-                // Compteur d'abonnés basé sur une estimation simple (puisque les abonnements sont locaux)
-                const subCountDisplay = videos.length * 5 + (Math.floor(Math.random() * 50)); 
+                // CORRECTION DU COMPTEUR: Compte le nombre d'utilisateurs qui ont 'authorName' dans leur tableau 'subs' (depuis le GIST)
+                let followerCount = 0;
+                for (const userName in this.data.users) {
+                    if (this.data.users[userName] && this.data.users[userName].subs && this.data.users[userName].subs.includes(authorName)) {
+                         followerCount++;
+                    }
+                }
                 
+                // Affichage des PP et Bannières (même si elles sont vides)
                 document.getElementById('pBanner').src = profile.banner || '';
                 document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
                 document.getElementById('pName').innerText = profile.name;
-                document.getElementById('pStats').innerText = `${subCountDisplay} abonnés • ${videos.length} vidéos`; 
+                
+                // AFFICHAGE CORRIGÉ
+                document.getElementById('pStats').innerText = `${followerCount} abonnés • ${videos.length} vidéos`; 
                 document.getElementById('pBio').innerText = profile.bio;
 
                 const actions = document.getElementById('profileActions');
@@ -456,6 +466,7 @@
                 if (isMyProfile) {
                     actions.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
                 } else if (this.data.user) {
+                    // L'état de l'abonnement est lu depuis les données locales (mt_subs)
                     const isSubscribed = this.data.subs.includes(authorName);
                     actions.innerHTML = `<button class="action-pill ${isSubscribed ? 'followed' : 'btn-red'}" onclick="app.toggleSub('${authorName}')">${isSubscribed ? '✅ Abonné' : 'S\'abonner'}</button>`;
                 }
@@ -463,6 +474,7 @@
                 this.render(videos, 'pVideos');
             },
 
+            // CORRECTION: Utilise les données du GIST pour les petits avatars
             getAvatar: function(name) {
                 return this.data.users[name]?.avatar || 'https://via.placeholder.com/36?text=U';
             },
@@ -602,18 +614,29 @@
                 this.openVideoOverlay(id);
             },
             
+            // CORRECTION: Synchronisation de l'abonnement dans le Local Storage ET le Gist
             toggleSub: async function(author) {
                 if(!this.data.user) return this.openLogin();
-                
+                const myUserName = this.data.user.name;
+
+                // 1. Mise à jour locale (pour le bouton)
                 const index = this.data.subs.indexOf(author);
                 if (index > -1) {
-                    this.data.subs.splice(index, 1);
+                    this.data.subs.splice(index, 1); // Se désabonner
                 } else {
-                    this.data.subs.push(author);
+                    this.data.subs.push(author); // S'abonner
                 }
-                
                 this.saveLocal(); 
-                this.viewProfile(author); 
+
+                // 2. Mise à jour du Gist (pour le compteur global)
+                if (!this.data.users[myUserName]) {
+                    // Si le profil n'existe pas encore dans this.data.users (rare, mais au cas où)
+                    this.data.users[myUserName] = { name: myUserName, email: this.data.user.email };
+                }
+                this.data.users[myUserName].subs = this.data.subs;
+                
+                await this.saveGist();
+                this.viewProfile(author); // Recharger la vue pour mettre à jour le bouton et le compteur
             },
 
             // --- GESTION ADMIN ---
@@ -860,6 +883,8 @@
                     await this.saveGist();
                     alert(`Admin ${newEmail} ajouté !`);
                     this.renderAdminList();
+                    // CORRECTION: Met à jour l'interface pour afficher le lien admin immédiatement
+                    this.updateAuthUI(); 
                 } else { alert("Email invalide ou déjà admin."); }
             },
             removeAdmin: async function(email) {
@@ -870,14 +895,6 @@
                 alert(`Admin ${email} retiré.`);
                 this.renderAdminList();
             },
-
-
-            // Initialisation
-            init: async function() {
-                await this.loadData();
-                this.updateAuthUI();
-                this.goHome();
-            }
         };
 
         app.init();
