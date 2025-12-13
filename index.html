@@ -282,23 +282,53 @@
                 } catch(e) { console.error("Load Error", e); }
             },
 
+            // FONCTION DE SAUVEGARDE CORRIGÉE ET RENFORCÉE
             saveGist: async function() {
                 if(!WORKER_PROXY_URL) {
                     console.error("WORKER_PROXY_URL est vide. Le Gist ne sera pas mis à jour.");
                     alert("ERREUR: Le lien Cloudflare Worker est vide. Le Gist ne sera pas mis à jour.");
                     return;
                 }
-                // S'assurer qu'au moins l'utilisateur actif a bien son profil mis à jour avant la sauvegarde globale
+                
+                // Assurez-vous que les abonnements locaux de l'utilisateur connecté sont enregistrés dans son profil Gist avant la sauvegarde
                 if (this.data.user && this.data.users[this.data.user.name]) {
+                    // Met à jour la propriété subs DANS l'objet utilisateur Gist
                     this.data.users[this.data.user.name].subs = this.data.subs;
+                } else if (this.data.user) {
+                    // Si l'utilisateur est connecté mais n'a pas d'objet dans this.data.users (nouveau profil)
+                    this.data.users[this.data.user.name] = { 
+                        name: this.data.user.name, 
+                        email: this.data.user.email, 
+                        subs: this.data.subs,
+                        avatar: "", 
+                        banner: "", 
+                        bio: "" 
+                    };
                 }
                 
-                const content = { videos: this.data.videos, users: this.data.users, admins: this.data.admins };
-                await fetch(WORKER_PROXY_URL, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
-                });
+                // Préparation du contenu complet à sauvegarder
+                const content = { 
+                    videos: this.data.videos, 
+                    users: this.data.users, 
+                    admins: this.data.admins 
+                };
+                
+                try {
+                    const response = await fetch(WORKER_PROXY_URL, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Gist save failed. Response:", errorText);
+                        alert(`ERREUR CRITIQUE: Échec de la sauvegarde sur le Gist (Code: ${response.status}). Vérifiez le Worker Cloudflare et sa configuration (Token GitHub). Détails en console.`);
+                    }
+                } catch (e) {
+                    console.error("Network or Fetch error during Gist save:", e);
+                    alert("ERREUR RÉSEAU: Impossible de contacter le Worker Cloudflare. Vérifiez votre connexion et l'URL du Worker.");
+                }
             },
             
             // --- AUTHENTIFICATION / LOCAL STORAGE ---
@@ -466,7 +496,7 @@
                     }
                 }
                 
-                // AFFICHAGE DES PP ET BANNIÈRES CORRIGÉES
+                // AFFICHAGE DES PP ET BANNIÈRES 
                 document.getElementById('pBanner').src = profile.banner || '';
                 document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
                 
@@ -487,7 +517,7 @@
                 this.render(videos, 'pVideos');
             },
 
-            // CORRECTION: Utilise les données du GIST pour les petits avatars
+            // Utilise les données du GIST pour les petits avatars
             getAvatar: function(name) {
                 return this.data.users[name]?.avatar || 'https://via.placeholder.com/36?text=U';
             },
