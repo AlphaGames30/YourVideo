@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyTube - AlphaGames30</title>
+    <title>Visiona - AlphaGames30</title>
     <style>
         :root { --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa; --hover: #272727; --blue: #3ea6ff; --red: #ff0000; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, Arial, sans-serif; overflow-x: hidden; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; height: 56px; background: var(--header); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
+        /* NOM DU SITE MIS À JOUR */
         .logo { font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; }
         .logo::before { content: '▶'; color: var(--red); font-size: 24px; margin-right: 5px; }
         .search-box { display: flex; flex: 1; max-width: 500px; margin: 0 10px; }
@@ -29,7 +30,7 @@
         .thumb-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #333; }
         .thumb { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Shorts pour un affichage vertical et scroll horizontal */
+        /* ZAPP (Shorts) pour un affichage vertical et scroll horizontal */
         .shorts-grid { 
             display: flex; 
             gap: 15px; 
@@ -57,10 +58,10 @@
         /* Conteneur vidéo standard (16:9) */
         .video-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; }
         
-        /* Nouveau conteneur pour les Shorts (vertical 9:16) */
+        /* Nouveau conteneur pour les ZAPP (Shorts) (vertical 9:16) */
         .short-player-wrapper { 
             width: 100%; 
-            max-width: 400px; /* Largeur maximale pour le Short */
+            max-width: 400px; /* Largeur maximale pour le Zapp */
             aspect-ratio: 9/16; /* Format vertical */
             background: #000; 
             margin: 0 auto; /* Centrage horizontal */
@@ -110,7 +111,7 @@
 <body>
 
     <header>
-        <div class="logo" onclick="app.goHome()"><span>MyTube</span></div>
+        <div class="logo" onclick="app.goHome()"><span>Visiona</span></div>
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Rechercher...">
             <button onclick="app.search()">🔍</button>
@@ -131,7 +132,7 @@
     <div class="container">
         <nav class="sidebar">
             <div class="nav-item" onclick="app.goHome()">🏠 Accueil</div>
-            <div class="nav-item" onclick="app.goShorts()">📱 Shorts</div>
+            <div class="nav-item" onclick="app.goShorts()">⚡ Zapp</div>
             <div class="nav-item" onclick="app.goSubs()">📺 Suivis</div>
             <hr style="border-color: #333;">
             <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
@@ -209,7 +210,7 @@
                 <div class="progress-fill" id="uploadProgressFill"></div>
             </div>
             <input type="text" id="upTitle" placeholder="Titre">
-            <label style="color:#aaa; font-size:12px;">Fichier Vidéo (Auto-détection Short)</label>
+            <label style="color:#aaa; font-size:12px;">Fichier Vidéo (Auto-détection Zapp)</label>
             <input type="file" id="upVideoFile" accept="video/*">
             <label style="color:#aaa; font-size:12px;">Miniature</label>
             <input type="file" id="upThumbFile" accept="image/*">
@@ -247,7 +248,7 @@
         const CLOUDINARY_UPLOAD_PRESET = "mytube_upload"; 
 
         // 3. URL LECTURE GIST (À REMPLACER)
-        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json"; 
+        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0c560faad87c92/raw/video.json"; 
         const GIST_FILE_NAME = "video.json"; 
 
         const PRIMARY_ADMIN_EMAIL = "edonis.imbert@gmail.com"; 
@@ -287,6 +288,11 @@
                     alert("ERREUR: Le lien Cloudflare Worker est vide. Le Gist ne sera pas mis à jour.");
                     return;
                 }
+                // S'assurer qu'au moins l'utilisateur actif a bien son profil mis à jour avant la sauvegarde globale
+                if (this.data.user && this.data.users[this.data.user.name]) {
+                    this.data.users[this.data.user.name].subs = this.data.subs;
+                }
+                
                 const content = { videos: this.data.videos, users: this.data.users, admins: this.data.admins };
                 await fetch(WORKER_PROXY_URL, {
                     method: 'PATCH',
@@ -318,8 +324,8 @@
                     localUserCreds[email] = { email, name, pass };
                     localStorage.setItem('mt_user_creds', JSON.stringify(localUserCreds));
                     
-                    // Initialisation du profil utilisateur avec des valeurs par défaut
-                    this.data.users[name] = { name, email, bio: "Nouveau créateur MyTube", avatar: "", banner: "", subs: [] };
+                    // Initialisation du profil utilisateur avec des valeurs par défaut dans le Gist
+                    this.data.users[name] = { name, email, bio: "Nouveau créateur Visiona", avatar: "", banner: "", subs: [] };
 
                     this.data.user = localUserCreds[email];
                     this.saveLocal(); 
@@ -385,7 +391,16 @@
                 const status = document.getElementById('profileUploadStatus');
 
                 const userName = this.data.user.name; 
-                let userData = this.data.users[userName] || { name: userName, email: this.data.user.email, subs: [] }; 
+                
+                // Assurez-vous que l'objet utilisateur existe dans this.data.users
+                let userData = this.data.users[userName] || { 
+                    name: userName, 
+                    email: this.data.user.email, 
+                    subs: this.data.subs, 
+                    avatar: "", 
+                    banner: "", 
+                    bio: "" 
+                }; 
 
                 if(name && name !== userName) {
                      alert("Le changement de nom de chaîne n'est pas supporté pour le moment.");
@@ -432,31 +447,30 @@
                 }
             },
             
-            // --- VUE PROFIL (CORRECTION COMPTEUR ABONNÉS) ---
+            // --- VUE PROFIL ---
             viewProfile: function(authorName) {
                 this.hideAll();
                 const v = document.getElementById('profileView');
                 v.style.display = 'block';
                 
-                // Récupère les données du profil visité
-                const profile = this.data.users[authorName] || { name: authorName, bio: "Créateur sans profil public.", avatar: "", banner: "" };
+                // Récupère les données du profil visité. Fournit des valeurs par défaut pour éviter les erreurs.
+                const profile = this.data.users[authorName] || { name: authorName, bio: `Créateur sur Visiona.`, avatar: "", banner: "" };
                 const videos = this.data.videos.filter(x => x.author === authorName);
                 const isMyProfile = this.data.user && this.data.user.name === authorName;
 
-                // CORRECTION DU COMPTEUR: Compte le nombre d'utilisateurs qui ont 'authorName' dans leur tableau 'subs' (depuis le GIST)
+                // Compteur: Compte les utilisateurs dans le GIST qui ont 'authorName' dans leur tableau 'subs'
                 let followerCount = 0;
                 for (const userName in this.data.users) {
-                    if (this.data.users[userName] && this.data.users[userName].subs && this.data.users[userName].subs.includes(authorName)) {
+                    if (this.data.users[userName] && Array.isArray(this.data.users[userName].subs) && this.data.users[userName].subs.includes(authorName)) {
                          followerCount++;
                     }
                 }
                 
-                // Affichage des PP et Bannières (même si elles sont vides)
+                // AFFICHAGE DES PP ET BANNIÈRES CORRIGÉES
                 document.getElementById('pBanner').src = profile.banner || '';
                 document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
-                document.getElementById('pName').innerText = profile.name;
                 
-                // AFFICHAGE CORRIGÉ
+                document.getElementById('pName').innerText = profile.name;
                 document.getElementById('pStats').innerText = `${followerCount} abonnés • ${videos.length} vidéos`; 
                 document.getElementById('pBio').innerText = profile.bio;
 
@@ -466,7 +480,6 @@
                 if (isMyProfile) {
                     actions.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
                 } else if (this.data.user) {
-                    // L'état de l'abonnement est lu depuis les données locales (mt_subs)
                     const isSubscribed = this.data.subs.includes(authorName);
                     actions.innerHTML = `<button class="action-pill ${isSubscribed ? 'followed' : 'btn-red'}" onclick="app.toggleSub('${authorName}')">${isSubscribed ? '✅ Abonné' : 'S\'abonner'}</button>`;
                 }
@@ -552,6 +565,7 @@
                     const videoUrl = await this.uploadCloudinary(videoFile, 'video', status, progressFill, progressBar);
                     if (!videoUrl) throw new Error("Échec de l'upload de la vidéo.");
 
+                    // Renommage "Short" en "Zapp"
                     let isShort = false;
                     const videoElement = document.createElement('video');
                     videoElement.src = URL.createObjectURL(videoFile);
@@ -571,7 +585,7 @@
                         author: this.data.user.name,
                         likes: 0,
                         dislikes: 0,
-                        isShort: isShort,
+                        isShort: isShort, // Garde le nom de variable technique isShort
                         comments: []
                     };
 
@@ -614,7 +628,6 @@
                 this.openVideoOverlay(id);
             },
             
-            // CORRECTION: Synchronisation de l'abonnement dans le Local Storage ET le Gist
             toggleSub: async function(author) {
                 if(!this.data.user) return this.openLogin();
                 const myUserName = this.data.user.name;
@@ -630,10 +643,10 @@
 
                 // 2. Mise à jour du Gist (pour le compteur global)
                 if (!this.data.users[myUserName]) {
-                    // Si le profil n'existe pas encore dans this.data.users (rare, mais au cas où)
-                    this.data.users[myUserName] = { name: myUserName, email: this.data.user.email };
+                    this.data.users[myUserName] = { name: myUserName, email: this.data.user.email, subs: this.data.subs };
+                } else {
+                    this.data.users[myUserName].subs = this.data.subs;
                 }
-                this.data.users[myUserName].subs = this.data.subs;
                 
                 await this.saveGist();
                 this.viewProfile(author); // Recharger la vue pour mettre à jour le bouton et le compteur
@@ -680,7 +693,8 @@
                 this.hideAll(); 
                 const g = document.getElementById('shortsGrid'); 
                 g.style.display = 'flex'; 
-                document.getElementById('mainTitle').innerHTML = "<h2>Shorts</h2>"; 
+                // NOM DU SYSTÈME DE SHORT MIS À JOUR
+                document.getElementById('mainTitle').innerHTML = "<h2>⚡ Zapp</h2>"; 
                 
                 g.innerHTML = this.data.videos.filter(x => x.isShort).map(s => `
                     <div class="short-card" onclick="app.openVideoOverlay(${s.id})">
@@ -883,7 +897,6 @@
                     await this.saveGist();
                     alert(`Admin ${newEmail} ajouté !`);
                     this.renderAdminList();
-                    // CORRECTION: Met à jour l'interface pour afficher le lien admin immédiatement
                     this.updateAuthUI(); 
                 } else { alert("Email invalide ou déjà admin."); }
             },
