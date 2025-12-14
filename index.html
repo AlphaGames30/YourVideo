@@ -6,30 +6,34 @@
     <title>Visiona - AlphaGames30</title>
     <style>
         :root { --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa; --hover: #272727; --blue: #3ea6ff; --red: #ff0000; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, Arial, sans-serif; overflow-x: hidden; padding-bottom: 60px; }
-        
+        /* padding-bottom ajouté pour laisser de la place à la barre de navigation mobile */
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, Arial, sans-serif; overflow-x: hidden; padding-bottom: 60px; } 
+
         header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; height: 56px; background: var(--header); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
         .logo { font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; }
         .logo::before { content: '▶'; color: var(--red); font-size: 24px; margin-right: 5px; }
-        
         .search-box { display: flex; flex: 1; max-width: 500px; margin: 0 10px; }
-        .search-box input { width: 100%; background: #121212; border: 1px solid #333; color: white; padding: 8px 15px; border-radius: 40px 0 0 40px; }
+        .search-box input { width: 100%; background: #121212; border: 1px solid #333; color: white; padding: 8px 15px; border-radius: 40px 0 0 40px; font-size: 14px; }
         .search-box button { background: #222; border: 1px solid #333; border-left: none; padding: 0 20px; border-radius: 0 40px 40px 0; cursor: pointer; color: var(--sec-text); }
         
         .header-btns button { background: none; border: none; color: white; font-size: 20px; margin-left: 10px; cursor: pointer; }
         .btn-login { border: 1px solid var(--blue) !important; color: var(--blue) !important; font-size: 14px !important; padding: 5px 10px; border-radius: 20px; font-weight: bold; }
 
         .container { display: flex; height: calc(100vh - 56px); }
+        
+        /* Sidebar : Caché par défaut sur mobile */
         .sidebar { width: 220px; background: var(--bg); padding: 10px; overflow-y: auto; flex-shrink: 0; border-right: 1px solid #222; }
         .nav-item { padding: 10px; border-radius: 10px; cursor: pointer; margin-bottom: 5px; }
         .nav-item:hover { background: var(--hover); }
 
-        /* Navigation mobile (bas de l'écran) */
+        /* Navigation mobile (Barre du bas) */
         .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: #0f0f0f; border-top: 1px solid #222; justify-content: space-around; align-items: center; z-index: 1000; }
         .mobile-nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--sec-text); cursor: pointer; }
         .mobile-nav-item span { font-size: 20px; color: white; }
 
         .content { flex: 1; padding: 20px; overflow-y: auto; }
+        
+        /* Grille de vidéos adaptative */
         .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .video-card { cursor: pointer; transition: transform 0.2s; }
         .video-card:hover { transform: scale(1.02); }
@@ -44,17 +48,21 @@
         .player-content { width: 95%; max-width: 1200px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; }
         
         #videoContainer { width: 100%; aspect-ratio: 16/9; background: #000; }
+        /* Style pour les zapps verticaux */
         #videoContainer.short-player-wrapper { width: 100%; max-width: 400px; aspect-ratio: 9/16; background: #000; margin: 0 auto; }
         video { width: 100%; height: 100%; }
 
+        /* Media Query pour les téléphones */
         @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .mobile-nav { display: flex; }
-            .search-box { display: none; }
-            .video-grid { grid-template-columns: 1fr; }
-            .content { padding: 10px; }
+            .sidebar { display: none; } /* Cache la barre latérale */
+            .mobile-nav { display: flex; } /* Affiche la barre de navigation du bas */
+            .search-box { display: none; } /* Cache la recherche dans le header pour les téléphones */
+            .video-grid { grid-template-columns: 1fr; } /* Une seule colonne de vidéo sur mobile */
+            .content { padding: 10px; } /* Moins de padding */
+            .profile-head { flex-direction: column; align-items: flex-start; } /* Le profil passe en colonne */
+            .avatar-big { margin-top: -60px; } /* Remonte l'avatar */
         }
-
+        
         .comment-section { background: #1a1a1a; padding: 20px; border-radius: 12px; }
         .comment-input-area { display: flex; gap: 10px; margin-bottom: 20px; }
         .comment-input-area input { flex: 1; background: none; border: none; border-bottom: 1px solid #333; color: white; padding: 8px; }
@@ -62,7 +70,7 @@
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; justify-content: center; align-items: center; }
         .modal-box { background: #212121; padding: 25px; border-radius: 15px; width: 90%; max-width: 450px; }
-        input[type="text"], input[type="password"], input[type="email"] { width: 100%; padding: 12px; margin: 10px 0; background: #121212; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
+        input[type="text"], input[type="password"], input[type="email"], textarea { width: 100%; padding: 12px; margin: 10px 0; background: #121212; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
         .btn-blue { width: 100%; padding: 12px; background: var(--blue); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
         .avatar-big { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--bg); background: #555; object-fit: cover; }
@@ -72,6 +80,11 @@
 
         .progress-bar { height: 15px; background: #444; border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--blue); width: 0%; transition: width 0.1s; }
+        
+        /* Admin table style */
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .admin-table th, .admin-table td { border: 1px solid #333; padding: 8px; text-align: left; }
+        .admin-table th { background: #222; }
     </style>
 </head>
 <body>
@@ -115,6 +128,7 @@
             <div id="mainTitle"></div>
             <div id="videoGrid" class="video-grid"></div>
             <div id="shortsGrid" class="shorts-grid" style="display:none;"></div>
+            
             <div id="profileView" class="profile-view" style="display:none;">
                 <img class="banner" id="pBanner" src="">
                 <div class="profile-head">
@@ -153,6 +167,10 @@
             <div id="playerActions" style="display:flex; gap:10px; align-items:center;"></div>
             <div class="comment-section">
                 <h4 id="commentCount">Commentaires</h4>
+                <div class="comment-input-area" id="commentInputArea">
+                    <input type="text" id="newCommentText" placeholder="Écrire un commentaire...">
+                    <button class="action-pill" onclick="app.postComment()">Publier</button>
+                </div>
                 <div id="commentList"></div>
             </div>
         </div>
@@ -170,6 +188,19 @@
             <input type="file" id="upThumbFile" accept="image/*">
             <button class="btn-blue" id="publishBtn" onclick="app.publish()">PUBLIER</button>
             <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Annuler</button>
+        </div>
+    </div>
+    
+    <div id="modalEditProfile" class="modal">
+        <div class="modal-box">
+            <h2>Modifier Profil</h2>
+            <input type="text" id="editName" placeholder="Nom">
+            <textarea id="editBio" placeholder="Bio"></textarea>
+            <label style="font-size:11px; color:#aaa;">Avatar :</label>
+            <input type="file" id="editAvatar" accept="image/*">
+            <label style="font-size:11px; color:#aaa;">Bannière :</label>
+            <input type="file" id="editBanner" accept="image/*">
+            <button class="btn-blue" onclick="app.saveProfile()">Sauvegarder</button>
         </div>
     </div>
 
@@ -196,6 +227,7 @@
                 admins: [PRIMARY_ADMIN_EMAIL], 
                 votes: JSON.parse(localStorage.getItem('mt_votes')) || {},
                 subs: JSON.parse(localStorage.getItem('mt_subs')) || [], 
+                currentVideoId: null,
             },
 
             init: async function() {
@@ -234,6 +266,9 @@
                 } else if (s == 2) { 
                     const name = document.getElementById('logNewName').value;
                     const pass = document.getElementById('logNewPass').value;
+                    if(this.data.users[name]) return alert("Ce nom d'utilisateur est déjà pris.");
+                    if(!name || !pass) return alert("Nom et mot de passe requis.");
+                    
                     localUserCreds[email] = { email, name, pass };
                     localStorage.setItem('mt_user_creds', JSON.stringify(localUserCreds));
                     this.data.users[name] = { name, email, bio: "Nouveau créateur Visiona", avatar: "", banner: "", subs: [] };
@@ -251,7 +286,11 @@
                 }
             },
             
-            doLogout: function() { localStorage.removeItem('mt_user'); location.reload(); },
+            doLogout: function() { 
+                localStorage.removeItem('mt_user'); 
+                document.getElementById('accountMenu').style.display = 'none'; // Ferme le menu
+                location.reload(); 
+            },
             
             updateAuthUI: function() {
                 const b = document.getElementById('loginBtn');
@@ -262,6 +301,12 @@
                 }
             },
             
+            toggleAccountMenu: function() {
+                if(!this.data.user) return this.openLogin();
+                const m = document.getElementById('accountMenu'); 
+                m.style.display = m.style.display === 'none' ? 'block' : 'none';
+            },
+
             goHome: function() { 
                 this.hideAll(); 
                 document.getElementById('videoGrid').style.display = 'grid'; 
@@ -277,6 +322,7 @@
                 g.innerHTML = this.data.videos.filter(x => x.isShort).map(s => `
                     <div class="short-card" onclick="app.openVideoOverlay(${s.id})">
                         <img src="${s.thumb}">
+                        <div style="position:absolute; bottom:10px; left:10px; font-size:12px; font-weight:bold; color:white; text-shadow: 1px 1px 2px black;">${s.title}</div>
                     </div>
                 `).join(''); 
             },
@@ -292,29 +338,53 @@
             viewProfile: function(authorName) {
                 this.hideAll();
                 document.getElementById('profileView').style.display = 'block';
-                const profile = this.data.users[authorName] || { name: authorName };
+                const profile = this.data.users[authorName] || { name: authorName, bio: "", avatar: "", banner: "" };
                 const videos = this.data.videos.filter(x => x.author === authorName);
                 
                 document.getElementById('pBanner').src = profile.banner || '';
                 document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
                 document.getElementById('pName').innerText = profile.name;
-                
+                document.getElementById('pBio').innerText = profile.bio;
+
                 let followerCount = 0;
                 for (const userName in this.data.users) {
                     if (this.data.users[userName] && Array.isArray(this.data.users[userName].subs) && this.data.users[userName].subs.includes(authorName)) followerCount++;
                 }
                 document.getElementById('pStats').innerText = `${followerCount} abonnés • ${videos.length} vidéos`;
+                
+                const actions = document.getElementById('profileActions');
+                if(this.data.user) {
+                    if(this.data.user.name === authorName) {
+                        actions.innerHTML = `<button class="action-pill" onclick="app.openEditProfile()">Modifier Profil</button>`;
+                    } else {
+                        const isSub = this.data.subs.includes(authorName);
+                        actions.innerHTML = `<button class="action-pill" onclick="app.toggleSub('${authorName}')" style="background:${isSub?'#272727':'#3ea6ff'}; color:${isSub?'white':'black'}">${isSub?'Abonné':'S\'abonner'}</button>`;
+                    }
+                } else actions.innerHTML = '';
+
+
                 this.render(videos, 'pVideos');
+            },
+
+            toggleSub: function(author) {
+                if(!this.data.user) return this.openLogin();
+                const idx = this.data.subs.indexOf(author);
+                if(idx > -1) this.data.subs.splice(idx, 1);
+                else this.data.subs.push(author);
+                localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
+                this.viewProfile(author);
             },
 
             render: function(list, target = 'videoGrid') {
                 const el = document.getElementById(target);
+                if(list.length === 0) { el.innerHTML = "<p style='color:#aaa; padding:20px;'>Rien à afficher.</p>"; return; }
                 el.innerHTML = list.map(v => `
                     <div class="video-card" onclick="app.openVideoOverlay(${v.id})">
                         <div class="thumb-container"><img src="${v.thumb}" class="thumb"></div>
                         <div style="padding-top:8px;">
                             <h3 style="margin:0; font-size:16px;">${v.title}</h3>
                             <p style="margin:0; font-size:14px; color:var(--sec-text);">${v.author}</p>
+                            <p style="margin:0; font-size:12px; color:var(--sec-text);">${v.likes} J'aime</p>
                         </div>
                     </div>
                 `).join('');
@@ -323,49 +393,200 @@
             openVideoOverlay: function(id) {
                 const v = this.data.videos.find(x => x.id == id);
                 if (!v) return;
+                this.data.currentVideoId = id;
                 document.getElementById('playerModal').style.display = 'block';
                 const container = document.getElementById('videoContainer');
                 const player = document.getElementById('mainVideoPlayer');
                 container.className = v.isShort ? 'short-player-wrapper' : '';
                 player.src = v.url;
                 document.getElementById('playerTitle').innerText = v.title;
+                this.renderPlayerActions(v);
+                this.renderComments(v);
             },
+            
+            renderPlayerActions: function(v) {
+                const actions = document.getElementById('playerActions');
+                const userVote = this.data.votes[v.id] || 0;
+                
+                const likeBtn = `<button class="action-pill" onclick="app.vote(${v.id}, 1)" style="${userVote === 1 ? 'background:var(--blue);' : ''}">👍 ${v.likes}</button>`;
+                const dislikeBtn = `<button class="action-pill" onclick="app.vote(${v.id}, -1)" style="${userVote === -1 ? 'background:var(--blue);' : ''}">👎 ${v.dislikes}</button>`;
+                
+                const subBtn = `<button class="action-pill" onclick="app.viewProfile('${v.author}')" style="background:#222;">${v.author}</button>`;
 
-            publish: async function() {
-                if(!this.data.user) return;
-                const title = document.getElementById('upTitle').value;
-                const vFile = document.getElementById('upVideoFile').files[0];
-                const tFile = document.getElementById('upThumbFile').files[0];
-                if(!vFile || !tFile) return;
+                actions.innerHTML = likeBtn + dislikeBtn + subBtn;
+            },
+            
+            vote: async function(videoId, type) {
+                if(!this.data.user) return this.openLogin();
+                const video = this.data.videos.find(v => v.id === videoId);
+                const userVote = this.data.votes[videoId] || 0;
 
-                document.getElementById('publishBtn').disabled = true;
-                const tUrl = await this.uploadCloudinary(tFile, 'image');
-                const vUrl = await this.uploadCloudinary(vFile, 'video', true);
+                if(userVote === type) { // Retirer le vote
+                    video[type === 1 ? 'likes' : 'dislikes']--;
+                    this.data.votes[videoId] = 0;
+                } else { // Changer ou ajouter un vote
+                    if(userVote !== 0) video[userVote === 1 ? 'likes' : 'dislikes']--; // Retirer l'ancien vote
+                    video[type === 1 ? 'likes' : 'dislikes']++; // Ajouter le nouveau vote
+                    this.data.votes[videoId] = type;
+                }
 
-                const isShort = await new Promise(r => {
-                    const vid = document.createElement('video');
-                    vid.src = URL.createObjectURL(vFile);
-                    vid.onloadedmetadata = () => r(vid.videoHeight > vid.videoWidth);
-                });
-
-                this.data.videos.unshift({ id: Date.now(), title, url: vUrl, thumb: tUrl, author: this.data.user.name, isShort, likes:0, dislikes:0, comments:[] });
+                localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
                 await this.saveGist();
-                location.reload();
+                this.renderPlayerActions(video);
             },
 
-            uploadCloudinary: async function(file, type, showProgress = false) {
+            renderComments: function(v) {
+                const list = document.getElementById('commentList');
+                document.getElementById('commentCount').innerText = `Commentaires (${v.comments.length})`;
+                document.getElementById('commentInputArea').style.display = this.data.user ? 'flex' : 'none';
+
+                list.innerHTML = v.comments.sort((a,b) => b.time - a.time).map(c => {
+                    const profile = this.data.users[c.author] || { avatar: 'https://via.placeholder.com/36' };
+                    return `
+                        <div style="display:flex; gap:10px; margin-bottom:15px; border-bottom:1px solid #111; padding-bottom:10px;">
+                            <img src="${this.getAvatar(c.author)}" class="avatar-small">
+                            <div>
+                                <div style="font-size:12px; color:#aaa;">${c.author} · ${new Date(c.time).toLocaleDateString()}</div>
+                                <div>${c.text}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            postComment: async function() {
+                if(!this.data.user || !this.data.currentVideoId) return;
+                const text = document.getElementById('newCommentText').value.trim();
+                if(!text) return;
+                
+                const video = this.data.videos.find(v => v.id === this.data.currentVideoId);
+                video.comments.push({ author: this.data.user.name, text: text, time: Date.now() });
+                
+                document.getElementById('newCommentText').value = '';
+                await this.saveGist();
+                this.renderComments(video);
+            },
+            
+            openEditProfile: function() {
+                if(!this.data.user) return;
+                const profile = this.data.users[this.data.user.name];
+                document.getElementById('editName').value = profile.name;
+                document.getElementById('editBio').value = profile.bio || '';
+                document.getElementById('modalEditProfile').style.display = 'flex';
+            },
+
+            saveProfile: async function() {
+                const profile = this.data.users[this.data.user.name];
+                profile.name = document.getElementById('editName').value;
+                profile.bio = document.getElementById('editBio').value;
+                
+                const avatarFile = document.getElementById('editAvatar').files[0];
+                const bannerFile = document.getElementById('editBanner').files[0];
+
+                if(avatarFile) profile.avatar = await this.uploadCloudinary(avatarFile, 'image');
+                if(bannerFile) profile.banner = await this.uploadCloudinary(bannerFile, 'image');
+
+                await this.saveGist();
+                this.closeModals();
+                this.viewProfile(profile.name);
+            },
+
+            goAdminPanel: function() { 
+                if(!this.isAdmin()) return;
+                this.hideAll(); 
+                document.getElementById('adminPanel').style.display='block';
+                this.renderAdminVideoList();
+                this.renderAdminList();
+            },
+
+            renderAdminVideoList: function() {
+                const list = document.getElementById('adminVideoList');
+                list.innerHTML = `
+                    <h3>Gestion des Vidéos (${this.data.videos.length})</h3>
+                    <table class="admin-table">
+                        <thead><tr><th>ID</th><th>Titre</th><th>Auteur</th><th>Actions</th></tr></thead>
+                        <tbody>${this.data.videos.map(v => `
+                            <tr>
+                                <td>${v.id}</td>
+                                <td>${v.title}</td>
+                                <td>${v.author}</td>
+                                <td><button class="action-pill" onclick="app.deleteVideo(${v.id})">Supprimer</button></td>
+                            </tr>
+                        `).join('')}</tbody>
+                    </table>`;
+            },
+            
+            deleteVideo: async function(id) {
+                if(!confirm("Êtes-vous sûr de vouloir supprimer cette vidéo ?")) return;
+                this.data.videos = this.data.videos.filter(v => v.id !== id);
+                await this.saveGist();
+                this.renderAdminVideoList();
+                this.goHome();
+            },
+            
+            renderAdminList: function() {
+                const list = document.getElementById('adminList');
+                list.innerHTML = `
+                    <table class="admin-table">
+                        <thead><tr><th>Email</th><th>Actions</th></tr></thead>
+                        <tbody>${this.data.admins.map(email => `
+                            <tr>
+                                <td>${email}</td>
+                                <td>
+                                    ${email === PRIMARY_ADMIN_EMAIL ? 'Admin Principal' : 
+                                      `<button class="action-pill" onclick="app.removeAdmin('${email}')">Retirer</button>`
+                                    }
+                                </td>
+                            </tr>
+                        `).join('')}</tbody>
+                    </table>`;
+            },
+            
+            addAdmin: async function() {
+                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut ajouter des admins.");
+                const newEmail = document.getElementById('newAdminEmail').value.trim();
+                if (newEmail && !this.data.admins.includes(newEmail)) {
+                    this.data.admins.push(newEmail);
+                    document.getElementById('newAdminEmail').value = '';
+                    await this.saveGist();
+                    alert(`Admin ${newEmail} ajouté !`);
+                    this.renderAdminList();
+                    this.updateAuthUI(); 
+                } else { alert("Email invalide ou déjà admin."); }
+            },
+            
+            removeAdmin: async function(email) {
+                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut retirer des admins.");
+                if (email === PRIMARY_ADMIN_EMAIL) return alert("Impossible de retirer l'Admin Principal.");
+                this.data.admins = this.data.admins.filter(e => e !== email);
+                await this.saveGist();
+                alert(`Admin ${email} retiré.`);
+                this.renderAdminList();
+            },
+
+            uploadCloudinary: async function(file, type) {
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type}/upload`);
-                if(showProgress) document.getElementById('uploadProgressBar').style.display = 'block';
+                
+                const progressBar = document.getElementById('uploadProgressBar');
+                const progressFill = document.getElementById('uploadProgressFill');
+                const status = document.getElementById('uploadStatus');
+
+                progressBar.style.display = 'block';
+
                 return new Promise(resolve => {
                     xhr.upload.onprogress = e => {
                         const p = Math.round((e.loaded / e.total) * 100);
-                        if(showProgress) document.getElementById('uploadProgressFill').style.width = p+'%';
+                        progressFill.style.width = p+'%';
+                        status.innerText = `Upload ${type}... ${p}%`;
                     };
-                    xhr.onload = () => resolve(JSON.parse(xhr.responseText).secure_url);
+                    xhr.onload = () => {
+                        status.innerText = `Upload ${type} terminé.`;
+                        resolve(JSON.parse(xhr.responseText).secure_url);
+                    };
                     xhr.send(formData);
                 });
             },
@@ -373,12 +594,9 @@
             isAdmin: function() { return this.data.user && this.data.admins.includes(this.data.user.email); },
             hideAll: function() { ['videoGrid', 'shortsGrid', 'profileView', 'adminPanel'].forEach(id => document.getElementById(id).style.display = 'none'); },
             closePlayer: function() { document.getElementById('playerModal').style.display='none'; document.getElementById('mainVideoPlayer').pause(); },
-            toggleAccountMenu: function() { const m = document.getElementById('accountMenu'); m.style.display = m.style.display === 'none' ? 'block' : 'none'; },
             closeModals: function() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); },
-            openUpload: function() { if(!this.data.user) return this.openLogin(); document.getElementById('modalUpload').style.display='flex'; },
-            openLogin: function() { document.getElementById('modalLoginEmail').style.display='flex'; },
+            openLogin: function() { this.closeModals(); document.getElementById('modalLoginEmail').style.display='flex'; },
             goMyProfile: function() { if(!this.data.user) return this.openLogin(); this.viewProfile(this.data.user.name); },
-            goAdminPanel: function() { this.hideAll(); document.getElementById('adminPanel').style.display='block'; },
             getAvatar: function(n) { return this.data.users[n]?.avatar || 'https://via.placeholder.com/36'; }
         };
         app.init();
