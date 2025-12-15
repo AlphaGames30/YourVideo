@@ -5,562 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Visiona - AlphaGames30</title>
     <style>
-        /* ========================================================= */
-        /* --- SECTION CSS : DÉFINITION DES VARIABLES GLOBALES  --- */
-        /* ========================================================= */
-        :root { 
-            --bg: #0f0f0f; 
-            --header: #0f0f0f; 
-            --text: #ffffff; 
-            --sec-text: #aaaaaa; 
-            --hover: #272727; 
-            --blue: #3ea6ff; 
-            --red: #ff0000; 
-        }
-
-        /* ========================================================= */
-        /* --- CSS : STYLE DU CORPS ET DE LA MISE EN PAGE GÉNÉRALE --- */
-        /* ========================================================= */
-        body { 
-            margin: 0; 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: Roboto, Arial, sans-serif; 
-            overflow-x: hidden; 
-            padding-bottom: 60px; /* Espace pour la navigation mobile */
-        }
-
-        /* --- HEADER ET NAVIGATION SUPÉRIEURE --- */
-        header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 0 16px; 
-            height: 56px; 
-            background: var(--header); 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            border-bottom: 1px solid #222; 
-        }
-
-        .logo { 
-            font-size: 20px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-        }
-
-        .logo::before { 
-            content: '▶'; 
-            color: var(--red); 
-            font-size: 24px; 
-            margin-right: 5px; 
-        }
-
-        /* --- BARRE DE RECHERCHE --- */
-        .search-box { 
-            display: flex; 
-            flex: 1; 
-            max-width: 500px; 
-            margin: 0 10px; 
-        }
-
-        .search-box input { 
-            width: 100%; 
-            background: #121212; 
-            border: 1px solid #333; 
-            color: white; 
-            padding: 8px 15px; 
-            border-radius: 40px 0 0 40px; 
-            border-right: none; 
-        }
-
-        .search-box button { 
-            background: #222; 
-            border: 1px solid #333; 
-            border-left: none; 
-            padding: 0 20px; 
-            border-radius: 0 40px 40px 0; 
-            cursor: pointer; 
-            color: var(--sec-text); 
-            transition: background 0.2s;
-        }
-
-        .search-box button:hover {
-            background: #333;
-        }
-
-        .header-btns button { 
-            background: none; 
-            border: none; 
-            color: white; 
-            font-size: 20px; 
-            margin-left: 10px; 
-            cursor: pointer; 
-        }
-
-        .btn-login { 
-            border: 1px solid var(--blue) !important; 
-            color: var(--blue) !important; 
-            font-size: 14px !important; 
-            padding: 5px 10px; 
-            border-radius: 20px; 
-            font-weight: bold; 
-            display: flex; 
-            align-items: center; 
-            gap: 5px; 
-            transition: background 0.2s, color 0.2s;
-        }
-
-        /* --- CONTENEUR PRINCIPAL (SIDEBAR + CONTENT) --- */
-        .container { 
-            display: flex; 
-            height: calc(100vh - 56px); 
-        }
-
-        /* --- SIDEBAR (NAVIGATION LATÉRALE) --- */
-        .sidebar { 
-            width: 220px; 
-            background: var(--bg); 
-            padding: 10px; 
-            overflow-y: auto; 
-            flex-shrink: 0; 
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-        }
-
-        .nav-item { 
-            padding: 10px; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            margin-bottom: 5px; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            transition: background 0.2s;
-        }
-
-        .nav-item:hover { 
-            background: var(--hover); 
-        }
-
-        /* --- ZONE DE CONTENU PRINCIPAL --- */
-        .content { 
-            flex: 1; 
-            padding: 20px; 
-            overflow-y: auto; 
-        }
-
-        /* --- GRILLES DE VIDÉOS --- */
-        .video-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 20px; 
-        }
-
-        .video-card { 
-            cursor: pointer; 
-            transition: transform 0.2s; 
-            overflow: hidden; 
-        }
-
-        .video-card:hover { 
-            transform: scale(1.01); 
-        }
-
-        .thumb-container { 
-            position: relative; 
-            width: 100%; 
-            aspect-ratio: 16/9; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            background: #333; 
-        }
-
-        .thumb { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            transition: opacity 0.3s;
-        }
-
-        /* --- GRILLE DES SHORTS --- */
-        .shorts-grid { 
-            display: flex; 
-            gap: 15px; 
-            overflow-x: auto; 
-            padding-bottom: 10px; 
-        }
-
-        .short-card { 
-            flex-shrink: 0; 
-            width: 160px; 
-            height: 300px; 
-            cursor: pointer; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            background: #333; 
-            position: relative; 
-            transition: transform 0.2s;
-        }
-         
-        .short-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .short-card img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-        }
-
-        /* --- PLAYER MODAL ET VIDÉO --- */
-        .player-overlay { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: black; 
-            z-index: 500; 
-            overflow-y: auto; 
-            padding-bottom: 50px; 
-        }
-
-        .player-content { 
-            width: 95%; 
-            max-width: 1200px; 
-            margin: 20px auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
-
-        .video-wrapper { 
-            width: 100%; 
-            aspect-ratio: 16/9; 
-            background: #000; 
-        }
-
-        /* CONTENEUR DE SHORTS POUR LE DÉFILEMENT SÉQUENTIEL */
-        .short-player-wrapper { 
-            width: 100%; 
-            max-width: 400px; 
-            aspect-ratio: 9/16; 
-            background: #000; 
-            margin: 0 auto; 
-            position: relative;
-        }
-         
-        .short-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 10px;
-            z-index: 510;
-        }
-         
-        .short-nav button {
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: white;
-            font-size: 24px;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-
-        video { 
-            width: 100%; 
-            height: 100%; 
-            background: #000;
-        }
-
-        /* --- SECTION COMMENTAIRES --- */
-        .comment-section { 
-            background: #1a1a1a; 
-            padding: 20px; 
-            border-radius: 12px; 
-            margin-top: 20px;
-        }
-
-        .comment-input-area { 
-            display: flex; 
-            gap: 10px; 
-            margin-bottom: 20px; 
-            align-items: center;
-        }
-
-        .comment-input-area input { 
-            flex: 1; 
-            background: none; 
-            border: none; 
-            border-bottom: 1px solid #333; 
-            color: white; 
-            padding: 8px; 
-            transition: border-bottom-color 0.3s;
-        }
-
-        .comment-input-area input:focus {
-            outline: none;
-            border-bottom-color: var(--text);
-        }
-
-        /* --- BOUTONS D'ACTION (PILLS) --- */
-        .action-pill { 
-            background: #272727; 
-            color: white; 
-            border: none; 
-            padding: 6px 12px; 
-            border-radius: 18px; 
-            font-size: 13px; 
-            cursor: pointer; 
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .action-pill:hover {
-            background: #3a3a3a;
-        }
-
-        .liked { 
-            color: var(--blue); 
-            background: rgba(62, 166, 255, 0.2);
-        }
-
-        .disliked { 
-            color: var(--red); 
-            background: rgba(255, 0, 0, 0.2);
-        }
-
-        .followed { 
-            background: #fff; 
-            color: #000; 
-            font-weight: bold;
-        }
-
-        .btn-red { 
-            background: var(--red); 
-            color: white; 
-        }
-
-        .btn-green { 
-            background: #00a854; 
-            color: white; 
-        }
-
-        /* --- MODALS ET FENÊTRES POP-UP --- */
-        .modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.8); 
-            z-index: 600; 
-            justify-content: center; 
-            align-items: center; 
-        }
-
-        .modal-box { 
-            background: #212121; 
-            padding: 25px; 
-            border-radius: 15px; 
-            width: 90%; 
-            max-width: 450px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
-         
-        /* --- VUES SPÉCIFIQUES (PROFIL / ADMIN / STATS) --- */
-        .profile-view, .stats-view { 
-            display: none; 
-            padding-bottom: 50px;
-        }
-
-        .admin-view { 
-            display: none; 
-            padding: 20px; 
-        }
-         
-        .stats-view h3 {
-            margin-top: 25px;
-            color: var(--blue);
-            border-bottom: 1px solid #333;
-            padding-bottom: 5px;
-        }
-         
-        .stats-view p {
-            margin: 8px 0;
-            font-size: 15px;
-        }
-
-
-        .admin-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
-        }
-
-        .admin-table th, .admin-table td { 
-            border: 1px solid #333; 
-            padding: 10px; 
-            text-align: left; 
-        }
-
-        .admin-table th { 
-            background: #222; 
-        }
-         
-        /* --- INPUTS GÉNÉRAUX --- */
-        input[type="text"], 
-        input[type="password"], 
-        input[type="email"], 
-        textarea { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 10px 0; 
-            background: #121212; 
-            border: 1px solid #333; 
-            color: white; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-        }
-
-        .btn-blue { 
-            width: 100%; 
-            padding: 12px; 
-            background: var(--blue); 
-            color: black; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: opacity 0.2s;
-        }
-
-        .btn-blue:hover {
-            opacity: 0.9;
-        }
-
-        /* --- AVATARS ET BANNIÈRE --- */
-        .avatar-big { 
-            width: 120px; 
-            height: 120px; 
-            border-radius: 50%; 
-            border: 4px solid var(--bg); 
-            background: #555; 
-            object-fit: cover; 
-            cursor: pointer; 
-        }
-
-        .avatar-small { 
-            width: 36px; 
-            height: 36px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            cursor: pointer; 
-        }
-
-        .banner { 
-            width: 100%; 
-            height: 200px; 
-            background: #333; 
-            border-radius: 15px; 
-            margin-bottom: -60px; 
-            object-fit: cover; 
-        }
-
-        .profile-head { 
-            display: flex; 
-            align-items: flex-end; 
-            gap: 20px; 
-            padding: 0 20px; 
-        }
-
-        /* --- NAVIGATION MOBILE (MEDIA QUERIES) --- */
-        @media(max-width: 768px) { 
-            .sidebar { 
-                display: none; 
-            } 
-            .mobile-nav { 
-                display: flex !important; 
-            } 
-            .search-box { 
-                display: none; 
-            }
-            .video-grid { 
-                grid-template-columns: 1fr; 
-            } 
-            .content {
-                padding: 10px;
-            }
-            .profile-head {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                padding: 0 10px;
-            }
-            .banner {
-                margin-bottom: -40px;
-                height: 120px;
-                border-radius: 0;
-            }
-            .avatar-big {
-                margin-top: 10px;
-            }
-        }
-         
-        .mobile-nav { 
-            display: none; 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 60px; 
-            background: #0f0f0f; 
-            border-top: 1px solid #222; 
-            justify-content: space-around; 
-            align-items: center; 
-            z-index: 1000; 
-        }
-
-        .mobile-nav-item { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            font-size: 10px; 
-            color: var(--sec-text); 
-            cursor: pointer; 
-        }
-
-        .mobile-nav-item span { 
-            font-size: 20px; 
-            color: white; 
-            margin-bottom: 2px; 
-        }
-
-        /* --- BARRE DE PROGRESSION UPLOAD --- */
-        .progress-bar { 
-            height: 15px; 
-            background: #444; 
-            border-radius: 8px; 
-            margin-bottom: 10px; 
-            overflow: hidden; 
-            width: 100%;
-        }
-
-        .progress-fill { 
-            height: 100%; 
-            background: var(--blue); 
-            width: 0%; 
-            transition: width 0.1s; 
-        }
+        :root { --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa; --hover: #272727; --blue: #3ea6ff; --red: #ff0000; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, Arial, sans-serif; overflow-x: hidden; padding-bottom: 60px; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; height: 56px; background: var(--header); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
+        .logo { font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; }
+        .logo::before { content: '▶'; color: var(--red); font-size: 24px; margin-right: 5px; }
+        .search-box { display: flex; flex: 1; max-width: 500px; margin: 0 10px; }
+        .search-box input { width: 100%; background: #121212; border: 1px solid #333; color: white; padding: 8px 15px; border-radius: 40px 0 0 40px; border-right: none; }
+        .search-box button { background: #222; border: 1px solid #333; border-left: none; padding: 0 20px; border-radius: 0 40px 40px 0; cursor: pointer; color: var(--sec-text); transition: background 0.2s; }
+        .search-box button:hover { background: #333; }
+        .header-btns button { background: none; border: none; color: white; font-size: 20px; margin-left: 10px; cursor: pointer; }
+        .btn-login { border: 1px solid var(--blue) !important; color: var(--blue) !important; font-size: 14px !important; padding: 5px 10px; border-radius: 20px; font-weight: bold; display: flex; align-items: center; gap: 5px; transition: background 0.2s, color 0.2s; }
+        .container { display: flex; height: calc(100vh - 56px); }
+        .sidebar { width: 220px; background: var(--bg); padding: 10px; overflow-y: auto; flex-shrink: 0; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+        .nav-item { padding: 10px; border-radius: 10px; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
+        .nav-item:hover { background: var(--hover); }
+        .content { flex: 1; padding: 20px; overflow-y: auto; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .video-card { cursor: pointer; transition: transform 0.2s; overflow: hidden; }
+        .video-card:hover { transform: scale(1.01); }
+        .thumb-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #333; }
+        .thumb { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
+        .shorts-grid { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; }
+        .short-card { flex-shrink: 0; width: 160px; height: 300px; cursor: pointer; border-radius: 12px; overflow: hidden; background: #333; position: relative; transition: transform 0.2s; }
+        .short-card:hover { transform: translateY(-5px); }
+        .short-card img { width: 100%; height: 100%; object-fit: cover; }
+        .player-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 500; overflow-y: auto; padding-bottom: 50px; }
+        .player-content { width: 95%; max-width: 1200px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; }
+        .video-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; }
+        .short-player-wrapper { width: 100%; max-width: 400px; aspect-ratio: 9/16; background: #000; margin: 0 auto; position: relative; }
+        .short-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; display: flex; justify-content: space-between; padding: 0 10px; z-index: 510; }
+        .short-nav button { background: rgba(0,0,0,0.5); border: none; color: white; font-size: 24px; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        video { width: 100%; height: 100%; background: #000; }
+        .comment-section { background: #1a1a1a; padding: 20px; border-radius: 12px; margin-top: 20px; }
+        .comment-input-area { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+        .comment-input-area input { flex: 1; background: none; border: none; border-bottom: 1px solid #333; color: white; padding: 8px; transition: border-bottom-color 0.3s; }
+        .comment-input-area input:focus { outline: none; border-bottom-color: var(--text); }
+        .action-pill { background: #272727; color: white; border: none; padding: 6px 12px; border-radius: 18px; font-size: 13px; cursor: pointer; transition: background 0.2s, color 0.2s; }
+        .action-pill:hover { background: #3a3a3a; }
+        .liked { color: var(--blue); background: rgba(62, 166, 255, 0.2); }
+        .disliked { color: var(--red); background: rgba(255, 0, 0, 0.2); }
+        .followed { background: #fff; color: #000; font-weight: bold; }
+        .btn-red { background: var(--red); color: white; }
+        .btn-green { background: #00a854; color: white; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 600; justify-content: center; align-items: center; }
+        .modal-box { background: #212121; padding: 25px; border-radius: 15px; width: 90%; max-width: 450px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .profile-view, .stats-view { display: none; padding-bottom: 50px; }
+        .admin-view { display: none; padding: 20px; }
+        .stats-view h3 { margin-top: 25px; color: var(--blue); border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .stats-view p { margin: 8px 0; font-size: 15px; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .admin-table th, .admin-table td { border: 1px solid #333; padding: 10px; text-align: left; }
+        .admin-table th { background: #222; }
+        input[type="text"], input[type="password"], input[type="email"], textarea { width: 100%; padding: 12px; margin: 10px 0; background: #121212; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
+        .btn-blue { width: 100%; padding: 12px; background: var(--blue); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
+        .btn-blue:hover { opacity: 0.9; }
+        .avatar-big { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--bg); background: #555; object-fit: cover; cursor: pointer; }
+        .avatar-small { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; cursor: pointer; }
+        .banner { width: 100%; height: 200px; background: #333; border-radius: 15px; margin-bottom: -60px; object-fit: cover; }
+        .profile-head { display: flex; align-items: flex-end; gap: 20px; padding: 0 20px; }
+        @media(max-width: 768px) { .sidebar { display: none; } .mobile-nav { display: flex !important; } .search-box { display: none; } .video-grid { grid-template-columns: 1fr; } .content { padding: 10px; } .profile-head { flex-direction: column; align-items: center; text-align: center; padding: 0 10px; } .banner { margin-bottom: -40px; height: 120px; border-radius: 0; } .avatar-big { margin-top: 10px; } }
+        .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: #0f0f0f; border-top: 1px solid #222; justify-content: space-around; align-items: center; z-index: 1000; }
+        .mobile-nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--sec-text); cursor: pointer; }
+        .mobile-nav-item span { font-size: 20px; color: white; margin-bottom: 2px; }
+        .progress-bar { height: 15px; background: #444; border-radius: 8px; margin-bottom: 10px; overflow: hidden; width: 100%; }
+        .progress-fill { height: 100%; background: var(--blue); width: 0%; transition: width 0.1s; }
     </style>
 </head>
 <body>
@@ -584,12 +93,11 @@
         <div class="nav-item" onclick="app.doLogout()">🚪 Déconnexion</div>
     </div>
 
-
     <div class="mobile-nav">
         <div class="mobile-nav-item" onclick="app.goHome()"><span>🏠</span>Accueil</div>
         <div class="mobile-nav-item" onclick="app.goShorts()"><span>⚡</span>Zapp</div>
         <div class="mobile-nav-item" onclick="app.goHistory()"><span>🕒</span>Historique</div>
-        <div class="mobile-nav-item" onclick="app.goStats()"><span>📊</span>Stats</div> 
+        <div class="mobile-nav-item" onclick="app.goStats()"><span>📊</span>Stats</div>
         <div class="mobile-nav-item" onclick="app.goMyProfile()"><span>👤</span>Moi</div>
     </div>
 
@@ -600,21 +108,20 @@
             <div class="nav-item" onclick="app.goSubs()">📺 Suivis</div>
             <hr style="border-color: #333; margin: 10px 0;">
             <div class="nav-item" onclick="app.goHistory()">🕒 Historique</div>
-            <div class="nav-item" onclick="app.goStats()">📊 Statistiques</div> 
+            <div class="nav-item" onclick="app.goStats()">📊 Statistiques</div>
             <hr style="border-color: #333; margin: 10px 0;">
             <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
         </nav>
 
         <main class="content">
             <div id="mainTitle"></div>
-             
+            
             <div id="videoGrid" class="video-grid"></div>
             <div id="shortsGrid" class="shorts-grid" style="display:none;"></div>
-             
+            
             <div id="statsView" class="stats-view">
                 <h2>📊 Mes Statistiques</h2>
-                <div id="statsContent" style="background:#1a1a1a; padding:20px; border-radius:10px;">
-                    </div>
+                <div id="statsContent" style="background:#1a1a1a; padding:20px; border-radius:10px;"></div>
             </div>
 
             <div id="profileView" class="profile-view">
@@ -634,13 +141,10 @@
 
             <div id="adminPanel" class="admin-view">
                 <h2>🔑 Panneau d'Administration</h2>
-                 
                 <h3 style="margin-top:20px;">Gestion des Vidéos</h3>
                 <div id="adminVideoList"></div>
-                 
                 <h3 style="margin-top:30px;">Gestion des Admins</h3>
                 <div id="adminList"></div>
-                 
                 <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
                     <input type="email" id="newAdminEmail" placeholder="Email du nouvel Admin">
                     <button class="action-pill btn-green" onclick="app.addAdmin()">Ajouter Admin</button>
@@ -668,11 +172,11 @@
                     <button onclick="app.nextShort()">Suivant ▶</button>
                 </div>
             </div>
-             
+            
             <h2 id="playerTitle" style="margin-bottom:5px;"></h2>
             <p id="playerMeta" style="color:var(--sec-text); font-size:14px; margin-top:0;"></p>
             <div id="playerActions" style="display:flex; gap:15px; align-items:center;"></div>
-             
+            
             <div class="comment-section">
                 <h4 id="commentCount">Commentaires</h4>
                 <div class="comment-input-area">
@@ -690,15 +194,11 @@
             <h2>Publier une vidéo</h2>
             <p id="uploadStatus" style="color: var(--blue); font-size:14px; text-align:center;"></p>
             <div class="progress-bar" id="uploadProgressBar" style="display: none;"><div class="progress-fill" id="uploadProgressFill"></div></div>
-             
             <input type="text" id="upTitle" placeholder="Titre de la vidéo">
-             
             <label style="color:#aaa; font-size:12px; display:block; margin-top:10px;">Fichier Vidéo (.mp4, .mov)</label>
             <input type="file" id="upVideoFile" accept="video/*" style="margin-bottom: 20px;">
-             
             <label style="color:#aaa; font-size:12px; display:block;">Miniature (Image de couverture)</label>
             <input type="file" id="upThumbFile" accept="image/*" style="margin-bottom: 20px;">
-             
             <button class="btn-blue" id="publishBtn" onclick="app.publish()">PUBLIER</button>
             <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Annuler</button>
         </div>
@@ -708,161 +208,90 @@
         <div class="modal-box">
             <h2>Personnaliser ma chaîne</h2>
             <p id="profileUploadStatus" style="color: var(--blue);"></p>
-             
             <input type="text" id="editName" placeholder="Nom de la chaîne">
             <textarea id="editBio" placeholder="Description (Bio)"></textarea>
-             
             <label style="color:#aaa; font-size:12px;">Photo de Profil</label>
             <input type="file" id="editPPFile" accept="image/*">
-             
             <label style="color:#aaa; font-size:12px;">Bannière</label>
             <input type="file" id="editBannerFile" accept="image/*">
-             
             <button class="btn-blue" onclick="app.saveProfile()">Enregistrer</button>
             <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Fermer</button>
         </div>
     </div>
 
-    <div id="modalLoginEmail" class="modal">
-        <div class="modal-box">
-            <h2>Connexion</h2>
-            <input type="email" id="logEmail" placeholder="Email">
-            <button class="btn-blue" onclick="app.loginStep(1)">Suivant</button>
-        </div>
-    </div>
-     
-    <div id="modalLoginRegister" class="modal">
-        <div class="modal-box">
-            <h2>Créer profil</h2>
-            <input type="text" id="logNewName" placeholder="Nom">
-            <input type="password" id="logNewPass" placeholder="Mot de passe">
-            <button class="btn-blue" onclick="app.loginStep(2)">C'est parti</button>
-        </div>
-    </div>
-     
-    <div id="modalLoginPass" class="modal">
-        <div class="modal-box">
-            <h2>Mot de passe</h2>
-            <input type="password" id="logPass" placeholder="Mot de passe">
-            <button class="btn-blue" onclick="app.loginStep(3)">Entrer</button>
-        </div>
-    </div>
-
+    <div id="modalLoginEmail" class="modal"><div class="modal-box"><h2>Connexion</h2><input type="email" id="logEmail" placeholder="Email"><button class="btn-blue" onclick="app.loginStep(1)">Suivant</button></div></div>
+    <div id="modalLoginRegister" class="modal"><div class="modal-box"><h2>Créer profil</h2><input type="text" id="logNewName" placeholder="Nom"><input type="password" id="logNewPass" placeholder="Mot de passe"><button class="btn-blue" onclick="app.loginStep(2)">C'est parti</button></div></div>
+    <div id="modalLoginPass" class="modal"><div class="modal-box"><h2>Mot de passe</h2><input type="password" id="logPass" placeholder="Mot de passe"><button class="btn-blue" onclick="app.loginStep(3)">Entrer</button></div></div>
 
     <script>
-        // --- CONFIGURATION ---
-        // Worker proxy pour la mise à jour du Gist (si vous l'utilisez)
-        const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; 
-         
-        // Configuration Cloudinary pour l'upload (doit être configuré)
-        const CLOUDINARY_CLOUD_NAME = "dvbsmh8qq"; 
-        const CLOUDINARY_UPLOAD_PRESET = "mytube_upload"; 
-         
-        // URL de votre Gist brut (le fichier JSON contenant les données)
-        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0c560faad87c92/raw/video.json"; 
-        const GIST_FILE_NAME = "video.json"; 
-         
-        // Email de l'administrateur principal (ne peut pas être retiré)
-        const PRIMARY_ADMIN_EMAIL = "edonis.imbert@gmail.com"; 
-         
-        // Cooldown pour les vues (1 heure en millisecondes)
-        const VIEW_COOLDOWN_MS = 60 * 60 * 1000; 
+        const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; 
+        const CLOUDINARY_CLOUD_NAME = "dvbsmh8qq"; 
+        const CLOUDINARY_UPLOAD_PRESET = "mytube_upload"; 
+        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0c560faad87c92/raw/video.json"; 
+        const GIST_FILE_NAME = "video.json"; 
+        const PRIMARY_ADMIN_EMAIL = "edonis.imbert@gmail.com"; 
+        const VIEW_COOLDOWN_MS = 60 * 60 * 1000; 
 
-        // Récupération des identifiants locaux pour la connexion
         let localUserCreds = JSON.parse(localStorage.getItem('mt_user_creds')) || {};
 
-        // Définition de l'objet principal de l'application
         const app = {
             data: {
-                // Données utilisateur connecté
-                user: JSON.parse(localStorage.getItem('mt_user')), 
-                // Liste de toutes les vidéos
+                user: JSON.parse(localStorage.getItem('mt_user')), 
                 videos: [],
-                // Liste de tous les utilisateurs/créateurs
-                users: {}, 
-                // Liste des emails des administrateurs
-                admins: [PRIMARY_ADMIN_EMAIL], 
-                // Votes de l'utilisateur (stockés localement)
+                users: {}, 
+                admins: [PRIMARY_ADMIN_EMAIL], 
                 votes: JSON.parse(localStorage.getItem('mt_votes')) || {},
-                // Abonnements de l'utilisateur (stockés localement)
-                subs: JSON.parse(localStorage.getItem('mt_subs')) || [], 
-                // Historique des vidéos regardées (stocké localement)
-                history: JSON.parse(localStorage.getItem('mt_history')) || [], 
-                // NOUVEAU: Temps de la dernière vue par vidéo pour le cooldown (local)
+                subs: JSON.parse(localStorage.getItem('mt_subs')) || [], 
+                history: JSON.parse(localStorage.getItem('mt_history')) || [], 
                 lastViewTimes: JSON.parse(localStorage.getItem('mt_last_views')) || {},
-                // NOUVEAU: Statistiques locales (temps passé)
-                stats: JSON.parse(localStorage.getItem('mt_stats')) || {
-                    timeSpentSeconds: 0,
-                },
+                stats: JSON.parse(localStorage.getItem('mt_stats')) || { timeSpentSeconds: 0 },
             },
             currentEditVideoId: null,
-             
-            // NOUVEAU: Variables pour la lecture séquentielle des Shorts
             currentPlayingVideoId: null,
-            currentShortsList: [], 
+            currentShortsList: [], 
             currentShortIndex: -1,
-
-            // --- FONCTIONS DE DÉMARRAGE ET DE GESTION DES DONNÉES ---
 
             init: async function() {
                 await this.loadData();
                 this.updateAuthUI();
-                this.trackSessionTime(); // Démarrer le suivi du temps
+                this.trackSessionTime();
                 this.goHome();
             },
 
             loadData: async function() {
-                // Charge les données principales depuis le Gist
                 try {
-                    const res = await fetch(GIST_URL + "?t=" + Date.now()); 
+                    const res = await fetch(GIST_URL + "?t=" + Date.now()); 
                     const json = await res.json();
                     this.data.videos = json.videos || [];
                     this.data.users = json.users || {};
                     this.data.admins = json.admins || [PRIMARY_ADMIN_EMAIL];
-                } catch(e) { 
-                    console.error("Erreur lors du chargement des données depuis le Gist.", e); 
-                    // Maintenir l'application fonctionnelle même en cas d'erreur de chargement
-                }
+                } catch(e) { console.error("Load Error", e); }
             },
 
             saveGist: async function() {
-                // Enregistre les données (vidéos, users, admins) sur le Gist via le Worker
                 if(!WORKER_PROXY_URL) return;
                 const content = { videos: this.data.videos, users: this.data.users, admins: this.data.admins };
-                try {
-                    await fetch(WORKER_PROXY_URL, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
-                    });
-                } catch(e) {
-                    console.error("Erreur lors de la sauvegarde du Gist.", e);
-                }
+                await fetch(WORKER_PROXY_URL, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
+                });
             },
 
             saveLocal: function() {
-                // Sauvegarde les données utilisateur et les préférences dans le localStorage
                 localStorage.setItem('mt_user', JSON.stringify(this.data.user));
                 localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
                 localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
-                localStorage.setItem('mt_history', JSON.stringify(this.data.history)); 
-                localStorage.setItem('mt_last_views', JSON.stringify(this.data.lastViewTimes)); // NOUVEAU: Sauvegarde du cooldown
-                localStorage.setItem('mt_stats', JSON.stringify(this.data.stats)); // NOUVEAU: Sauvegarde des stats locales
+                localStorage.setItem('mt_history', JSON.stringify(this.data.history)); 
+                localStorage.setItem('mt_last_views', JSON.stringify(this.data.lastViewTimes));
+                localStorage.setItem('mt_stats', JSON.stringify(this.data.stats));
             },
-             
-            // NOUVEAU: Suivi du temps de session
+            
             trackSessionTime: function() {
-                if (!this.data.stats.timeSpentSeconds) {
-                    this.data.stats.timeSpentSeconds = 0;
-                }
-                // Incrémente le temps passé toutes les 60 secondes (1 minute)
-                setInterval(() => {
-                    this.data.stats.timeSpentSeconds += 60;
-                    this.saveLocal();
-                }, 60000); 
+                if (!this.data.stats.timeSpentSeconds) this.data.stats.timeSpentSeconds = 0;
+                setInterval(() => { this.data.stats.timeSpentSeconds += 60; this.saveLocal(); }, 60000); 
             },
 
-            // Calcul du temps écoulé
             timeAgo: function(timestamp) {
                 const seconds = Math.floor((Date.now() - timestamp) / 1000);
                 if (seconds < 60) return "quelques secondes";
@@ -876,22 +305,20 @@
                 return months + " mois";
             },
 
-            // --- FONCTIONS DE GESTION DE L'AUTHENTIFICATION ---
-             
             loginStep: async function(s) {
                 const email = document.getElementById('logEmail').value.toLowerCase();
-                if (s == 1) { 
+                if (s == 1) { 
                     if (!email.includes('@')) return alert("Email invalide");
                     this.closeModals();
                     if (localUserCreds[email]) {
                         document.getElementById('modalLoginPass').style.display = 'flex';
-                        document.getElementById('logPass').value = ''; 
+                        document.getElementById('logPass').value = ''; 
                     } else {
                         document.getElementById('modalLoginRegister').style.display = 'flex';
-                        document.getElementById('logNewName').value = ''; 
+                        document.getElementById('logNewName').value = ''; 
                         document.getElementById('logNewPass').value = '';
                     }
-                } else if (s == 2) { 
+                } else if (s == 2) { 
                     const name = document.getElementById('logNewName').value;
                     const pass = document.getElementById('logNewPass').value;
                     if (!name || pass.length < 4) return alert("Nom et mot de passe (min 4 caractères) sont requis.");
@@ -900,832 +327,519 @@
                     this.data.users[name] = { name, email, bio: "Nouveau créateur Visiona", avatar: "", banner: "", subs: [] };
                     this.data.user = localUserCreds[email];
                     this.saveLocal(); await this.saveGist(); location.reload();
-                } else if (s == 3) { 
+                } else if (s == 3) { 
                     const pass = document.getElementById('logPass').value;
-                    const userCreds = localUserCreds[email];
-                    if (pass === userCreds.pass) {
-                        this.data.user = userCreds;
+                    const creds = localUserCreds[email];
+                    if (creds && creds.pass === pass) {
+                        this.data.user = creds; 
                         this.saveLocal(); location.reload();
-                    } else {
-                        alert("Mot de passe incorrect.");
-                    }
+                    } else { alert("Mauvais mot de passe."); }
                 }
             },
-
-            doLogout: function() {
-                this.data.user = null;
-                this.saveLocal();
-                location.reload();
+            
+            doLogout: function() { 
+                localStorage.removeItem('mt_user'); 
+                localStorage.removeItem('mt_subs'); 
+                localStorage.removeItem('mt_votes'); 
+                localStorage.removeItem('mt_history'); 
+                localStorage.removeItem('mt_last_views'); 
+                localStorage.removeItem('mt_stats');
+                location.reload(); 
             },
-
+            
             updateAuthUI: function() {
-                const loggedIn = !!this.data.user;
-                const loginBtn = document.getElementById('loginBtn');
-                const accountMenu = document.getElementById('accountMenu');
+                const b = document.getElementById('loginBtn');
                 const adminLink = document.getElementById('adminLink');
-
-                if (loggedIn) {
-                    loginBtn.innerHTML = `👤 ${this.data.user.name.split(' ')[0]}`;
-                    loginBtn.onclick = () => this.toggleAccountMenu();
-                    document.getElementById('menuUserName').textContent = this.data.user.name;
-                    document.getElementById('userCommentAvatar').src = this.getCreatorInfo(this.data.user.name).avatar || 'https://via.placeholder.com/36x36?text=Moi';
-
-                    if (this.data.admins.includes(this.data.user.email)) {
-                        adminLink.style.display = 'flex';
-                    }
+                const menuUserName = document.getElementById('menuUserName');
+                if(this.data.user && this.data.user.name) { 
+                    b.innerText = this.data.user.name;
+                    menuUserName.innerText = this.data.user.name; 
+                    if(this.isAdmin()) adminLink.style.display = 'block';
                 } else {
-                    loginBtn.innerHTML = '👤 Se connecter';
-                    loginBtn.onclick = () => this.openLogin();
-                    accountMenu.style.display = 'none';
-                    document.getElementById('userCommentAvatar').src = 'https://via.placeholder.com/36x36?text=U';
+                    b.innerText = "👤 Se connecter";
+                    menuUserName.innerText = '';
+                    adminLink.style.display = 'none';
+                }
+            },
+            
+            goStats: function() {
+                if(!this.data.user) return this.openLogin(); 
+                this.hideAll();
+                document.getElementById('statsView').style.display = 'block';
+                document.getElementById('mainTitle').innerHTML = "<h2>📊 Mes Statistiques</h2>";
+                const userName = this.data.user.name;
+                const totalTimeSeconds = this.data.stats.timeSpentSeconds;
+                const timeFormatted = `${Math.floor(totalTimeSeconds / 3600)}h ${Math.floor((totalTimeSeconds % 3600) / 60)}m`;
+                const likesGiven = Object.values(this.data.votes).filter(v => v === 1).length;
+                const videosWatched = this.data.history.length;
+                const channelsFollowed = this.data.subs.length;
+                let followers = 0;
+                for (const author in this.data.users) { if (this.data.users[author]?.subs?.includes(userName)) followers++; }
+                let likesReceived = 0;
+                let dislikesReceived = 0;
+                this.data.videos.filter(v => v.author === userName).forEach(v => { likesReceived += (v.likes || 0); dislikesReceived += (v.dislikes || 0); });
+                const authorWatchCounts = {};
+                this.data.history.map(id => this.data.videos.find(v => v.id == id)?.author).filter(a => a).forEach(author => { authorWatchCounts[author] = (authorWatchCounts[author] || 0) + 1; });
+                const topAuthors = Object.entries(authorWatchCounts).sort(([, a], [, b]) => b - a).slice(0, 3).map(([author, count]) => `${author} (${count} vues)`);
+                
+                document.getElementById('statsContent').innerHTML = `
+                    <h3>Global</h3><p>Temps passé : <strong>${timeFormatted}</strong></p><p>Vidéos regardées : <strong>${videosWatched}</strong></p><p>Likes donnés : <strong>${likesGiven}</strong></p>
+                    <h3>Votre Chaîne (${userName})</h3><p>Abonnés : <strong>${followers}</strong></p><p>Abonnements : <strong>${channelsFollowed}</strong></p><p>Likes reçus : <strong>${likesReceived}</strong></p>
+                    <h3>Top 3 Visionnage</h3>${topAuthors.length > 0 ? `<ol style="margin-top:5px; padding-left:20px;">${topAuthors.map(item => `<li>${item}</li>`).join('')}</ol>` : '<p>Pas assez de données.</p>'}
+                `;
+            },
+
+            toggleVote: async function(id, type) {
+                if(!this.data.user) return this.openLogin();
+                const v = this.data.videos.find(x => x.id == id);
+                if (!v) return;
+                const currentVote = this.data.votes[id] || 0;
+                v.likes = v.likes || 0; v.dislikes = v.dislikes || 0;
+                if (type === 'like') {
+                    if (currentVote === 1) { v.likes--; this.data.votes[id] = 0; } 
+                    else if (currentVote === -1) { v.dislikes--; v.likes++; this.data.votes[id] = 1; } 
+                    else { v.likes++; this.data.votes[id] = 1; }
+                } else if (type === 'dislike') {
+                    if (currentVote === -1) { v.dislikes--; this.data.votes[id] = 0; } 
+                    else if (currentVote === 1) { v.likes--; v.dislikes++; this.data.votes[id] = -1; } 
+                    else { v.dislikes++; this.data.votes[id] = -1; }
+                }
+                this.saveLocal(); 
+                await this.saveGist(); 
+                this.updatePlayerActions(id); 
+            },
+            
+            updatePlayerActions: function(id) {
+                const v = this.data.videos.find(x => x.id == id);
+                if (!v) return;
+                this.currentPlayingVideoId = id;
+                const currentVote = this.data.votes[id] || 0;
+                document.getElementById('playerActions').innerHTML = `
+                    <img src="${this.getAvatar(v.author)}" class="avatar-small" onclick="app.closePlayer(); app.viewProfile('${v.author}')" style="cursor:pointer;">
+                    <h4 style="margin: 0; cursor:pointer;" onclick="app.closePlayer(); app.viewProfile('${v.author}')">${v.author}</h4>
+                    <button class="action-pill ${currentVote === 1 ? 'liked' : ''}" onclick="app.toggleVote(${id}, 'like')">👍 ${v.likes || 0}</button>
+                    <button class="action-pill ${currentVote === -1 ? 'disliked' : ''}" onclick="app.toggleVote(${id}, 'dislike')">👎 ${v.dislikes || 0}</button>
+                `;
+                document.getElementById('playerMeta').innerText = `${v.views || 0} vues • Il y a ${this.timeAgo(v.id)}`;
+                this.renderComments(v);
+            },
+
+            toggleSub: async function(author) {
+                if(!this.data.user) return this.openLogin();
+                const index = this.data.subs.indexOf(author);
+                if (index > -1) this.data.subs.splice(index, 1);
+                else this.data.subs.push(author);
+                this.saveLocal(); 
+                if (!this.data.users[this.data.user.name]) this.data.users[this.data.user.name] = { name: this.data.user.name, email: this.data.user.email };
+                this.data.users[this.data.user.name].subs = this.data.subs;
+                await this.saveGist(); this.viewProfile(author); 
+            },
+
+            render: function(list, target = 'videoGrid') {
+                const targetElement = document.getElementById(target);
+                if (list.length === 0) { targetElement.innerHTML = "<p style='color:#aaa; padding:20px;'>Aucune vidéo.</p>"; return; }
+                targetElement.innerHTML = list.map(v => `
+                    <div class="video-card" onclick="app.openVideoOverlay(${v.id}, ${v.isShort ? 'true' : 'false'})">
+                        <div class="thumb-container"><img src="${v.thumb}" class="thumb"></div>
+                        <div style="padding-top: 8px;">
+                            <h3 style="margin: 0 0 4px 0; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${v.title}</h3>
+                            <p style="margin: 0; font-size: 14px; color: var(--sec-text);">${v.author}</p>
+                            <p style="margin: 0; font-size: 12px; color: var(--sec-text);">${v.views || 0} vues • Il y a ${this.timeAgo(v.id)}</p>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            goHome: function() { 
+                this.hideAll(); 
+                document.getElementById('videoGrid').style.display = 'grid'; 
+                document.getElementById('mainTitle').innerHTML = "<h2>Accueil</h2>"; 
+                this.render(this.data.videos.filter(v => !v.isShort));
+            },
+            
+            goShorts: function() { 
+                this.hideAll(); 
+                const g = document.getElementById('shortsGrid'); 
+                g.style.display = 'flex'; 
+                document.getElementById('mainTitle').innerHTML = "<h2>⚡ Zapp</h2>"; 
+                const shortIds = this.data.videos.filter(x => x.isShort).map(v => v.id);
+                g.innerHTML = this.data.videos.filter(x => x.isShort).map((s, index) => `
+                    <div class="short-card" onclick="app.openShortsPlayer(${s.id}, [${shortIds.join(',')}], ${index})">
+                        <img src="${s.thumb}">
+                        <div style="position:absolute; bottom:10px; left:10px; font-size:12px; font-weight:bold; color:white; text-shadow: 1px 1px 2px black;">${s.title}</div>
+                    </div>
+                `).join(''); 
+            },
+
+            goSubs: function() { 
+                if(!this.data.user) return this.openLogin(); 
+                this.hideAll(); 
+                document.getElementById('videoGrid').style.display = 'grid'; 
+                document.getElementById('mainTitle').innerHTML = "<h2>Mes suivis</h2>"; 
+                this.render(this.data.videos.filter(x => this.data.subs.includes(x.author))); 
+            },
+            
+            goHistory: function() {
+                this.hideAll();
+                document.getElementById('videoGrid').style.display = 'grid';
+                document.getElementById('mainTitle').innerHTML = "<h2>🕒 Mon Historique</h2>";
+                const list = this.data.history.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
+                this.render(list);
+            },
+            
+            search: function() {
+                const term = document.getElementById('searchInput').value.toLowerCase();
+                this.hideAll();
+                document.getElementById('videoGrid').style.display = 'grid';
+                document.getElementById('mainTitle').innerHTML = `<h2>Résultats pour "${term}"</h2>`;
+                this.render(this.data.videos.filter(v => v.title.toLowerCase().includes(term) || v.author.toLowerCase().includes(term)));
+            },
+
+            openShortsPlayer: function(id, listIds, index) {
+                this.currentShortsList = listIds;
+                this.currentShortIndex = index;
+                this.openVideoOverlay(id, true);
+            },
+            
+            nextShort: function() {
+                if (this.currentShortIndex < this.currentShortsList.length - 1) {
+                    this.currentShortIndex++;
+                    const nextId = this.currentShortsList[this.currentShortIndex];
+                    this.openVideoOverlay(nextId, true, true);
+                }
+            },
+            
+            prevShort: function() {
+                if (this.currentShortIndex > 0) {
+                    this.currentShortIndex--;
+                    const prevId = this.currentShortsList[this.currentShortIndex];
+                    this.openVideoOverlay(prevId, true, true);
                 }
             },
 
-            openLogin: function() {
-                this.closeModals();
-                document.getElementById('modalLoginEmail').style.display = 'flex';
-                document.getElementById('logEmail').value = '';
+            openVideoOverlay: async function(id, isShort = false, isSequentialNav = false) {
+                const v = this.data.videos.find(x => x.id == id);
+                if (!v) return;
+                this.currentPlayingVideoId = id;
+                const now = Date.now();
+                const lastView = this.data.lastViewTimes[id];
+                let viewCountUpdated = false;
+                if (!lastView || (now - lastView) > VIEW_COOLDOWN_MS) {
+                    v.views = (v.views || 0) + 1;
+                    this.data.lastViewTimes[id] = now;
+                    await this.saveGist(); 
+                    viewCountUpdated = true;
+                }
+                this.data.history = [id, ...this.data.history.filter(x => x !== id)].slice(0, 50);
+                this.saveLocal();
+                document.getElementById('playerModal').style.display = 'block';
+                const player = document.getElementById('mainVideoPlayer');
+                if (!isSequentialNav) player.src = v.url;
+                document.getElementById('playerTitle').innerText = v.title;
+                this.updatePlayerActions(id); 
+                const isVideoShort = v.isShort || isShort;
+                document.getElementById('videoContainer').className = isVideoShort ? 'short-player-wrapper' : 'video-wrapper';
+                const shortNav = document.getElementById('shortNav');
+                if (isVideoShort && this.currentShortsList.length > 0) {
+                    shortNav.style.display = 'flex';
+                    shortNav.querySelector('button:first-child').disabled = this.currentShortIndex <= 0;
+                    shortNav.querySelector('button:last-child').disabled = this.currentShortIndex >= this.currentShortsList.length - 1;
+                } else {
+                    shortNav.style.display = 'none';
+                    this.currentShortsList = []; 
+                    this.currentShortIndex = -1;
+                }
+                this.renderComments(v);
+            },
+            
+            closePlayer: function() { 
+                document.getElementById('playerModal').style.display='none'; 
+                document.getElementById('mainVideoPlayer').pause();
+                document.getElementById('mainVideoPlayer').src = "";
+                this.currentShortsList = []; 
+                this.currentShortIndex = -1;
             },
 
-            toggleAccountMenu: function() {
-                const menu = document.getElementById('accountMenu');
-                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            renderComments: function(video) {
+                const list = document.getElementById('commentList');
+                document.getElementById('commentCount').innerText = `Commentaires (${video.comments?.length || 0})`;
+                if (this.data.user) document.getElementById('userCommentAvatar').src = this.getAvatar(this.data.user.name);
+                else document.getElementById('userCommentAvatar').src = 'https://via.placeholder.com/36?text=U';
+                list.innerHTML = (video.comments || []).map(c => `
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <img src="${this.getAvatar(c.author)}" class="avatar-small" onclick="app.closePlayer(); app.viewProfile('${c.author}')" style="cursor:pointer;">
+                        <div>
+                            <span style="font-weight:bold; font-size:14px; cursor:pointer;" onclick="app.closePlayer(); app.viewProfile('${c.author}')">${c.author}</span>
+                            <span style="font-size:12px; color:#999; margin-left:8px;">${new Date(c.time).toLocaleDateString()}</span>
+                            <p style="margin:2px 0 0 0;">${c.text}</p>
+                        </div>
+                    </div>
+                `).join('');
             },
-
-            closeModals: function() {
-                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-                document.getElementById('accountMenu').style.display = 'none';
+            
+            addComment: async function() {
+                if(!this.data.user) return this.openLogin();
+                const text = document.getElementById('newCommentInput').value.trim();
+                const video = this.data.videos.find(v => v.id === this.currentPlayingVideoId);
+                if (!text || !video) return;
+                if (!video.comments) video.comments = [];
+                video.comments.unshift({ author: this.data.user.name, text: text, time: Date.now() });
+                document.getElementById('newCommentInput').value = '';
+                this.renderComments(video); 
+                await this.saveGist();
             },
-
-            // --- FONCTIONS D'UPLOAD ET DE PUBLICATION ---
-
-            openUpload: function() {
-                if (!this.data.user) return this.openLogin();
-                this.closeModals();
-                document.getElementById('modalUpload').style.display = 'flex';
-                document.getElementById('upTitle').value = '';
-                document.getElementById('upVideoFile').value = '';
-                document.getElementById('upThumbFile').value = '';
-                document.getElementById('uploadStatus').textContent = "";
-                document.getElementById('uploadProgressBar').style.display = 'none';
-                document.getElementById('publishBtn').disabled = false;
-            },
-
-            updateProgress: function(elementId, progress, statusText) {
-                const fill = document.getElementById(elementId);
-                fill.style.width = Math.min(progress, 100) + '%';
-                document.getElementById('uploadStatus').textContent = `${statusText}: ${Math.round(Math.min(progress, 100))}%`;
-            },
-
-            uploadToCloudinary: async function(file, resourceType, onProgress) {
-                const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`;
+            
+            uploadCloudinary: async function(file, type, statusElement = null, progressFill = null, progressBar = null) {
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type}/upload`);
+                if(progressBar) progressBar.style.display = 'block';
                 return new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', url);
-                    
-                    xhr.upload.onprogress = (event) => {
-                        if (event.lengthComputable) {
-                            const progress = (event.loaded / event.total) * 100;
-                            onProgress(progress);
+                    xhr.upload.addEventListener('progress', (e) => {
+                        if (e.lengthComputable) {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            if (progressFill) progressFill.style.width = `${percent}%`;
                         }
-                    };
-
-                    xhr.onload = () => {
-                        if (xhr.status === 200) {
-                            const response = JSON.parse(xhr.responseText);
-                            resolve(response.secure_url);
-                        } else {
-                            reject(new Error(`Cloudinary upload failed: ${xhr.responseText}`));
-                        }
-                    };
-
-                    xhr.onerror = () => reject(new Error('Erreur réseau lors de l\'upload Cloudinary.'));
+                    });
+                    xhr.onload = () => resolve(JSON.parse(xhr.responseText).secure_url);
+                    xhr.onerror = () => reject("Erreur reseau");
                     xhr.send(formData);
                 });
             },
 
-            /**
-             * CORRECTION LIGNE ~650:
-             * Ajoute la logique de création de l'objet vidéo et de sauvegarde sur le Gist.
-             * Le problème "les vidéo ne se publie pas" est corrigé en insérant ce bloc.
-             */
             publish: async function() {
-                if (!this.data.user) return alert("Vous devez être connecté pour publier.");
-                const title = document.getElementById('upTitle').value.trim();
+                if(!this.data.user) return alert("Connectez-vous.");
+                const title = document.getElementById('upTitle').value;
                 const videoFile = document.getElementById('upVideoFile').files[0];
                 const thumbFile = document.getElementById('upThumbFile').files[0];
+                const status = document.getElementById('uploadStatus');
+                const publishBtn = document.getElementById('publishBtn');
+                const progressBar = document.getElementById('uploadProgressBar');
+                const progressFill = document.getElementById('uploadProgressFill');
 
-                if (!title || !videoFile || !thumbFile) {
-                    return alert("Tous les champs sont requis.");
-                }
-
-                document.getElementById('publishBtn').disabled = true;
-                document.getElementById('uploadStatus').textContent = "Début de l'upload...";
-                document.getElementById('uploadProgressBar').style.display = 'block';
-
+                if (!title || !videoFile || !thumbFile) return alert("Champs requis.");
+                publishBtn.disabled = true;
+                
                 try {
-                    // 1. Upload du Fichier Vidéo
-                    const videoUrl = await this.uploadToCloudinary(videoFile, 'video', (progress) => {
-                        this.updateProgress('uploadProgressFill', progress, "Upload Vidéo");
-                    });
+                    status.innerText = "Upload Miniature...";
+                    const thumbUrl = await this.uploadCloudinary(thumbFile, 'image');
+                    status.innerText = "Upload Vidéo...";
+                    const videoUrl = await this.uploadCloudinary(videoFile, 'video', status, progressFill, progressBar);
 
-                    // 2. Upload de la Miniature
-                    const thumbUrl = await this.uploadToCloudinary(thumbFile, 'image', (progress) => {
-                        this.updateProgress('uploadProgressFill', 100 + progress, "Upload Miniature");
-                    });
+                    let isShort = false;
+                    const videoElement = document.createElement('video');
+                    videoElement.src = URL.createObjectURL(videoFile);
+                    await new Promise(resolve => videoElement.onloadedmetadata = resolve);
+                    if (videoElement.videoHeight > videoElement.videoWidth) isShort = true;
                     
-                    // --- CORRECTION DU PROBLÈME DE PUBLICATION ---
                     const newVideo = {
-                        id: 'v' + Date.now(),
+                        id: Date.now(),
                         title: title,
-                        creator: this.data.user.name,
-                        creatorEmail: this.data.user.email,
-                        videoUrl: videoUrl,
-                        thumbUrl: thumbUrl,
-                        // Simplification d'une vérification plus complexe (dépend de l'API File ou des metadata)
-                        isShort: (videoFile.size < 5000000), 
-                        views: 0,
+                        url: videoUrl,
+                        thumb: thumbUrl,
+                        author: this.data.user.name,
                         likes: 0,
                         dislikes: 0,
-                        date: Date.now(),
-                        comments: [],
+                        views: 0, 
+                        isShort: isShort,
+                        comments: []
                     };
-
-                    this.data.videos.unshift(newVideo); // Ajout au début
-                    await this.saveGist(); // Sauvegarde des nouvelles données
-                    // ---------------------------------------------
-
-                    alert("Vidéo publiée avec succès !");
+                    this.data.videos.unshift(newVideo);
+                    await this.saveGist();
                     this.closeModals();
                     this.goHome();
-                } catch(e) {
-                    console.error("Erreur de publication:", e);
-                    alert("Erreur lors de la publication. Voir la console pour les détails.");
-                } finally {
-                    document.getElementById('publishBtn').disabled = false;
-                    document.getElementById('uploadProgressBar').style.display = 'none';
-                    document.getElementById('uploadStatus').textContent = "";
-                }
+                } catch (e) {
+                    console.error(e);
+                    alert("Erreur publication.");
+                } finally { publishBtn.disabled = false; progressBar.style.display = 'none'; }
             },
 
-            // --- FONCTIONS DE RENDU (UI) ---
-
-            clearContent: function() {
-                document.getElementById('videoGrid').style.display = 'grid';
-                document.getElementById('shortsGrid').style.display = 'none';
-                document.getElementById('videoGrid').innerHTML = '';
-                document.getElementById('shortsGrid').innerHTML = '';
-                document.getElementById('profileView').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'none';
-                document.getElementById('statsView').style.display = 'none';
-                document.getElementById('mainTitle').textContent = '';
-                document.getElementById('playerModal').style.display = 'none';
-            },
-
-            renderVideoCard: function(video) {
-                const user = this.data.users[video.creator] || { avatar: '', name: video.creator };
-                
-                return `
-                    <div class="video-card" onclick="app.openPlayer('${video.id}')">
-                        <div class="thumb-container">
-                            <img class="thumb" src="${video.thumbUrl}" alt="Thumbnail">
-                        </div>
-                        <div style="display:flex; margin-top:10px; gap:8px; align-items:flex-start;">
-                            <img src="${user.avatar || 'https://via.placeholder.com/36x36?text=U'}" 
-                                 class="avatar-small" 
-                                 onclick="event.stopPropagation(); app.goProfile('${video.creator}')">
-                            <div style="flex:1;">
-                                <div style="font-weight:bold; font-size:16px; line-height:1.4; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${video.title}</div>
-                                <p style="color:var(--sec-text); font-size:14px; margin:3px 0; cursor:pointer;"
-                                   onclick="event.stopPropagation(); app.goProfile('${video.creator}')">${user.name}</p>
-                                <p style="color:var(--sec-text); font-size:13px; margin:0;">${video.views} vues • il y a ${this.timeAgo(video.date)}</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            },
+            isAdmin: function() { return this.data.user && this.data.admins.includes(this.data.user.email); },
             
-            renderShortCard: function(video) {
-                return `
-                    <div class="short-card" onclick="app.openPlayer('${video.id}', true)">
-                        <img src="${video.thumbUrl}" alt="Short Thumbnail">
-                        <div style="position:absolute; bottom:10px; left:10px; right:10px; color:white; font-weight:bold;">
-                            ${video.title}
-                        </div>
-                    </div>
-                `;
-            },
-            
-            // --- FONCTIONS D'AFFICHAGE DES VUES ---
-
-            goHome: function() {
-                this.clearContent();
-                document.getElementById('mainTitle').textContent = 'Vidéos Recommandées';
-                
-                // Mélanger les vidéos pour une meilleure expérience 'Accueil'
-                const allVideos = [...this.data.videos].sort(() => Math.random() - 0.5); 
-                
-                const shorts = allVideos.filter(v => v.isShort);
-                const videos = allVideos.filter(v => !v.isShort);
-                
-                document.getElementById('videoGrid').innerHTML = videos.map(v => this.renderVideoCard(v)).join('');
-                
-                if (shorts.length > 0) {
-                    document.getElementById('shortsGrid').style.display = 'flex';
-                    document.getElementById('shortsGrid').innerHTML = shorts.map(v => this.renderShortCard(v)).join('');
-                    document.getElementById('mainTitle').insertAdjacentHTML('afterend', '<h2 style="margin-top:20px; font-size: 20px;">⚡ Zapp (Shorts)</h2>');
-                }
-            },
-
-            goSubs: function() {
-                if (!this.data.user) return this.openLogin();
-                this.clearContent();
-                document.getElementById('mainTitle').textContent = 'Vidéos de vos Abonnements';
-                
-                const subscribedUsers = this.data.subs;
-                if (subscribedUsers.length === 0) {
-                    document.getElementById('videoGrid').innerHTML = '<p style="color:#aaa;">Vous n\'êtes abonné à aucune chaîne. Visitez la page d\'accueil pour découvrir des créateurs !</p>';
-                    return;
-                }
-                
-                const subVideos = this.data.videos
-                    .filter(v => subscribedUsers.includes(v.creator))
-                    .sort((a, b) => b.date - a.date);
-                    
-                if (subVideos.length === 0) {
-                    document.getElementById('videoGrid').innerHTML = '<p style="color:#aaa;">Aucune nouvelle vidéo de vos abonnements.</p>';
-                    return;
-                }
-                    
-                document.getElementById('videoGrid').innerHTML = subVideos.map(v => this.renderVideoCard(v)).join('');
-            },
-
-            goHistory: function() {
-                if (!this.data.user) return this.openLogin();
-                this.clearContent();
-                document.getElementById('mainTitle').textContent = 'Historique des Vidéos';
-                
-                if (this.data.history.length === 0) {
-                    document.getElementById('videoGrid').innerHTML = '<p style="color:#aaa;">Votre historique est vide.</p>';
-                    return;
-                }
-                
-                const historyVideos = this.data.history
-                    .map(id => this.data.videos.find(v => v.id === id))
-                    .filter(v => v !== undefined)
-                    .reverse(); // Afficher les plus récents en premier
-                    
-                document.getElementById('videoGrid').innerHTML = historyVideos.map(v => this.renderVideoCard(v)).join('');
-            },
-
-            goStats: function() {
-                this.clearContent();
-                document.getElementById('statsView').style.display = 'block';
-                const statsContent = document.getElementById('statsContent');
-                
-                const totalViews = this.data.videos.reduce((sum, v) => sum + v.views, 0);
-                const totalLikes = this.data.videos.reduce((sum, v) => sum + v.likes, 0);
-                const totalComments = this.data.videos.reduce((sum, v) => sum + v.comments.length, 0);
-                
-                const mins = Math.floor(this.data.stats.timeSpentSeconds / 60);
-                const hrs = Math.floor(mins / 60);
-                const displayMins = mins % 60;
-                
-                let myStats = '';
-                if (this.data.user) {
-                    const myVideos = this.data.videos.filter(v => v.creator === this.data.user.name);
-                    const myViews = myVideos.reduce((sum, v) => sum + v.views, 0);
-                    const myLikes = myVideos.reduce((sum, v) => sum + v.likes, 0);
-                    const mySubs = this.data.users[this.data.user.name]?.subs.length || 0;
-                    
-                    myStats = `
-                        <h3>Vos Statistiques de Créateur</h3>
-                        <p>Total de Vues sur vos vidéos : <strong>${myViews}</strong></p>
-                        <p>Total de Likes sur vos vidéos : <strong>${myLikes}</strong></p>
-                        <p>Nombre d'Abonnés : <strong>${mySubs}</strong></p>
-                    `;
-                }
-
-                statsContent.innerHTML = `
-                    <h3>Statistiques Globales de la Plateforme</h3>
-                    <p>Nombre total de vidéos : <strong>${this.data.videos.length}</strong></p>
-                    <p>Total des vues sur toutes les vidéos : <strong>${totalViews}</strong></p>
-                    <p>Total des J'aime (Likes) : <strong>${totalLikes}</strong></p>
-                    <p>Total des Commentaires : <strong>${totalComments}</strong></p>
-                    
-                    <h3>Votre Activité</h3>
-                    <p>Temps passé sur Visiona : <strong>${hrs}h ${displayMins}m</strong></p>
-                    
-                    ${myStats}
-                `;
-            },
-
-            goShorts: function() {
-                this.clearContent();
-                document.getElementById('videoGrid').style.display = 'none';
-                document.getElementById('shortsGrid').style.display = 'flex';
-                document.getElementById('mainTitle').textContent = '⚡ Zapp (Shorts)';
-                
-                this.currentShortsList = this.data.videos.filter(v => v.isShort);
-                this.currentShortsList.sort(() => Math.random() - 0.5); // Randomiser
-
-                if (this.currentShortsList.length === 0) {
-                    document.getElementById('shortsGrid').innerHTML = '<p style="color:#aaa;">Aucun Short disponible.</p>';
-                    return;
-                }
-                
-                // Afficher uniquement les miniatures au lieu de lancer le player directement
-                document.getElementById('shortsGrid').innerHTML = this.currentShortsList.map(v => this.renderShortCard(v)).join('');
-            },
-
-            // Ouvre le lecteur modal pour une vidéo ou un short
-            openPlayer: function(videoId, isShortsList = false) {
-                this.closeModals();
-                const video = this.data.videos.find(v => v.id === videoId);
-                if (!video) return;
-
-                const playerModal = document.getElementById('playerModal');
-                const videoPlayer = document.getElementById('mainVideoPlayer');
-                const videoContainer = document.getElementById('videoContainer');
-                const shortNav = document.getElementById('shortNav');
-
-                // Configuration pour Short ou Vidéo longue
-                if (isShortsList) {
-                    videoContainer.className = 'short-player-wrapper';
-                    shortNav.style.display = 'flex';
-                    this.currentShortIndex = this.currentShortsList.findIndex(v => v.id === videoId);
-                } else {
-                    videoContainer.className = 'video-wrapper';
-                    shortNav.style.display = 'none';
-                    this.currentShortsList = []; // Réinitialiser la liste des shorts
-                    this.currentShortIndex = -1;
-                }
-
-                videoPlayer.src = video.videoUrl;
-                playerModal.style.display = 'block';
-                this.currentPlayingVideoId = video.id;
-
-                const creator = this.getCreatorInfo(video.creator);
-                
-                // Met à jour les informations de la vidéo
-                document.getElementById('playerTitle').textContent = video.title;
-                
-                /**
-                 * CORRECTION LIGNE ~720 (suite) pour l'affichage dans le lecteur:
-                 * Ajout de l'onClick sur l'avatar et le nom du créateur.
-                 */
-                document.getElementById('playerMeta').innerHTML = `
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <img src="${creator.avatar || 'https://via.placeholder.com/36x36?text=U'}" 
-                             class="avatar-small" 
-                             onclick="app.closePlayer(); app.goProfile('${video.creator}')">
-                        <span style="font-weight:bold; cursor:pointer;"
-                              onclick="app.closePlayer(); app.goProfile('${video.creator}')">${creator.name}</span>
-                        <span style="color:var(--sec-text); font-size:14px;">• ${video.views} vues • Publié il y a ${this.timeAgo(video.date)}</span>
-                    </div>
-                `;
-
-                this.renderPlayerActions(video);
-                this.renderComments(video);
-                this.registerView(video);
-                
-                // Défilement automatique au player sur mobile
-                if(window.innerWidth <= 768) {
-                    playerModal.scrollTo(0, 0);
-                }
-            },
-            
-            closePlayer: function() {
-                document.getElementById('mainVideoPlayer').pause();
-                document.getElementById('playerModal').style.display = 'none';
-                this.currentPlayingVideoId = null;
-            },
-
-            prevShort: function() {
-                if (this.currentShortsList.length === 0 || this.currentShortIndex <= 0) return;
-                this.currentShortIndex--;
-                this.openPlayer(this.currentShortsList[this.currentShortIndex].id, true);
-            },
-
-            nextShort: function() {
-                if (this.currentShortsList.length === 0 || this.currentShortIndex >= this.currentShortsList.length - 1) return;
-                this.currentShortIndex++;
-                this.openPlayer(this.currentShortsList[this.currentShortIndex].id, true);
-            },
-            
-            // --- FONCTIONS DE PROFIL ---
-
-            getCreatorInfo: function(creatorName) {
-                return this.data.users[creatorName] || { name: creatorName, email: '', bio: 'Chaîne inconnue', avatar: 'https://via.placeholder.com/36x36?text=U', banner: '' };
-            },
-
-            goMyProfile: function() {
-                if (!this.data.user) return this.openLogin();
-                this.goProfile(this.data.user.name, true);
-            },
-
-            goProfile: function(creatorName, isMyProfile = false) {
-                this.clearContent();
-                document.getElementById('profileView').style.display = 'block';
-
-                const creator = this.getCreatorInfo(creatorName);
-                const videos = this.data.videos.filter(v => v.creator === creatorName).sort((a, b) => b.date - a.date);
-                const followers = creator.subs.length;
-                
-                // Rendu des informations de base
-                document.getElementById('pBanner').src = creator.banner || 'https://via.placeholder.com/1200x200?text=Bannière';
-                document.getElementById('profileAvatar').src = creator.avatar || 'https://via.placeholder.com/120x120?text=U';
-                document.getElementById('pName').textContent = creator.name;
-                document.getElementById('pStats').textContent = `${followers} abonnés • ${videos.length} vidéos`;
-                document.getElementById('pBio').textContent = creator.bio || 'Aucune description.';
-                
-                // Rendu des actions (S'abonner ou Modifier)
-                const actionsDiv = document.getElementById('profileActions');
-                actionsDiv.innerHTML = '';
-                
-                if (isMyProfile) {
-                    actionsDiv.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
-                } else if (this.data.user) {
-                    const isSubscribed = this.data.subs.includes(creatorName);
-                    const subClass = isSubscribed ? 'followed' : 'btn-red';
-                    const subText = isSubscribed ? '✅ Abonné' : '🔴 S\'abonner';
-                    actionsDiv.innerHTML = `<button class="action-pill ${subClass}" onclick="app.toggleSubscription('${creatorName}')">${subText}</button>`;
-                }
-                
-                // Rendu des vidéos
-                document.getElementById('pVideos').innerHTML = videos.map(v => this.renderVideoCard(v)).join('');
-                
-                // Mise à jour de l'URL pour un lien direct (si vous utilisez le routing URL)
-                // window.history.pushState(null, '', `?view=profile&user=${creatorName}`);
-            },
-
-            openEditProfile: function() {
-                if (!this.data.user) return this.openLogin();
-                this.closeModals();
-                document.getElementById('modalEditProfile').style.display = 'flex';
-                
-                const creator = this.getCreatorInfo(this.data.user.name);
-                document.getElementById('editName').value = creator.name;
-                document.getElementById('editBio').value = creator.bio || '';
-                document.getElementById('editPPFile').value = '';
-                document.getElementById('editBannerFile').value = '';
-                document.getElementById('profileUploadStatus').textContent = '';
-            },
-
-            saveProfile: async function() {
-                if (!this.data.user) return;
-                
-                const newName = document.getElementById('editName').value.trim();
-                const newBio = document.getElementById('editBio').value.trim();
-                const ppFile = document.getElementById('editPPFile').files[0];
-                const bannerFile = document.getElementById('editBannerFile').files[0];
-                
-                const creatorName = this.data.user.name;
-                let creator = this.data.users[creatorName];
-                let uploadedCount = 0;
-                
-                document.getElementById('profileUploadStatus').textContent = "Sauvegarde en cours...";
-                
-                try {
-                    // 1. Mise à jour de l'Avatar (PDP)
-                    if (ppFile) {
-                        const ppUrl = await this.uploadToCloudinary(ppFile, 'image', (p) => document.getElementById('profileUploadStatus').textContent = `Upload Photo Profil: ${Math.round(p)}%`);
-                        creator.avatar = ppUrl;
-                        uploadedCount++;
-                    }
-
-                    // 2. Mise à jour de la Bannière
-                    if (bannerFile) {
-                        const bannerUrl = await this.uploadToCloudinary(bannerFile, 'image', (p) => document.getElementById('profileUploadStatus').textContent = `Upload Bannière: ${Math.round(p)}%`);
-                        creator.banner = bannerUrl;
-                        uploadedCount++;
-                    }
-                    
-                    // 3. Mise à jour du nom et de la bio (gestion du changement de nom plus complexe, ici on se concentre sur la bio)
-                    creator.bio = newBio;
-                    
-                    // Si le nom change (très complexe à gérer dans cette architecture), on alerte
-                    if (newName !== creator.name) {
-                        alert("Le changement de nom de chaîne n'est pas supporté dans cette version simplifiée.");
-                    }
-
-                    this.data.users[creatorName] = creator;
-                    
-                    await this.saveGist();
-                    
-                    alert("Profil mis à jour !");
-                    this.closeModals();
-                    this.goMyProfile();
-                } catch(e) {
-                    console.error("Erreur de sauvegarde de profil:", e);
-                    document.getElementById('profileUploadStatus').textContent = "Erreur de sauvegarde.";
-                }
-            },
-            
-            // --- FONCTIONS D'INTERACTION UTILISATEUR (LIKE/SUB) ---
-
-            toggleLike: async function(videoId) {
-                if (!this.data.user) return this.openLogin();
-                
-                const video = this.data.videos.find(v => v.id === videoId);
-                let vote = this.data.votes[videoId];
-                
-                if (vote === 'like') {
-                    video.likes--;
-                    delete this.data.votes[videoId];
-                } else if (vote === 'dislike') {
-                    video.dislikes--;
-                    video.likes++;
-                    this.data.votes[videoId] = 'like';
-                } else {
-                    video.likes++;
-                    this.data.votes[videoId] = 'like';
-                }
-                
-                this.saveLocal();
-                await this.saveGist();
-                this.renderPlayerActions(video);
-            },
-            
-            toggleDislike: async function(videoId) {
-                if (!this.data.user) return this.openLogin();
-                
-                const video = this.data.videos.find(v => v.id === videoId);
-                let vote = this.data.votes[videoId];
-                
-                if (vote === 'dislike') {
-                    video.dislikes--;
-                    delete this.data.votes[videoId];
-                } else if (vote === 'like') {
-                    video.likes--;
-                    video.dislikes++;
-                    this.data.votes[videoId] = 'dislike';
-                } else {
-                    video.dislikes++;
-                    this.data.votes[videoId] = 'dislike';
-                }
-                
-                this.saveLocal();
-                await this.saveGist();
-                this.renderPlayerActions(video);
-            },
-            
-            renderPlayerActions: function(video) {
-                const actionsDiv = document.getElementById('playerActions');
-                const vote = this.data.votes[video.id];
-                
-                const likeClass = vote === 'like' ? 'liked' : '';
-                const dislikeClass = vote === 'dislike' ? 'disliked' : '';
-                
-                actionsDiv.innerHTML = `
-                    <button class="action-pill ${likeClass}" onclick="app.toggleLike('${video.id}')">👍 ${video.likes}</button>
-                    <button class="action-pill ${dislikeClass}" onclick="app.toggleDislike('${video.id}')">👎 ${video.dislikes}</button>
-                    <button class="action-pill" onclick="alert('Fonctionnalité de partage non implémentée.')">🔗 Partager</button>
-                    <button class="action-pill" onclick="alert('Fonctionnalité de téléchargement non implémentée.')">⬇️ Télécharger</button>
-                `;
-            },
-            
-            toggleSubscription: async function(creatorName) {
-                if (!this.data.user) return this.openLogin();
-                
-                const user = this.data.users[creatorName];
-                if (!user) return;
-                
-                const index = this.data.subs.indexOf(creatorName);
-                const isSubscribed = index !== -1;
-                
-                if (isSubscribed) {
-                    this.data.subs.splice(index, 1);
-                    user.subs = user.subs.filter(s => s !== this.data.user.name);
-                } else {
-                    this.data.subs.push(creatorName);
-                    if (!user.subs.includes(this.data.user.name)) {
-                        user.subs.push(this.data.user.name);
-                    }
-                }
-                
-                this.saveLocal();
-                await this.saveGist();
-                this.goProfile(creatorName);
-            },
-            
-            // --- FONCTIONS DE VUES ET COMMENTAIRES ---
-            
-            registerView: async function(video) {
-                const videoId = video.id;
-                const now = Date.now();
-                const lastView = this.data.lastViewTimes[videoId] || 0;
-
-                // Applique le cooldown d'une heure pour compter une vue
-                if (now - lastView > VIEW_COOLDOWN_MS) {
-                    video.views++;
-                    this.data.lastViewTimes[videoId] = now;
-                    this.saveLocal();
-                    await this.saveGist();
-                    
-                    // Mettre à jour l'historique seulement si une vue a été comptée
-                    if (this.data.user) {
-                        const history = this.data.history.filter(id => id !== videoId);
-                        history.push(videoId);
-                        this.data.history = history.slice(-50); // Limiter à 50 vidéos
-                        this.saveLocal();
-                    }
-                }
-            },
-            
-            addComment: async function() {
-                if (!this.data.user) return this.openLogin();
-                
-                const input = document.getElementById('newCommentInput');
-                const text = input.value.trim();
-                const videoId = this.currentPlayingVideoId;
-                
-                if (!text || !videoId) return;
-                
-                const video = this.data.videos.find(v => v.id === videoId);
-                if (!video) return;
-                
-                const newComment = {
-                    id: 'c' + Date.now(),
-                    creator: this.data.user.name,
-                    text: text,
-                    date: Date.now(),
-                };
-                
-                video.comments.unshift(newComment);
-                input.value = '';
-                
-                await this.saveGist();
-                this.renderComments(video);
-            },
-            
-            renderComments: function(video) {
-                const list = document.getElementById('commentList');
-                const count = document.getElementById('commentCount');
-                
-                count.textContent = `${video.comments.length} Commentaires`;
-                
-                if (video.comments.length === 0) {
-                    list.innerHTML = '<p style="color:#aaa; text-align:center;">Soyez le premier à commenter !</p>';
-                    return;
-                }
-                
-                list.innerHTML = video.comments.map(c => {
-                    const creator = this.getCreatorInfo(c.creator);
-                    return `
-                        <div style="display:flex; gap:10px; margin-bottom:20px;">
-                            <img src="${creator.avatar || 'https://via.placeholder.com/36x36?text=U'}" 
-                                 class="avatar-small" 
-                                 onclick="app.closePlayer(); app.goProfile('${c.creator}')">
-                            <div style="flex:1;">
-                                <div style="font-size:13px; color:var(--sec-text);">
-                                    <span style="font-weight:bold; color:var(--text); cursor:pointer;" onclick="app.closePlayer(); app.goProfile('${c.creator}')">${c.creator}</span> 
-                                    • il y a ${this.timeAgo(c.date)}
-                                </div>
-                                <p style="margin:5px 0 0 0;">${c.text}</p>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            },
-
-            // --- FONCTIONS DE RECHERCHE ---
-
-            search: function() {
-                const query = document.getElementById('searchInput').value.trim().toLowerCase();
-                if (!query) {
-                    return this.goHome();
-                }
-                
-                this.clearContent();
-                document.getElementById('mainTitle').textContent = `Résultats pour "${query}"`;
-
-                const results = this.data.videos.filter(v => 
-                    v.title.toLowerCase().includes(query) || 
-                    v.creator.toLowerCase().includes(query)
-                ).sort((a, b) => b.views - a.views); // Triage par pertinence (vues)
-                
-                if (results.length === 0) {
-                    document.getElementById('videoGrid').innerHTML = `<p style="color:#aaa;">Aucun résultat trouvé pour "${query}".</p>`;
-                } else {
-                    document.getElementById('videoGrid').innerHTML = results.map(v => this.renderVideoCard(v)).join('');
-                }
-            },
-            
-            // --- FONCTIONS ADMIN ---
-
             goAdminPanel: function() {
-                if (!this.data.user || !this.data.admins.includes(this.data.user.email)) {
-                    return alert("Accès refusé. Vous n'êtes pas administrateur.");
-                }
-                
-                this.clearContent();
+                if (!this.isAdmin()) return alert("Accès refusé.");
+                this.hideAll(); 
                 document.getElementById('adminPanel').style.display = 'block';
-                this.renderAdminVideoList();
+                this.renderAdminVideoList(); 
                 this.renderAdminList();
             },
 
             renderAdminVideoList: function() {
-                const listDiv = document.getElementById('adminVideoList');
-                const videosHtml = this.data.videos.sort((a, b) => b.date - a.date).map(v => `
-                    <tr id="adminVideoRow-${v.id}">
-                        <td>${v.title}</td>
-                        <td>${v.creator}</td>
-                        <td>${v.views}</td>
-                        <td>
-                            <button class="action-pill" onclick="app.openAdminEditVideo('${v.id}', '${v.title}')">Modifier</button>
-                            <button class="action-pill btn-red" onclick="app.deleteVideo('${v.id}')">Supprimer</button>
-                        </td>
-                    </tr>
-                `).join('');
-                
-                listDiv.innerHTML = `
-                    <table class="admin-table">
-                        <thead>
-                            <tr><th>Titre</th><th>Créateur</th><th>Vues</th><th>Actions</th></tr>
-                        </thead>
-                        <tbody>
-                            ${videosHtml}
-                        </tbody>
-                    </table>
-                `;
+                const list = document.getElementById('adminVideoList');
+                list.innerHTML = `<table class="admin-table">
+                    <thead><tr><th>ID (Date)</th><th>Titre</th><th>Auteur</th><th>Vues</th><th>Actions</th></tr></thead>
+                    <tbody>${this.data.videos.map(v => `
+                        <tr>
+                            <td>${v.id}</td>
+                            <td>${v.title}</td>
+                            <td>${v.author}</td>
+                            <td>${v.views || 0}</td>
+                            <td>
+                                <button class="action-pill" onclick="app.openAdminEditModal(${v.id}, '${v.title.replace(/'/g, "\\'")}')">✎</button>
+                                <button class="action-pill btn-red" onclick="app.deleteVideo(${v.id})">❌</button>
+                            </td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>`;
             },
-            
-            openAdminEditVideo: function(videoId, title) {
-                this.currentEditVideoId = videoId;
+
+            openAdminEditModal: function(id, title) {
+                this.currentEditVideoId = id;
                 document.getElementById('editVideoTitle').value = title;
                 document.getElementById('modalEditVideo').style.display = 'flex';
             },
 
             saveAdminVideoEdit: async function() {
-                const videoId = this.currentEditVideoId;
-                const newTitle = document.getElementById('editVideoTitle').value.trim();
-                
-                if (!videoId || !newTitle) return;
-
-                const video = this.data.videos.find(v => v.id === videoId);
-                if (video) {
-                    video.title = newTitle;
-                    await this.saveGist();
-                    this.closeModals();
-                    this.renderAdminVideoList();
+                const newTitle = document.getElementById('editVideoTitle').value;
+                const index = this.data.videos.findIndex(v => v.id == this.currentEditVideoId);
+                if (index > -1 && newTitle.trim()) {
+                    this.data.videos[index].title = newTitle.trim();
+                    this.closeModals(); 
+                    await this.saveGist(); 
+                    this.goAdminPanel(); 
                 }
             },
 
-            deleteVideo: async function(videoId) {
-                if (!confirm("Êtes-vous sûr de vouloir supprimer cette vidéo ?")) return;
-                
-                this.data.videos = this.data.videos.filter(v => v.id !== videoId);
-                await this.saveGist();
-                this.renderAdminVideoList();
+            deleteVideo: async function(id) {
+                if (!confirm("Voulez-vous vraiment supprimer cette vidéo ?")) return;
+                this.data.videos = this.data.videos.filter(v => v.id != id);
+                await this.saveGist(); 
+                this.goAdminPanel(); 
             },
 
             renderAdminList: function() {
-                const listDiv = document.getElementById('adminList');
-                listDiv.innerHTML = `
-                    <table class="admin-table">
-                        <thead>
-                            <tr><th>Email</th><th>Actions</th></tr>
-                        </thead>
-                        <tbody>${this.data.admins.map(email => `
-                            <tr>
-                                <td>${email} ${email === PRIMARY_ADMIN_EMAIL ? '(Principal)' : ''}</td>
-                                <td>
-                                    ${email === PRIMARY_ADMIN_EMAIL ? 
-                                        '<button class="action-pill" disabled>Admin Principal</button>' : 
-                                        `<button class="action-pill btn-red" onclick="app.removeAdmin('${email}')">Retirer</button>`
-                                    }
-                                </td>
-                            </tr>
-                        `).join('')}</tbody>
-                    </table>
-                `;
+                const list = document.getElementById('adminList');
+                list.innerHTML = `<table class="admin-table">
+                    <thead><tr><th>Email</th><th>Action</th></tr></thead>
+                    <tbody>${this.data.admins.map(email => `
+                        <tr>
+                            <td>${email}</td>
+                            <td>${email === PRIMARY_ADMIN_EMAIL ? '⭐ Admin Principal' : `<button class="action-pill btn-red" onclick="app.removeAdmin('${email}')">❌ Retirer</button>`}</td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>`;
             },
+
             addAdmin: async function() {
                 if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut ajouter des admins.");
                 const newEmail = document.getElementById('newAdminEmail').value.trim();
                 if (newEmail && !this.data.admins.includes(newEmail)) {
-                    this.data.admins.push(newEmail);
+                    this.data.admins.push(newEmail); 
                     document.getElementById('newAdminEmail').value = '';
-                    await this.saveGist();
-                    alert(`Admin ${newEmail} ajouté !`);
+                    await this.saveGist(); 
                     this.renderAdminList();
-                    // CORRECTION: Met à jour l'interface pour afficher le lien admin immédiatement
                     this.updateAuthUI(); 
                 } else { alert("Email invalide ou déjà admin."); }
             },
+
             removeAdmin: async function(email) {
                 if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut retirer des admins.");
                 if (email === PRIMARY_ADMIN_EMAIL) return alert("Impossible de retirer l'Admin Principal.");
                 this.data.admins = this.data.admins.filter(e => e !== email);
-                await this.saveGist();
-                alert(`Admin ${email} retiré.`);
+                await this.saveGist(); 
                 this.renderAdminList();
+                this.updateAuthUI(); 
             },
+
+            getAvatar: function(name) { 
+                return this.data.users[name]?.avatar || 'https://via.placeholder.com/36?text=U'; 
+            },
+
+            hideAll: function() { 
+                ['videoGrid', 'shortsGrid', 'profileView', 'adminPanel', 'statsView'].forEach(id => document.getElementById(id).style.display = 'none');
+            },
+
+            toggleAccountMenu: function() { 
+                const m = document.getElementById('accountMenu'); 
+                m.style.display = m.style.display === 'none' ? 'block' : 'none'; 
+            },
+
+            closeModals: function() { 
+                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
+            },
+
+            openUpload: function() { 
+                if(!this.data.user) return this.openLogin(); 
+                document.getElementById('modalUpload').style.display='flex'; 
+                document.getElementById('uploadProgressBar').style.display = 'none';
+            },
+
+            openLogin: function() { 
+                document.getElementById('modalLoginEmail').style.display='flex'; 
+            },
+
+            goMyProfile: function() {
+                if(!this.data.user || !this.data.user.name) return this.openLogin(); 
+                this.viewProfile(this.data.user.name);
+            },
+
+            viewProfile: function(authorName) {
+                this.closePlayer(); // Fix: Ferme le player pour afficher le profil
+                this.hideAll();
+                const v = document.getElementById('profileView');
+                v.style.display = 'block';
+                const profile = this.data.users[authorName] || { name: authorName, bio: "", avatar: "", banner: "" };
+                const videos = this.data.videos.filter(x => x.author === authorName);
+                const isMyProfile = this.data.user && this.data.user.name === authorName;
+                let followerCount = 0;
+                for (const userName in this.data.users) {
+                    if (this.data.users[userName] && this.data.users[userName].subs && this.data.users[userName].subs.includes(authorName)) followerCount++;
+                }
+                document.getElementById('pBanner').src = profile.banner || '';
+                document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
+                document.getElementById('pName').innerText = profile.name;
+                document.getElementById('pStats').innerText = `${followerCount} abonnés • ${videos.length} vidéos`; 
+                document.getElementById('pBio').innerText = profile.bio;
+                const actions = document.getElementById('profileActions');
+                actions.innerHTML = '';
+                if (isMyProfile) actions.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
+                else if (this.data.user) {
+                    const isSubscribed = this.data.subs.includes(authorName);
+                    actions.innerHTML = `<button class="action-pill ${isSubscribed ? 'followed' : 'btn-red'}" onclick="app.toggleSub('${authorName}')">${isSubscribed ? '✅ Abonné' : 'S\'abonner'}</button>`;
+                }
+                this.render(videos, 'pVideos');
+            },
+
+            openEditProfile: function() { 
+                if(!this.data.user) return this.openLogin();
+                const profile = this.data.users[this.data.user.name] || {};
+                document.getElementById('editName').value = profile.name || this.data.user.name;
+                document.getElementById('editBio').value = profile.bio || '';
+                document.getElementById('modalEditProfile').style.display='flex'; 
+            },
+
+            saveProfile: async function() {
+                if(!this.data.user) return;
+                const bio = document.getElementById('editBio').value;
+                const pp = document.getElementById('editPPFile').files[0];
+                const ban = document.getElementById('editBannerFile').files[0];
+                const status = document.getElementById('profileUploadStatus');
+                const userName = this.data.user.name; 
+                let userData = this.data.users[userName] || { name: userName, email: this.data.user.email, subs: [] }; 
+                if(bio) userData.bio = bio;
+                status.innerText = "Traitement...";
+                try {
+                    if(pp) {
+                        status.innerText = "Upload Photo de Profil...";
+                        const newAvatarUrl = await this.uploadCloudinary(pp, 'image');
+                        if (newAvatarUrl) userData.avatar = newAvatarUrl;
+                    }
+                    if(ban) {
+                        status.innerText = "Upload Bannière...";
+                        const newBannerUrl = await this.uploadCloudinary(ban, 'image');
+                        if (newBannerUrl) userData.banner = newBannerUrl;
+                    }
+                    this.data.users[userName] = userData; 
+                    await this.saveGist();
+                    alert("Profil mis à jour !");
+                    location.reload();
+                } catch (e) {
+                    alert("Erreur lors de la mise à jour du profil.");
+                    console.error(e);
+                } finally { status.innerText = ""; }
+            }
         };
 
         app.init();
