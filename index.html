@@ -269,13 +269,21 @@
             },
 
             saveGist: async function() {
-                if(!WORKER_PROXY_URL) return;
+                if(!WORKER_PROXY_URL) {
+                    alert("ERREUR CRITIQUE : Le lien du Worker (WORKER_PROXY_URL) est vide dans le code ! La sauvegarde ne marchera pas.");
+                    return;
+                }
                 const content = { videos: this.data.videos, users: this.data.users, admins: this.data.admins };
-                await fetch(WORKER_PROXY_URL, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
-                });
+                try {
+                    await fetch(WORKER_PROXY_URL, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
+                    });
+                } catch(e) {
+                    console.error("Erreur lors de la sauvegarde du Gist.", e);
+                    alert("Erreur de sauvegarde : " + e.message);
+                }
             },
 
             saveLocal: function() {
@@ -437,7 +445,7 @@
 
             render: function(list, target = 'videoGrid') {
                 const targetElement = document.getElementById(target);
-                if (list.length === 0) { targetElement.innerHTML = "<p style='color:#aaa; padding:20px;'>Aucune vidéo.</p>"; return; }
+                if (list.length === 0) { targetElement.innerHTML = "<p style='color:#aaa; padding:20px;'>Aucune vidéo à afficher pour le moment.</p>"; return; }
                 targetElement.innerHTML = list.map(v => `
                     <div class="video-card" onclick="app.openVideoOverlay(${v.id}, ${v.isShort ? 'true' : 'false'})">
                         <div class="thumb-container"><img src="${v.thumb}" class="thumb"></div>
