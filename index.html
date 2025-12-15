@@ -2,565 +2,109 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visiona - AlphaGames30</title>
     <style>
-        /* ========================================================= */
-        /* --- SECTION CSS : DÉFINITION DES VARIABLES GLOBALES  --- */
-        /* ========================================================= */
-        :root { 
-            --bg: #0f0f0f; 
-            --header: #0f0f0f; 
-            --text: #ffffff; 
-            --sec-text: #aaaaaa; 
-            --hover: #272727; 
-            --blue: #3ea6ff; 
-            --red: #ff0000; 
-        }
-
-        /* ========================================================= */
-        /* --- CSS : STYLE DU CORPS ET DE LA MISE EN PAGE GÉNÉRALE --- */
-        /* ========================================================= */
-        body { 
-            margin: 0; 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: Roboto, Arial, sans-serif; 
-            overflow-x: hidden; 
-            padding-bottom: 60px; /* Espace pour la navigation mobile */
-        }
-
-        /* --- HEADER ET NAVIGATION SUPÉRIEURE --- */
-        header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 0 16px; 
-            height: 56px; 
-            background: var(--header); 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            border-bottom: 1px solid #222; 
-        }
-
-        .logo { 
-            font-size: 20px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-        }
-
-        .logo::before { 
-            content: '▶'; 
-            color: var(--red); 
-            font-size: 24px; 
-            margin-right: 5px; 
-        }
-
-        /* --- BARRE DE RECHERCHE --- */
-        .search-box { 
-            display: flex; 
-            flex: 1; 
-            max-width: 500px; 
-            margin: 0 10px; 
-        }
-
-        .search-box input { 
-            width: 100%; 
-            background: #121212; 
-            border: 1px solid #333; 
-            color: white; 
-            padding: 8px 15px; 
-            border-radius: 40px 0 0 40px; 
-            border-right: none; 
-        }
-
-        .search-box button { 
-            background: #222; 
-            border: 1px solid #333; 
-            border-left: none; 
-            padding: 0 20px; 
-            border-radius: 0 40px 40px 0; 
-            cursor: pointer; 
-            color: var(--sec-text); 
-            transition: background 0.2s;
-        }
-
-        .search-box button:hover {
-            background: #333;
-        }
-
-        .header-btns button { 
-            background: none; 
-            border: none; 
-            color: white; 
-            font-size: 20px; 
-            margin-left: 10px; 
-            cursor: pointer; 
-        }
-
-        .btn-login { 
-            border: 1px solid var(--blue) !important; 
-            color: var(--blue) !important; 
-            font-size: 14px !important; 
-            padding: 5px 10px; 
-            border-radius: 20px; 
-            font-weight: bold; 
-            display: flex; 
-            align-items: center; 
-            gap: 5px; 
-            transition: background 0.2s, color 0.2s;
-        }
-
-        /* --- CONTENEUR PRINCIPAL (SIDEBAR + CONTENT) --- */
-        .container { 
-            display: flex; 
-            height: calc(100vh - 56px); 
-        }
-
-        /* --- SIDEBAR (NAVIGATION LATÉRALE) --- */
-        .sidebar { 
-            width: 220px; 
-            background: var(--bg); 
-            padding: 10px; 
-            overflow-y: auto; 
-            flex-shrink: 0; 
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-        }
-
-        .nav-item { 
-            padding: 10px; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            margin-bottom: 5px; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            transition: background 0.2s;
-        }
-
-        .nav-item:hover { 
-            background: var(--hover); 
-        }
-
-        /* --- ZONE DE CONTENU PRINCIPAL --- */
-        .content { 
-            flex: 1; 
-            padding: 20px; 
-            overflow-y: auto; 
-        }
-
-        /* --- GRILLES DE VIDÉOS --- */
-        .video-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 20px; 
-        }
-
-        .video-card { 
-            cursor: pointer; 
-            transition: transform 0.2s; 
-            overflow: hidden; 
-        }
-
-        .video-card:hover { 
-            transform: scale(1.01); 
-        }
-
-        .thumb-container { 
-            position: relative; 
-            width: 100%; 
-            aspect-ratio: 16/9; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            background: #333; 
-        }
-
-        .thumb { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            transition: opacity 0.3s;
-        }
-
-        /* --- GRILLE DES SHORTS --- */
+        :root { --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa; --hover: #272727; --blue: #3ea6ff; --red: #ff0000; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, Arial, sans-serif; overflow-x: hidden; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; height: 56px; background: var(--header); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
+        .logo { font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; }
+        .logo::before { content: '▶'; color: var(--red); font-size: 24px; margin-right: 5px; }
+        .search-box { display: flex; flex: 1; max-width: 500px; margin: 0 10px; }
+        .search-box input { width: 100%; background: #121212; border: 1px solid #333; color: white; padding: 8px 15px; border-radius: 40px 0 0 40px; }
+        .search-box button { background: #222; border: 1px solid #333; border-left: none; padding: 0 20px; border-radius: 0 40px 40px 0; cursor: pointer; color: var(--sec-text); }
+        .header-btns button { background: none; border: none; color: white; font-size: 20px; margin-left: 10px; cursor: pointer; }
+        .btn-login { border: 1px solid var(--blue) !important; color: var(--blue) !important; font-size: 14px !important; padding: 5px 10px; border-radius: 20px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        
+        .container { display: flex; height: calc(100vh - 56px); }
+        .sidebar { width: 220px; background: var(--bg); padding: 10px; overflow-y: auto; flex-shrink: 0; }
+        @media(max-width: 768px) { .sidebar { display: none; } }
+        .nav-item { padding: 10px; border-radius: 10px; cursor: pointer; margin-bottom: 5px; }
+        .nav-item:hover { background: var(--hover); }
+        .content { flex: 1; padding: 20px; overflow-y: auto; }
+        
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .video-card { cursor: pointer; transition: transform 0.2s; }
+        .video-card:hover { transform: scale(1.02); }
+        .thumb-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #333; }
+        .thumb { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Shorts pour un affichage vertical et scroll horizontal */
         .shorts-grid { 
             display: flex; 
             gap: 15px; 
             overflow-x: auto; 
             padding-bottom: 10px; 
         }
-
-        .short-card { 
+        .short-card {
             flex-shrink: 0; 
             width: 160px; 
             height: 300px; 
-            cursor: pointer; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            background: #333; 
-            position: relative; 
-            transition: transform 0.2s;
+            cursor: pointer;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #333;
         }
+        .short-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .player-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 500; overflow-y: auto; padding-bottom: 50px; }
+        .player-content { width: 95%; max-width: 1200px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; }
         
-        .short-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .short-card img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-        }
-
-        /* --- PLAYER MODAL ET VIDÉO --- */
-        .player-overlay { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: black; 
-            z-index: 500; 
-            overflow-y: auto; 
-            padding-bottom: 50px; 
-        }
-
-        .player-content { 
-            width: 95%; 
-            max-width: 1200px; 
-            margin: 20px auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
-
-        .video-wrapper { 
-            width: 100%; 
-            aspect-ratio: 16/9; 
-            background: #000; 
-        }
-
-        /* CONTENEUR DE SHORTS POUR LE DÉFILEMENT SÉQUENTIEL */
+        /* Conteneur vidéo standard (16:9) */
+        .video-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; }
+        
+        /* Nouveau conteneur pour les Shorts (vertical 9:16) */
         .short-player-wrapper { 
             width: 100%; 
-            max-width: 400px; 
-            aspect-ratio: 9/16; 
+            max-width: 400px; /* Largeur maximale pour le Short */
+            aspect-ratio: 9/16; /* Format vertical */
             background: #000; 
-            margin: 0 auto; 
-            position: relative;
+            margin: 0 auto; /* Centrage horizontal */
         }
-        
-        .short-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 10px;
-            z-index: 510;
-        }
-        
-        .short-nav button {
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: white;
-            font-size: 24px;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-
-        video { 
+        .short-player-wrapper video {
             width: 100%; 
-            height: 100%; 
-            background: #000;
+            height: 100%;
         }
 
-        /* --- SECTION COMMENTAIRES --- */
-        .comment-section { 
-            background: #1a1a1a; 
-            padding: 20px; 
-            border-radius: 12px; 
-            margin-top: 20px;
-        }
+        video { width: 100%; height: 100%; }
 
-        .comment-input-area { 
-            display: flex; 
-            gap: 10px; 
-            margin-bottom: 20px; 
-            align-items: center;
-        }
+        .comment-section { background: #1a1a1a; padding: 20px; border-radius: 12px; }
+        .comment-input-area { display: flex; gap: 10px; margin-bottom: 20px; }
+        .comment-input-area input { flex: 1; background: none; border: none; border-bottom: 1px solid #333; color: white; padding: 8px; }
 
-        .comment-input-area input { 
-            flex: 1; 
-            background: none; 
-            border: none; 
-            border-bottom: 1px solid #333; 
-            color: white; 
-            padding: 8px; 
-            transition: border-bottom-color 0.3s;
-        }
+        .action-pill { background: #272727; color: white; border: none; padding: 6px 12px; border-radius: 18px; font-size: 13px; cursor: pointer; }
+        .liked { color: var(--blue); }
+        .disliked { color: var(--red); }
+        .followed { background: #fff; color: #000; }
+        .btn-red { background: var(--red); color: white; }
+        .btn-green { background: #00a854; color: white; }
 
-        .comment-input-area input:focus {
-            outline: none;
-            border-bottom-color: var(--text);
-        }
-
-        /* --- BOUTONS D'ACTION (PILLS) --- */
-        .action-pill { 
-            background: #272727; 
-            color: white; 
-            border: none; 
-            padding: 6px 12px; 
-            border-radius: 18px; 
-            font-size: 13px; 
-            cursor: pointer; 
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .action-pill:hover {
-            background: #3a3a3a;
-        }
-
-        .liked { 
-            color: var(--blue); 
-            background: rgba(62, 166, 255, 0.2);
-        }
-
-        .disliked { 
-            color: var(--red); 
-            background: rgba(255, 0, 0, 0.2);
-        }
-
-        .followed { 
-            background: #fff; 
-            color: #000; 
-            font-weight: bold;
-        }
-
-        .btn-red { 
-            background: var(--red); 
-            color: white; 
-        }
-
-        .btn-green { 
-            background: #00a854; 
-            color: white; 
-        }
-
-        /* --- MODALS ET FENÊTRES POP-UP --- */
-        .modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.8); 
-            z-index: 600; 
-            justify-content: center; 
-            align-items: center; 
-        }
-
-        .modal-box { 
-            background: #212121; 
-            padding: 25px; 
-            border-radius: 15px; 
-            width: 90%; 
-            max-width: 450px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 600; justify-content: center; align-items: center; }
+        .modal-box { background: #212121; padding: 25px; border-radius: 15px; width: 90%; max-width: 450px; }
         
-        /* --- VUES SPÉCIFIQUES (PROFIL / ADMIN / STATS) --- */
-        .profile-view, .stats-view { 
-            display: none; 
-            padding-bottom: 50px;
-        }
-
-        .admin-view { 
-            display: none; 
-            padding: 20px; 
-        }
+        .profile-view { display: none; }
+        .admin-view { display: none; padding: 20px; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .admin-table th, .admin-table td { border: 1px solid #333; padding: 10px; text-align: left; }
+        .admin-table th { background: #222; }
         
-        .stats-view h3 {
-            margin-top: 25px;
-            color: var(--blue);
-            border-bottom: 1px solid #333;
-            padding-bottom: 5px;
-        }
-        
-        .stats-view p {
-            margin: 8px 0;
-            font-size: 15px;
-        }
+        input[type="text"], input[type="password"], input[type="email"] { width: 100%; padding: 12px; margin: 10px 0; background: #121212; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
+        .btn-blue { width: 100%; padding: 12px; background: var(--blue); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
+        .avatar-big { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--bg); background: #555; object-fit: cover; cursor: pointer; }
+        .avatar-small { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; cursor: pointer; }
 
-        .admin-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
-        }
+        .banner { width: 100%; height: 200px; background: #333; border-radius: 15px; margin-bottom: -60px; object-fit: cover; }
+        .profile-head { display: flex; align-items: flex-end; gap: 20px; padding: 0 20px; }
+        #profileActions button { margin-top: 10px; }
 
-        .admin-table th, .admin-table td { 
-            border: 1px solid #333; 
-            padding: 10px; 
-            text-align: left; 
-        }
-
-        .admin-table th { 
-            background: #222; 
-        }
-        
-        /* --- INPUTS GÉNÉRAUX --- */
-        input[type="text"], 
-        input[type="password"], 
-        input[type="email"], 
-        textarea { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 10px 0; 
-            background: #121212; 
-            border: 1px solid #333; 
-            color: white; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-        }
-
-        .btn-blue { 
-            width: 100%; 
-            padding: 12px; 
-            background: var(--blue); 
-            color: black; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: opacity 0.2s;
-        }
-
-        .btn-blue:hover {
-            opacity: 0.9;
-        }
-
-        /* --- AVATARS ET BANNIÈRE --- */
-        .avatar-big { 
-            width: 120px; 
-            height: 120px; 
-            border-radius: 50%; 
-            border: 4px solid var(--bg); 
-            background: #555; 
-            object-fit: cover; 
-            cursor: pointer; 
-        }
-
-        .avatar-small { 
-            width: 36px; 
-            height: 36px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            cursor: pointer; 
-        }
-
-        .banner { 
-            width: 100%; 
-            height: 200px; 
-            background: #333; 
-            border-radius: 15px; 
-            margin-bottom: -60px; 
-            object-fit: cover; 
-        }
-
-        .profile-head { 
-            display: flex; 
-            align-items: flex-end; 
-            gap: 20px; 
-            padding: 0 20px; 
-        }
-
-        /* --- NAVIGATION MOBILE (MEDIA QUERIES) --- */
-        @media(max-width: 768px) { 
-            .sidebar { 
-                display: none; 
-            } 
-            .mobile-nav { 
-                display: flex !important; 
-            } 
-            .search-box { 
-                display: none; 
-            }
-            .video-grid { 
-                grid-template-columns: 1fr; 
-            } 
-            .content {
-                padding: 10px;
-            }
-            .profile-head {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                padding: 0 10px;
-            }
-            .banner {
-                margin-bottom: -40px;
-                height: 120px;
-                border-radius: 0;
-            }
-            .avatar-big {
-                margin-top: 10px;
-            }
-        }
-        
-        .mobile-nav { 
-            display: none; 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 60px; 
-            background: #0f0f0f; 
-            border-top: 1px solid #222; 
-            justify-content: space-around; 
-            align-items: center; 
-            z-index: 1000; 
-        }
-
-        .mobile-nav-item { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            font-size: 10px; 
-            color: var(--sec-text); 
-            cursor: pointer; 
-        }
-
-        .mobile-nav-item span { 
-            font-size: 20px; 
-            color: white; 
-            margin-bottom: 2px; 
-        }
-
-        /* --- BARRE DE PROGRESSION UPLOAD --- */
-        .progress-bar { 
-            height: 15px; 
-            background: #444; 
-            border-radius: 8px; 
-            margin-bottom: 10px; 
-            overflow: hidden; 
-            width: 100%;
-        }
-
-        .progress-fill { 
-            height: 100%; 
-            background: var(--blue); 
-            width: 0%; 
-            transition: width 0.1s; 
-        }
+        /* Style de la barre de progression */
+        .progress-bar { height: 15px; background: #444; border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--blue); width: 0%; transition: width 0.1s; }
     </style>
 </head>
 <body>
@@ -577,55 +121,35 @@
         </div>
     </header>
 
-    <div id="accountMenu" style="display:none; position:absolute; right:10px; top:60px; background:#282828; padding:15px; border-radius:10px; z-index:1000; min-width: 150px;">
-        <div id="menuUserName" style="font-weight:bold; margin-bottom:10px; border-bottom: 1px solid #333; padding-bottom: 10px;"></div>
+    <div id="accountMenu" style="display:none; position:absolute; right:10px; top:60px; background:#282828; padding:15px; border-radius:10px; z-index:1000;">
+        <div id="menuUserName" style="font-weight:bold; margin-bottom:10px;"></div>
         <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
         <div id="adminLink" class="nav-item" onclick="app.goAdminPanel()" style="display:none;">🔑 Admin Panel</div>
         <div class="nav-item" onclick="app.doLogout()">🚪 Déconnexion</div>
     </div>
 
-
-    <div class="mobile-nav">
-        <div class="mobile-nav-item" onclick="app.goHome()"><span>🏠</span>Accueil</div>
-        <div class="mobile-nav-item" onclick="app.goShorts()"><span>⚡</span>Zapp</div>
-        <div class="mobile-nav-item" onclick="app.goHistory()"><span>🕒</span>Historique</div>
-        <div class="mobile-nav-item" onclick="app.goStats()"><span>📊</span>Stats</div> 
-        <div class="mobile-nav-item" onclick="app.goMyProfile()"><span>👤</span>Moi</div>
-    </div>
-
     <div class="container">
         <nav class="sidebar">
             <div class="nav-item" onclick="app.goHome()">🏠 Accueil</div>
-            <div class="nav-item" onclick="app.goShorts()">⚡ Zapp</div>
+            <div class="nav-item" onclick="app.goShorts()">📱 Zap</div>
             <div class="nav-item" onclick="app.goSubs()">📺 Suivis</div>
-            <hr style="border-color: #333; margin: 10px 0;">
-            <div class="nav-item" onclick="app.goHistory()">🕒 Historique</div>
-            <div class="nav-item" onclick="app.goStats()">📊 Statistiques</div> 
-            <hr style="border-color: #333; margin: 10px 0;">
+            <hr style="border-color: #333;">
             <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
         </nav>
 
         <main class="content">
             <div id="mainTitle"></div>
-            
             <div id="videoGrid" class="video-grid"></div>
             <div id="shortsGrid" class="shorts-grid" style="display:none;"></div>
-            
-            <div id="statsView" class="stats-view">
-                <h2>📊 Mes Statistiques</h2>
-                <div id="statsContent" style="background:#1a1a1a; padding:20px; border-radius:10px;">
-                    </div>
-            </div>
-
             <div id="profileView" class="profile-view">
                 <img class="banner" id="pBanner" src="">
                 <div class="profile-head">
-                    <img id="profileAvatar" src="" class="avatar-big">
+                    <img id="profileAvatar" src="" class="avatar-big" onclick="app.goMyProfile()">
                     <div>
                         <h1 id="pName" style="margin:0;">Nom</h1>
                         <p id="pStats" style="color:var(--sec-text); margin:5px 0;"></p>
                         <p id="pBio" style="color:#aaa;"></p>
-                        <div id="profileActions" style="margin-top: 10px;"></div>
+                        <div id="profileActions"></div>
                     </div>
                 </div>
                 <h3 style="margin-top:30px; padding: 0 20px;">Vidéos</h3>
@@ -634,18 +158,17 @@
 
             <div id="adminPanel" class="admin-view">
                 <h2>🔑 Panneau d'Administration</h2>
-                
-                <h3 style="margin-top:20px;">Gestion des Vidéos</h3>
+                <h3 style="margin-top:20px;">Gestion des Vidéos (${app.data?.videos?.length || 0})</h3>
                 <div id="adminVideoList"></div>
                 
                 <h3 style="margin-top:30px;">Gestion des Admins</h3>
                 <div id="adminList"></div>
-                
-                <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
-                    <input type="email" id="newAdminEmail" placeholder="Email du nouvel Admin">
+                <div style="margin-top:15px;">
+                    <input type="email" id="newAdminEmail" placeholder="Email du nouvel Admin" style="width:250px; padding:8px; border-radius:8px;">
                     <button class="action-pill btn-green" onclick="app.addAdmin()">Ajouter Admin</button>
                 </div>
             </div>
+
         </main>
     </div>
 
@@ -661,23 +184,16 @@
     <div id="playerModal" class="player-overlay">
         <div style="padding: 15px;"><button class="action-pill" onclick="app.closePlayer()">✕ Fermer</button></div>
         <div class="player-content">
-            <div id="videoContainer" class="video-wrapper">
+            <div id="videoContainer">
                 <video id="mainVideoPlayer" controls autoplay></video>
-                <div id="shortNav" class="short-nav" style="display:none;">
-                    <button onclick="app.prevShort()">◀ Précédent</button>
-                    <button onclick="app.nextShort()">Suivant ▶</button>
-                </div>
             </div>
-            
-            <h2 id="playerTitle" style="margin-bottom:5px;"></h2>
-            <p id="playerMeta" style="color:var(--sec-text); font-size:14px; margin-top:0;"></p>
-            <div id="playerActions" style="display:flex; gap:15px; align-items:center;"></div>
-            
+            <h2 id="playerTitle"></h2>
+            <div id="playerActions" style="display:flex; gap:10px; align-items:center;"></div>
             <div class="comment-section">
                 <h4 id="commentCount">Commentaires</h4>
                 <div class="comment-input-area">
                     <img src="" id="userCommentAvatar" class="avatar-small">
-                    <input type="text" id="newCommentInput" placeholder="Ajouter un commentaire...">
+                    <input type="text" id="newCommentInput" placeholder="Commenter...">
                     <button class="action-pill" onclick="app.addComment()">Publier</button>
                 </div>
                 <div id="commentList"></div>
@@ -688,17 +204,15 @@
     <div id="modalUpload" class="modal">
         <div class="modal-box">
             <h2>Publier une vidéo</h2>
-            <p id="uploadStatus" style="color: var(--blue); font-size:14px; text-align:center;"></p>
-            <div class="progress-bar" id="uploadProgressBar" style="display: none;"><div class="progress-fill" id="uploadProgressFill"></div></div>
-            
-            <input type="text" id="upTitle" placeholder="Titre de la vidéo">
-            
-            <label style="color:#aaa; font-size:12px; display:block; margin-top:10px;">Fichier Vidéo (.mp4, .mov)</label>
-            <input type="file" id="upVideoFile" accept="video/*" style="margin-bottom: 20px;">
-            
-            <label style="color:#aaa; font-size:12px; display:block;">Miniature (Image de couverture)</label>
-            <input type="file" id="upThumbFile" accept="image/*" style="margin-bottom: 20px;">
-            
+            <p id="uploadStatus" style="color: var(--blue);"></p>
+            <div class="progress-bar" id="uploadProgressBar" style="display: none;">
+                <div class="progress-fill" id="uploadProgressFill"></div>
+            </div>
+            <input type="text" id="upTitle" placeholder="Titre">
+            <label style="color:#aaa; font-size:12px;">Fichier Vidéo (Auto-détection Short)</label>
+            <input type="file" id="upVideoFile" accept="video/*">
+            <label style="color:#aaa; font-size:12px;">Miniature</label>
+            <input type="file" id="upThumbFile" accept="image/*">
             <button class="btn-blue" id="publishBtn" onclick="app.publish()">PUBLIER</button>
             <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Annuler</button>
         </div>
@@ -708,178 +222,83 @@
         <div class="modal-box">
             <h2>Personnaliser ma chaîne</h2>
             <p id="profileUploadStatus" style="color: var(--blue);"></p>
-            
             <input type="text" id="editName" placeholder="Nom de la chaîne">
-            <textarea id="editBio" placeholder="Description (Bio)"></textarea>
-            
+            <input type="text" id="editBio" placeholder="Description (Bio)">
             <label style="color:#aaa; font-size:12px;">Photo de Profil</label>
             <input type="file" id="editPPFile" accept="image/*">
-            
             <label style="color:#aaa; font-size:12px;">Bannière</label>
             <input type="file" id="editBannerFile" accept="image/*">
-            
             <button class="btn-blue" onclick="app.saveProfile()">Enregistrer</button>
             <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Fermer</button>
         </div>
     </div>
 
-    <div id="modalLoginEmail" class="modal">
-        <div class="modal-box">
-            <h2>Connexion</h2>
-            <input type="email" id="logEmail" placeholder="Email">
-            <button class="btn-blue" onclick="app.loginStep(1)">Suivant</button>
-        </div>
-    </div>
-    
-    <div id="modalLoginRegister" class="modal">
-        <div class="modal-box">
-            <h2>Créer profil</h2>
-            <input type="text" id="logNewName" placeholder="Nom">
-            <input type="password" id="logNewPass" placeholder="Mot de passe">
-            <button class="btn-blue" onclick="app.loginStep(2)">C'est parti</button>
-        </div>
-    </div>
-    
-    <div id="modalLoginPass" class="modal">
-        <div class="modal-box">
-            <h2>Mot de passe</h2>
-            <input type="password" id="logPass" placeholder="Mot de passe">
-            <button class="btn-blue" onclick="app.loginStep(3)">Entrer</button>
-        </div>
-    </div>
-
+    <div id="modalLoginEmail" class="modal"><div class="modal-box"><h2>Connexion</h2><input type="email" id="logEmail" placeholder="Email"><button class="btn-blue" onclick="app.loginStep(1)">Suivant</button></div></div>
+    <div id="modalLoginRegister" class="modal"><div class="modal-box"><h2>Créer</h2><input type="text" id="logNewName" placeholder="Nom"><input type="password" id="logNewPass" placeholder="Mot de passe"><button class="btn-blue" onclick="app.loginStep(2)">C'est parti</button></div></div>
+    <div id="modalLoginPass" class="modal"><div class="modal-box"><h2>Mot de passe</h2><input type="password" id="logPass" placeholder="Mot de passe"><button class="btn-blue" onclick="app.loginStep(3)">Entrer</button></div></div>
 
     <script>
-        // --- CONFIGURATION ---
-        // Worker proxy pour la mise à jour du Gist (si vous l'utilisez)
+        // --- CONFIGURATION (Vérifiez ces 3 liens pour que la publication fonctionne) ---
+        // 1. URL DU WORKER CLOUDFLARE (À REMPLACER)
         const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; 
         
-        // Configuration Cloudinary pour l'upload (doit être configuré)
+        // 2. CONFIG CLOUDINARY (Images/Vidéos) (À REMPLACER)
         const CLOUDINARY_CLOUD_NAME = "dvbsmh8qq"; 
         const CLOUDINARY_UPLOAD_PRESET = "mytube_upload"; 
-        
-        // URL de votre Gist brut (le fichier JSON contenant les données)
+
+        // 3. URL LECTURE GIST (À REMPLACER)
         const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json"; 
         const GIST_FILE_NAME = "video.json"; 
-        
-        // Email de l'administrateur principal (ne peut pas être retiré)
+
         const PRIMARY_ADMIN_EMAIL = "edonis.imbert@gmail.com"; 
         
-        // Cooldown pour les vues (1 heure en millisecondes)
-        const VIEW_COOLDOWN_MS = 60 * 60 * 1000; 
-
-        // Récupération des identifiants locaux pour la connexion
         let localUserCreds = JSON.parse(localStorage.getItem('mt_user_creds')) || {};
 
-        // Définition de l'objet principal de l'application
         const app = {
             data: {
-                // Données utilisateur connecté
                 user: JSON.parse(localStorage.getItem('mt_user')), 
-                // Liste de toutes les vidéos
                 videos: [],
-                // Liste de tous les utilisateurs/créateurs
                 users: {}, 
-                // Liste des emails des administrateurs
                 admins: [PRIMARY_ADMIN_EMAIL], 
-                // Votes de l'utilisateur (stockés localement)
                 votes: JSON.parse(localStorage.getItem('mt_votes')) || {},
-                // Abonnements de l'utilisateur (stockés localement)
                 subs: JSON.parse(localStorage.getItem('mt_subs')) || [], 
-                // Historique des vidéos regardées (stocké localement)
-                history: JSON.parse(localStorage.getItem('mt_history')) || [], 
-                // NOUVEAU: Temps de la dernière vue par vidéo pour le cooldown (local)
-                lastViewTimes: JSON.parse(localStorage.getItem('mt_last_views')) || {},
-                // NOUVEAU: Statistiques locales (temps passé)
-                stats: JSON.parse(localStorage.getItem('mt_stats')) || {
-                    timeSpentSeconds: 0,
-                },
             },
             currentEditVideoId: null,
-            
-            // NOUVEAU: Variables pour la lecture séquentielle des Shorts
-            currentPlayingVideoId: null,
-            currentShortsList: [], 
-            currentShortIndex: -1,
-
-            // --- FONCTIONS DE DÉMARRAGE ET DE GESTION DES DONNÉES ---
 
             init: async function() {
                 await this.loadData();
                 this.updateAuthUI();
-                this.trackSessionTime(); // Démarrer le suivi du temps
                 this.goHome();
             },
 
             loadData: async function() {
-                // Charge les données principales depuis le Gist
                 try {
                     const res = await fetch(GIST_URL + "?t=" + Date.now()); 
                     const json = await res.json();
                     this.data.videos = json.videos || [];
                     this.data.users = json.users || {};
                     this.data.admins = json.admins || [PRIMARY_ADMIN_EMAIL];
-                } catch(e) { 
-                    console.error("Erreur lors du chargement des données depuis le Gist.", e); 
-                    // Maintenir l'application fonctionnelle même en cas d'erreur de chargement
-                }
+                } catch(e) { console.error("Load Error", e); }
             },
 
             saveGist: async function() {
-                // Enregistre les données (vidéos, users, admins) sur le Gist via le Worker
-                if(!WORKER_PROXY_URL) return;
+                if(!WORKER_PROXY_URL) {
+                    console.error("WORKER_PROXY_URL est vide. Le Gist ne sera pas mis à jour.");
+                    alert("ERREUR: Le lien Cloudflare Worker est vide. Le Gist ne sera pas mis à jour.");
+                    return;
+                }
                 const content = { videos: this.data.videos, users: this.data.users, admins: this.data.admins };
-                try {
-                    await fetch(WORKER_PROXY_URL, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
-                    });
-                } catch(e) {
-                    console.error("Erreur lors de la sauvegarde du Gist.", e);
-                }
-            },
-
-            saveLocal: function() {
-                // Sauvegarde les données utilisateur et les préférences dans le localStorage
-                localStorage.setItem('mt_user', JSON.stringify(this.data.user));
-                localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
-                localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
-                localStorage.setItem('mt_history', JSON.stringify(this.data.history)); 
-                localStorage.setItem('mt_last_views', JSON.stringify(this.data.lastViewTimes)); // NOUVEAU: Sauvegarde du cooldown
-                localStorage.setItem('mt_stats', JSON.stringify(this.data.stats)); // NOUVEAU: Sauvegarde des stats locales
+                await fetch(WORKER_PROXY_URL, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
+                });
             },
             
-            // NOUVEAU: Suivi du temps de session
-            trackSessionTime: function() {
-                if (!this.data.stats.timeSpentSeconds) {
-                    this.data.stats.timeSpentSeconds = 0;
-                }
-                // Incrémente le temps passé toutes les 60 secondes (1 minute)
-                setInterval(() => {
-                    this.data.stats.timeSpentSeconds += 60;
-                    this.saveLocal();
-                }, 60000); 
-            },
-
-            // Calcul du temps écoulé
-            timeAgo: function(timestamp) {
-                const seconds = Math.floor((Date.now() - timestamp) / 1000);
-                if (seconds < 60) return "quelques secondes";
-                const minutes = Math.floor(seconds / 60);
-                if (minutes < 60) return minutes + " minutes";
-                const hours = Math.floor(minutes / 60);
-                if (hours < 24) return hours + " heures";
-                const days = Math.floor(hours / 24);
-                if (days < 30) return days + " jours";
-                const months = Math.floor(days / 30);
-                return months + " mois";
-            },
-
-            // --- FONCTIONS DE GESTION DE L'AUTHENTIFICATION (INCHANGÉES) ---
-            
+            // --- AUTHENTIFICATION / LOCAL STORAGE ---
             loginStep: async function(s) {
                 const email = document.getElementById('logEmail').value.toLowerCase();
+                
                 if (s == 1) { 
                     if (!email.includes('@')) return alert("Email invalide");
                     this.closeModals();
@@ -895,18 +314,30 @@
                     const name = document.getElementById('logNewName').value;
                     const pass = document.getElementById('logNewPass').value;
                     if (!name || pass.length < 4) return alert("Nom et mot de passe (min 4 caractères) sont requis.");
+
                     localUserCreds[email] = { email, name, pass };
                     localStorage.setItem('mt_user_creds', JSON.stringify(localUserCreds));
-                    this.data.users[name] = { name, email, bio: "Nouveau créateur Visiona", avatar: "", banner: "", subs: [] };
+                    
+                    // Initialisation du profil utilisateur avec des valeurs par défaut
+                    this.data.users[name] = { name, email, bio: "Nouveau créateur MyTube", avatar: "", banner: "", subs: [] };
+
                     this.data.user = localUserCreds[email];
-                    this.saveLocal(); await this.saveGist(); location.reload();
+                    this.saveLocal(); 
+                    
+                    await this.saveGist(); 
+                    location.reload();
+
                 } else if (s == 3) { 
                     const pass = document.getElementById('logPass').value;
                     const creds = localUserCreds[email];
+
                     if (creds && creds.pass === pass) {
                         this.data.user = creds; 
-                        this.saveLocal(); location.reload();
-                    } else { alert("Mauvais mot de passe."); }
+                        this.saveLocal();
+                        location.reload();
+                    } else {
+                        alert("Mauvais mot de passe.");
+                    }
                 }
             },
             
@@ -914,16 +345,20 @@
                 localStorage.removeItem('mt_user'); 
                 localStorage.removeItem('mt_subs'); 
                 localStorage.removeItem('mt_votes'); 
-                localStorage.removeItem('mt_history'); 
-                localStorage.removeItem('mt_last_views'); 
-                localStorage.removeItem('mt_stats');
                 location.reload(); 
+            },
+            
+            saveLocal: function() {
+                localStorage.setItem('mt_user', JSON.stringify(this.data.user));
+                localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
+                localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
             },
             
             updateAuthUI: function() {
                 const b = document.getElementById('loginBtn');
                 const adminLink = document.getElementById('adminLink');
                 const menuUserName = document.getElementById('menuUserName');
+                
                 if(this.data.user && this.data.user.name) { 
                     b.innerText = this.data.user.name;
                     menuUserName.innerText = this.data.user.name; 
@@ -935,85 +370,240 @@
                 }
             },
             
-            // --- NOUVEAU: FONCTIONS DE STATISTIQUES ---
-            goStats: function() {
-                if(!this.data.user) return this.openLogin(); 
-                this.hideAll();
-                document.getElementById('statsView').style.display = 'block';
-                document.getElementById('mainTitle').innerHTML = "<h2>📊 Mes Statistiques</h2>";
-
-                const userName = this.data.user.name;
-                
-                // 1. Temps passé
-                const totalTimeSeconds = this.data.stats.timeSpentSeconds;
-                const timeFormatted = `${Math.floor(totalTimeSeconds / 3600)}h ${Math.floor((totalTimeSeconds % 3600) / 60)}m`;
-
-                // 2. Likes donnés
-                const likesGiven = Object.values(this.data.votes).filter(v => v === 1).length;
-
-                // 3. Videos regardées (historique)
-                const videosWatched = this.data.history.length;
-
-                // 4. Abonnements (Canaux suivis)
-                const channelsFollowed = this.data.subs.length;
-
-                // 5. Abonnés reçus (Calculé dynamiquement)
-                let followers = 0;
-                for (const author in this.data.users) {
-                    if (this.data.users[author]?.subs?.includes(userName)) {
-                        followers++;
-                    }
-                }
-
-                // 6. Likes/Dislikes reçus (Calculé dynamiquement)
-                let likesReceived = 0;
-                let dislikesReceived = 0;
-                this.data.videos.filter(v => v.author === userName).forEach(v => {
-                    likesReceived += (v.likes || 0);
-                    dislikesReceived += (v.dislikes || 0);
-                });
-                
-                // 7. Top 3 des chaînes regardées
-                const authorWatchCounts = {};
-                this.data.history.map(id => this.data.videos.find(v => v.id == id)?.author).filter(a => a).forEach(author => {
-                    authorWatchCounts[author] = (authorWatchCounts[author] || 0) + 1;
-                });
-                const topAuthors = Object.entries(authorWatchCounts)
-                    .sort(([, a], [, b]) => b - a)
-                    .slice(0, 3)
-                    .map(([author, count]) => `${author} (${count} vues)`);
-                
-                const html = `
-                    <h3>Global</h3>
-                    <p>Temps passé sur le site : <strong>${timeFormatted}</strong></p>
-                    <p>Vidéos regardées : <strong>${videosWatched}</strong></p>
-                    <p>J'aime (Likes) donnés : <strong>${likesGiven}</strong></p>
-                    
-                    <h3>Votre Chaîne (${userName})</h3>
-                    <p>Nombre d'abonnés : <strong>${followers}</strong></p>
-                    <p>Nombre d'abonnements (chaînes suivies) : <strong>${channelsFollowed}</strong></p>
-                    <p>J'aime (Likes) reçus : <strong>${likesReceived}</strong></p>
-                    <p>Je n'aime pas (Dislikes) reçus : <strong>${dislikesReceived}</strong></p>
-
-                    <h3>Votre Top 3 de Visionnage</h3>
-                    ${topAuthors.length > 0 ? `
-                        <ol style="margin-top:5px; padding-left:20px;">
-                            ${topAuthors.map(item => `<li>${item}</li>`).join('')}
-                        </ol>
-                    ` : '<p>Pas assez de données dans l\'historique pour le top 3.</p>'}
-                `;
-                document.getElementById('statsContent').innerHTML = html;
+            goMyProfile: function() {
+                if(!this.data.user || !this.data.user.name) return this.openLogin(); 
+                this.viewProfile(this.data.user.name);
             },
 
+            // --- GESTION PROFIL / BANNER / PDP ---
+            saveProfile: async function() {
+                if(!this.data.user) return;
+                const name = document.getElementById('editName').value;
+                const bio = document.getElementById('editBio').value;
+                const pp = document.getElementById('editPPFile').files[0];
+                const ban = document.getElementById('editBannerFile').files[0];
+                const status = document.getElementById('profileUploadStatus');
 
-            // --- FONCTIONS DE GESTION DES LIKES/ABONNEMENTS ---
+                const userName = this.data.user.name; 
+                let userData = this.data.users[userName] || { name: userName, email: this.data.user.email, subs: [] }; 
+
+                if(name && name !== userName) {
+                     alert("Le changement de nom de chaîne n'est pas supporté pour le moment.");
+                     return;
+                }
+
+                if(bio) userData.bio = bio;
+                
+                status.innerText = "";
+                
+                try {
+                    if(pp) {
+                        status.innerText = "Téléversement de la photo de profil (1/2)...";
+                        const newAvatarUrl = await this.uploadCloudinary(pp, 'image', status);
+                        if (newAvatarUrl) {
+                            userData.avatar = newAvatarUrl;
+                        } else {
+                             alert("Erreur lors de l'upload de la photo de profil. L'ancienne photo est conservée.");
+                        }
+                    }
+
+                    if(ban) {
+                        status.innerText = "Téléversement de la bannière (2/2)...";
+                        const newBannerUrl = await this.uploadCloudinary(ban, 'image', status);
+                        if (newBannerUrl) {
+                            userData.banner = newBannerUrl;
+                        } else {
+                            alert("Erreur lors de l'upload de la bannière. L'ancienne bannière est conservée.");
+                        }
+                    }
+
+                    this.data.users[userName] = userData; 
+
+                    status.innerText = "Sauvegarde des données du profil...";
+                    await this.saveGist();
+                    
+                    alert("Profil mis à jour !");
+                    location.reload();
+
+                } catch (e) {
+                    alert("Une erreur est survenue pendant l'upload ou la sauvegarde. Voir la console F12.");
+                    console.error("Erreur de sauvegarde de profil:", e);
+                    status.innerText = "Erreur de sauvegarde.";
+                }
+            },
+            
+            // --- VUE PROFIL (CORRECTION BOUTON/COMPTEUR) ---
+            viewProfile: function(authorName) {
+                // CORRECTION: Cette ligne ferme immédiatement le lecteur vidéo si l'utilisateur clique sur un profil.
+                this.closePlayer(); 
+                
+                this.hideAll();
+                const v = document.getElementById('profileView');
+                v.style.display = 'block';
+                
+                // Récupère les données du profil visité
+                const profile = this.data.users[authorName] || { name: authorName, bio: "Créateur sans profil public.", avatar: "", banner: "" };
+                const videos = this.data.videos.filter(x => x.author === authorName);
+                const isMyProfile = this.data.user && this.data.user.name === authorName;
+
+                // CORRECTION DU COMPTEUR: Compte le nombre d'utilisateurs qui ont 'authorName' dans leur tableau 'subs' (depuis le GIST)
+                let followerCount = 0;
+                for (const userName in this.data.users) {
+                    if (this.data.users[userName] && this.data.users[userName].subs && this.data.users[userName].subs.includes(authorName)) {
+                         followerCount++;
+                    }
+                }
+                
+                // Affichage des PP et Bannières (même si elles sont vides)
+                document.getElementById('pBanner').src = profile.banner || '';
+                document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
+                document.getElementById('pName').innerText = profile.name;
+                
+                // AFFICHAGE CORRIGÉ
+                document.getElementById('pStats').innerText = `${followerCount} abonnés • ${videos.length} vidéos`; 
+                document.getElementById('pBio').innerText = profile.bio;
+
+                const actions = document.getElementById('profileActions');
+                actions.innerHTML = '';
+
+                if (isMyProfile) {
+                    actions.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
+                } else if (this.data.user) {
+                    // L'état de l'abonnement est lu depuis les données locales (mt_subs)
+                    const isSubscribed = this.data.subs.includes(authorName);
+                    actions.innerHTML = `<button class="action-pill ${isSubscribed ? 'followed' : 'btn-red'}" onclick="app.toggleSub('${authorName}')">${isSubscribed ? '✅ Abonné' : 'S\'abonner'}</button>`;
+                }
+                
+                this.render(videos, 'pVideos');
+            },
+
+            // CORRECTION: Utilise les données du GIST pour les petits avatars
+            getAvatar: function(name) {
+                return this.data.users[name]?.avatar || 'https://via.placeholder.com/36?text=U';
+            },
+
+            // --- GESTION UPLOAD ---
+            uploadCloudinary: async function(file, type, statusElement = null, progressFill = null, progressBar = null) {
+                if(!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+                    alert("Configuration Cloudinary manquante. Impossible d'uploader.");
+                    return '';
+                }
+                
+                return new Promise((resolve, reject) => {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type}/upload`);
+                    
+                    if(progressBar) progressBar.style.display = 'block';
+                    if (progressFill) {
+                        xhr.upload.addEventListener('progress', (e) => {
+                            if (e.lengthComputable) {
+                                const percent = Math.round((e.loaded / e.total) * 100);
+                                progressFill.style.width = `${percent}%`;
+                                if (statusElement) statusElement.innerText = statusElement.innerText.split('(')[0].trim() + ` (${percent}%)`;
+                            }
+                        });
+                    }
+                    
+                    xhr.onload = function() {
+                        if (progressBar) progressBar.style.display = 'none';
+                        if (xhr.status === 200) {
+                            const data = JSON.parse(xhr.responseText);
+                            resolve(data.secure_url);
+                        } else {
+                            if (statusElement) statusElement.innerText = "Erreur d'upload. Code: " + xhr.status;
+                            reject(new Error('Erreur Cloudinary'));
+                        }
+                    };
+
+                    xhr.onerror = function() {
+                        if (progressBar) progressBar.style.display = 'none';
+                        if (statusElement) statusElement.innerText = "Erreur de réseau lors de l'upload.";
+                        reject(new Error('Erreur de réseau'));
+                    };
+
+                    xhr.send(formData);
+                });
+            },
+
+            publish: async function() {
+                // Cette fonction est complète. Si elle ne marche pas, vérifiez les variables de CONFIGURATION (Worker URL et Cloudinary).
+                if(!this.data.user) return alert("Veuillez vous connecter pour publier.");
+                
+                const title = document.getElementById('upTitle').value;
+                const videoFile = document.getElementById('upVideoFile').files[0];
+                const thumbFile = document.getElementById('upThumbFile').files[0];
+                const status = document.getElementById('uploadStatus');
+                const publishBtn = document.getElementById('publishBtn');
+                const progressBar = document.getElementById('uploadProgressBar');
+                const progressFill = document.getElementById('uploadProgressFill');
+
+                if (!title || !videoFile || !thumbFile) return alert("Tous les champs sont requis.");
+
+                publishBtn.disabled = true;
+                
+                try {
+                    status.innerText = "1. Téléversement de la miniature...";
+                    progressFill.style.width = '0%';
+                    const thumbUrl = await this.uploadCloudinary(thumbFile, 'image');
+                    if (!thumbUrl) throw new Error("Échec de l'upload de la miniature.");
+
+                    status.innerText = "2. Téléversement de la vidéo...";
+                    progressFill.style.width = '0%';
+                    const videoUrl = await this.uploadCloudinary(videoFile, 'video', status, progressFill, progressBar);
+                    if (!videoUrl) throw new Error("Échec de l'upload de la vidéo.");
+
+                    let isShort = false;
+                    const videoElement = document.createElement('video');
+                    videoElement.src = URL.createObjectURL(videoFile);
+                    await new Promise(resolve => videoElement.onloadedmetadata = resolve);
+                    if (videoElement.videoHeight > videoElement.videoWidth) {
+                        isShort = true;
+                    }
+                    URL.revokeObjectURL(videoElement.src);
+                    
+                    status.innerText = "3. Publication sur le Gist...";
+                    
+                    const newVideo = {
+                        id: Date.now(),
+                        title: title,
+                        url: videoUrl,
+                        thumb: thumbUrl,
+                        author: this.data.user.name,
+                        likes: 0,
+                        dislikes: 0,
+                        isShort: isShort,
+                        comments: []
+                    };
+
+                    this.data.videos.unshift(newVideo);
+                    await this.saveGist();
+
+                    status.innerText = "Publication réussie !";
+                    this.closeModals();
+                    this.goHome();
+
+                } catch (e) {
+                    status.innerText = "Erreur lors de la publication. Voir la console F12.";
+                    console.error("Erreur de publication:", e);
+                } finally {
+                    publishBtn.disabled = false;
+                    progressBar.style.display = 'none';
+                }
+            },
+
+            // --- GESTION DES ABONNEMENTS ET VOTES ---
 
             toggleVote: async function(id, type) {
                 if(!this.data.user) return this.openLogin();
                 const v = this.data.videos.find(x => x.id == id);
                 if (!v) return;
                 const currentVote = this.data.votes[id] || 0;
-                v.likes = v.likes || 0; v.dislikes = v.dislikes || 0;
+                v.likes = v.likes || 0;
+                v.dislikes = v.dislikes || 0;
                 if (type === 'like') {
                     if (currentVote === 1) { v.likes--; this.data.votes[id] = 0; } 
                     else if (currentVote === -1) { v.dislikes--; v.likes++; this.data.votes[id] = 1; } 
@@ -1023,59 +613,61 @@
                     else if (currentVote === 1) { v.likes--; v.dislikes++; this.data.votes[id] = -1; } 
                     else { v.dislikes++; this.data.votes[id] = -1; }
                 }
-                
-                this.saveLocal(); 
-                await this.saveGist(); 
-                // CORRECTION: On n'appelle plus openVideoOverlay pour ne pas incrémenter les vues
-                this.updatePlayerActions(id); 
+                this.saveLocal();
+                await this.saveGist();
+                this.openVideoOverlay(id);
             },
             
-            updatePlayerActions: function(id) {
-                // Met à jour les boutons d'action et les métadonnées SANS recharger la vidéo
-                const v = this.data.videos.find(x => x.id == id);
-                if (!v) return;
-                this.currentPlayingVideoId = id;
-
-                const currentVote = this.data.votes[id] || 0;
-                document.getElementById('playerActions').innerHTML = `
-                    <img src="${this.getAvatar(v.author)}" class="avatar-small" onclick="app.viewProfile('${v.author}')">
-                    <h4 style="margin: 0; cursor:pointer;" onclick="app.viewProfile('${v.author}')">${v.author}</h4>
-                    <button class="action-pill ${currentVote === 1 ? 'liked' : ''}" onclick="app.toggleVote(${id}, 'like')">👍 ${v.likes || 0}</button>
-                    <button class="action-pill ${currentVote === -1 ? 'disliked' : ''}" onclick="app.toggleVote(${id}, 'dislike')">👎 ${v.dislikes || 0}</button>
-                `;
-                document.getElementById('playerMeta').innerText = `${v.views || 0} vues • Il y a ${this.timeAgo(v.id)}`;
-                this.renderComments(v);
-            },
-
+            // CORRECTION: Synchronisation de l'abonnement dans le Local Storage ET le Gist
             toggleSub: async function(author) {
                 if(!this.data.user) return this.openLogin();
+                const myUserName = this.data.user.name;
+
+                // 1. Mise à jour locale (pour le bouton)
                 const index = this.data.subs.indexOf(author);
-                if (index > -1) this.data.subs.splice(index, 1);
-                else this.data.subs.push(author);
+                if (index > -1) {
+                    this.data.subs.splice(index, 1); // Se désabonner
+                } else {
+                    this.data.subs.push(author); // S'abonner
+                }
                 this.saveLocal(); 
-                if (!this.data.users[this.data.user.name]) this.data.users[this.data.user.name] = { name: this.data.user.name, email: this.data.user.email };
-                this.data.users[this.data.user.name].subs = this.data.subs;
-                await this.saveGist(); this.viewProfile(author); 
+
+                // 2. Mise à jour du Gist (pour le compteur global)
+                if (!this.data.users[myUserName]) {
+                    // Si le profil n'existe pas encore dans this.data.users (rare, mais au cas où)
+                    this.data.users[myUserName] = { name: myUserName, email: this.data.user.email };
+                }
+                this.data.users[myUserName].subs = this.data.subs;
+                
+                await this.saveGist();
+                this.viewProfile(author); // Recharger la vue pour mettre à jour le bouton et le compteur
+            },
+
+            // --- GESTION ADMIN ---
+            isAdmin: function() {
+                return this.data.user && this.data.admins.includes(this.data.user.email);
+            },
+            goAdminPanel: function() {
+                if (!this.isAdmin()) return alert("Accès refusé. Vous n'êtes pas administrateur.");
+                this.hideAll();
+                document.getElementById('adminPanel').style.display = 'block';
+                this.renderAdminVideoList();
+                this.renderAdminList();
             },
             
-            // --- FONCTIONS DE NAVIGATION ET RENDU ---
+            // --- RENDERING ET NAVIGATION ---
 
             render: function(list, target = 'videoGrid') {
-                // Génère le HTML pour la grille de vidéos
                 const targetElement = document.getElementById(target);
-                
-                if (list.length === 0) { 
-                    targetElement.innerHTML = "<p style='color:#aaa; padding:20px;'>Aucune vidéo à afficher pour le moment.</p>"; 
-                    return; 
-                }
-                
                 targetElement.innerHTML = list.map(v => `
-                    <div class="video-card" onclick="app.openVideoOverlay(${v.id}, ${v.isShort ? 'true' : 'false'})">
-                        <div class="thumb-container"><img src="${v.thumb}" class="thumb"></div>
+                    <div class="video-card" onclick="app.openVideoOverlay(${v.id})">
+                        <div class="thumb-container">
+                            <img src="${v.thumb}" class="thumb" alt="${v.title}">
+                        </div>
                         <div style="padding-top: 8px;">
                             <h3 style="margin: 0 0 4px 0; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${v.title}</h3>
-                            <p style="margin: 0; font-size: 14px; color: var(--sec-text);">${v.author}</p>
-                            <p style="margin: 0; font-size: 12px; color: var(--sec-text);">${v.views || 0} vues • Il y a ${this.timeAgo(v.id)}</p>
+                            <p style="margin: 0; font-size: 14px; color: var(--sec-text); cursor:pointer;" onclick="event.stopPropagation(); app.viewProfile('${v.author}')">${v.author}</p>
+                            <p style="margin: 0; font-size: 13px; color: var(--sec-text);">${v.likes || 0} J'aime</p>
                         </div>
                     </div>
                 `).join('');
@@ -1092,15 +684,11 @@
                 this.hideAll(); 
                 const g = document.getElementById('shortsGrid'); 
                 g.style.display = 'flex'; 
-                document.getElementById('mainTitle').innerHTML = "<h2>⚡ Zapp</h2>"; 
+                document.getElementById('mainTitle').innerHTML = "<h2>Shorts</h2>"; 
                 
-                // Récupère la liste de tous les IDs de Shorts
-                const shortIds = this.data.videos.filter(x => x.isShort).map(v => v.id);
-                
-                g.innerHTML = this.data.videos.filter(x => x.isShort).map((s, index) => `
-                    <div class="short-card" onclick="app.openShortsPlayer(${s.id}, [${shortIds.join(',')}], ${index})">
-                        <img src="${s.thumb}">
-                        <div style="position:absolute; bottom:10px; left:10px; font-size:12px; font-weight:bold; color:white; text-shadow: 1px 1px 2px black;">${s.title}</div>
+                g.innerHTML = this.data.videos.filter(x => x.isShort).map(s => `
+                    <div class="short-card" onclick="app.openVideoOverlay(${s.id})">
+                        <img src="${s.thumb}" alt="${s.title}">
                     </div>
                 `).join(''); 
             },
@@ -1110,104 +698,54 @@
                 this.hideAll(); 
                 document.getElementById('videoGrid').style.display = 'grid'; 
                 document.getElementById('mainTitle').innerHTML = "<h2>Mes suivis</h2>"; 
-                this.render(this.data.videos.filter(x => this.data.subs.includes(x.author))); 
-            },
-            
-            goHistory: function() {
-                this.hideAll();
-                document.getElementById('videoGrid').style.display = 'grid';
-                document.getElementById('mainTitle').innerHTML = "<h2>🕒 Mon Historique</h2>";
-                const list = this.data.history.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
-                this.render(list);
+                const vids = this.data.videos.filter(x => this.data.subs.includes(x.author)); 
+                this.render(vids); 
             },
             
             search: function() {
                 const term = document.getElementById('searchInput').value.toLowerCase();
+                const results = this.data.videos.filter(v => 
+                    v.title.toLowerCase().includes(term) || 
+                    v.author.toLowerCase().includes(term)
+                );
                 this.hideAll();
                 document.getElementById('videoGrid').style.display = 'grid';
                 document.getElementById('mainTitle').innerHTML = `<h2>Résultats pour "${term}"</h2>`;
-                this.render(this.data.videos.filter(v => v.title.toLowerCase().includes(term) || v.author.toLowerCase().includes(term)));
+                this.render(results);
             },
 
-            // --- NOUVEAU: GESTION DE LA LECTURE SÉQUENTIELLE DES SHORTS ---
-            openShortsPlayer: function(id, listIds, index) {
-                // Configure le mode Shorts séquentiel
-                this.currentShortsList = listIds;
-                this.currentShortIndex = index;
-                this.openVideoOverlay(id, true);
+            hideAll: function() { 
+                ['videoGrid', 'shortsGrid', 'profileView', 'adminPanel'].forEach(id => document.getElementById(id).style.display = 'none');
             },
             
-            nextShort: function() {
-                if (this.currentShortIndex < this.currentShortsList.length - 1) {
-                    this.currentShortIndex++;
-                    const nextId = this.currentShortsList[this.currentShortIndex];
-                    this.openVideoOverlay(nextId, true, true);
-                }
-            },
-            
-            prevShort: function() {
-                if (this.currentShortIndex > 0) {
-                    this.currentShortIndex--;
-                    const prevId = this.currentShortsList[this.currentShortIndex];
-                    this.openVideoOverlay(prevId, true, true);
-                }
-            },
-            
-            // --- GESTION DU PLAYER VIDÉO ---
-
-            openVideoOverlay: async function(id, isShort = false, isSequentialNav = false) {
+            // --- GESTION DU LECTEUR ET COMMENTAIRES ---
+            openVideoOverlay: function(id) {
                 const v = this.data.videos.find(x => x.id == id);
                 if (!v) return;
                 
-                this.currentPlayingVideoId = id; // Sauvegarde l'ID de la vidéo jouée
-                
-                // NOUVEAU: COOLDOWN ET GESTION DES VUES (1 heure)
-                const now = Date.now();
-                const lastView = this.data.lastViewTimes[id];
-                let viewCountUpdated = false;
-
-                if (!lastView || (now - lastView) > VIEW_COOLDOWN_MS) {
-                    v.views = (v.views || 0) + 1;
-                    this.data.lastViewTimes[id] = now;
-                    await this.saveGist(); // Sauvegarde la nouvelle vue sur le Gist
-                    viewCountUpdated = true;
-                } else {
-                    // Vue non comptabilisée (cooldown actif)
-                }
-
-                // NOUVEAU: Gestion Historique (même si vue non comptabilisée)
-                this.data.history = [id, ...this.data.history.filter(x => x !== id)].slice(0, 50);
-                this.saveLocal();
-
                 document.getElementById('playerModal').style.display = 'block';
+                
+                const videoContainer = document.getElementById('videoContainer');
                 const player = document.getElementById('mainVideoPlayer');
                 
-                // Ne pas recharger la vidéo si on navigue séquentiellement (améliore la fluidité)
-                if (!isSequentialNav) {
-                    player.src = v.url;
-                }
+                videoContainer.className = ''; 
 
-                document.getElementById('playerTitle').innerText = v.title;
-                document.getElementById('playerMeta').innerText = `${v.views} vues ${viewCountUpdated ? '(Nouvelle vue!)' : ''} • Il y a ${this.timeAgo(v.id)}`;
-                
-                this.updatePlayerActions(id); // Met à jour les boutons (Likes/Dislikes)
-                
-                // Ajuste la taille du player pour les shorts
-                const isVideoShort = v.isShort || isShort;
-                document.getElementById('videoContainer').className = isVideoShort ? 'short-player-wrapper' : 'video-wrapper';
-
-                // Affiche les contrôles de navigation des Shorts si c'est une Short et qu'on est en mode séquentiel
-                const shortNav = document.getElementById('shortNav');
-                if (isVideoShort && this.currentShortsList.length > 0) {
-                    shortNav.style.display = 'flex';
-                    shortNav.querySelector('button:first-child').disabled = this.currentShortIndex <= 0;
-                    shortNav.querySelector('button:last-child').disabled = this.currentShortIndex >= this.currentShortsList.length - 1;
+                if (v.isShort) {
+                    videoContainer.classList.add('short-player-wrapper');
                 } else {
-                    shortNav.style.display = 'none';
-                    this.currentShortsList = []; 
-                    this.currentShortIndex = -1;
+                    videoContainer.classList.add('video-wrapper');
                 }
 
+                player.src = v.url;
+                document.getElementById('playerTitle').innerText = v.title;
+                const currentVote = this.data.votes[id] || 0;
+                const likeBtn = `<button class="action-pill ${currentVote === 1 ? 'liked' : ''}" onclick="app.toggleVote(${id}, 'like')">👍 ${v.likes || 0}</button>`;
+                const dislikeBtn = `<button class="action-pill ${currentVote === -1 ? 'disliked' : ''}" onclick="app.toggleVote(${id}, 'dislike')">👎 ${v.dislikes || 0}</button>`;
+                document.getElementById('playerActions').innerHTML = `
+                    <img src="${this.getAvatar(v.author)}" class="avatar-small" onclick="event.stopPropagation(); app.viewProfile('${v.author}')" style="margin-right: 10px;">
+                    <h4 style="margin: 0; cursor:pointer;" onclick="event.stopPropagation(); app.viewProfile('${v.author}')">${v.author}</h4>
+                    ${likeBtn} ${dislikeBtn}
+                `;
                 this.renderComments(v);
             },
             
@@ -1215,27 +753,20 @@
                 document.getElementById('playerModal').style.display='none'; 
                 document.getElementById('mainVideoPlayer').pause();
                 document.getElementById('mainVideoPlayer').src = "";
-                // Réinitialise le mode Short
-                this.currentShortsList = []; 
-                this.currentShortIndex = -1;
             },
 
             renderComments: function(video) {
-                // Affiche la liste des commentaires
                 const list = document.getElementById('commentList');
-                document.getElementById('commentCount').innerText = `Commentaires (${video.comments?.length || 0})`;
-                
+                const count = document.getElementById('commentCount');
+                count.innerText = `Commentaires (${video.comments?.length || 0})`;
                 if (this.data.user) {
                     document.getElementById('userCommentAvatar').src = this.getAvatar(this.data.user.name);
-                } else {
-                    document.getElementById('userCommentAvatar').src = 'https://via.placeholder.com/36?text=U';
                 }
-                
-                list.innerHTML = (video.comments || []).map(c => `
-                    <div style="display:flex; gap:10px; margin-bottom:15px;">
-                        <img src="${this.getAvatar(c.author)}" class="avatar-small" onclick="app.viewProfile('${c.author}')">
+                list.innerHTML = video.comments.map(c => `
+                    <div style="display:flex; gap:10px; margin-bottom:15px; align-items:flex-start;">
+                        <img src="${this.getAvatar(c.author)}" class="avatar-small">
                         <div>
-                            <span style="font-weight:bold; font-size:14px; cursor:pointer;" onclick="app.viewProfile('${c.author}')">${c.author}</span>
+                            <span style="font-weight:bold; font-size:14px;">${c.author}</span>
                             <span style="font-size:12px; color:#999; margin-left:8px;">${new Date(c.time).toLocaleDateString()}</span>
                             <p style="margin:2px 0 0 0;">${c.text}</p>
                         </div>
@@ -1245,144 +776,131 @@
             
             addComment: async function() {
                 if(!this.data.user) return this.openLogin();
-                const text = document.getElementById('newCommentInput').value.trim();
-                const video = this.data.videos.find(v => v.id === this.currentPlayingVideoId);
-                
-                if (!text || !video) return;
-                
-                if (!video.comments) video.comments = [];
-                video.comments.unshift({ author: this.data.user.name, text: text, time: Date.now() });
-                
-                document.getElementById('newCommentInput').value = '';
-                this.renderComments(video); 
+                const commentInput = document.getElementById('newCommentInput');
+                const text = commentInput.value.trim();
+                const videoElement = document.getElementById('mainVideoPlayer');
+                if (!text || !videoElement.src) return;
+                const currentVideoUrl = videoElement.src;
+                const video = this.data.videos.find(v => v.url === currentVideoUrl);
+                if (!video) return;
+                const newComment = {
+                    author: this.data.user.name,
+                    text: text,
+                    time: Date.now()
+                };
+                video.comments.push(newComment);
+                commentInput.value = '';
+                this.renderComments(video);
                 await this.saveGist();
             },
             
-            // --- FONCTIONS ADMINISTRATEUR (INCHANGÉES) ---
-
-            isAdmin: function() { 
-                return this.data.user && this.data.admins.includes(this.data.user.email); 
-            },
+            // --- MODAL UTILS ---
+            toggleAccountMenu: function() { const m = document.getElementById('accountMenu'); m.style.display = m.style.display === 'none' ? 'block' : 'none'; },
             
-            goAdminPanel: function() {
-                if (!this.isAdmin()) return alert("Accès refusé.");
-                this.hideAll(); 
-                document.getElementById('adminPanel').style.display = 'block';
-                this.renderAdminVideoList(); 
-                this.renderAdminList();
+            closeModals: function() { 
+                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+                document.getElementById('upTitle').value = '';
+                document.getElementById('upVideoFile').value = '';
+                document.getElementById('upThumbFile').value = '';
+                document.getElementById('uploadStatus').innerText = '';
+                document.getElementById('uploadProgressBar').style.display = 'none';
             },
 
+            openUpload: function() { if(!this.data.user) return this.openLogin(); document.getElementById('modalUpload').style.display='flex'; },
+            openEditProfile: function() { 
+                if(!this.data.user) return this.openLogin();
+                const profile = this.data.users[this.data.user.name] || {};
+                document.getElementById('editName').value = profile.name || this.data.user.name;
+                document.getElementById('editBio').value = profile.bio || '';
+                document.getElementById('editPPFile').value = '';
+                document.getElementById('editBannerFile').value = '';
+                document.getElementById('modalEditProfile').style.display='flex'; 
+            },
+            openLogin: function() { document.getElementById('modalLoginEmail').style.display='flex'; },
+
+            // --- FONCTIONS ADMIN ---
             renderAdminVideoList: function() {
                 const list = document.getElementById('adminVideoList');
+                const videos = this.data.videos;
                 list.innerHTML = `<table class="admin-table">
-                    <thead><tr><th>ID (Date)</th><th>Titre</th><th>Auteur</th><th>Vues</th><th>Actions</th></tr></thead>
-                    <tbody>${this.data.videos.map(v => `
+                    <thead><tr><th>ID</th><th>Titre</th><th>Auteur</th><th>Actions</th></tr></thead>
+                    <tbody>${videos.map(v => `
                         <tr>
                             <td>${v.id}</td>
-                            <td>${v.title}</td>
+                            <td id="title-${v.id}">${v.title}</td>
                             <td>${v.author}</td>
-                            <td>${v.views || 0}</td>
                             <td>
-                                <button class="action-pill" onclick="app.openAdminEditModal(${v.id}, '${v.title.replace(/'/g, "\\'")}')">✎</button>
-                                <button class="action-pill btn-red" onclick="app.deleteVideo(${v.id})">❌</button>
+                                <button class="action-pill" onclick="app.openAdminEditModal(${v.id}, '${v.title.replace(/'/g, "\\'")}')">✎ Modifier</button>
+                                <button class="action-pill btn-red" onclick="app.deleteVideo(${v.id})">❌ Supprimer</button>
                             </td>
                         </tr>
                     `).join('')}</tbody>
                 </table>`;
             },
-
             openAdminEditModal: function(id, title) {
                 this.currentEditVideoId = id;
                 document.getElementById('editVideoTitle').value = title;
                 document.getElementById('modalEditVideo').style.display = 'flex';
             },
-
             saveAdminVideoEdit: async function() {
                 const newTitle = document.getElementById('editVideoTitle').value;
                 const index = this.data.videos.findIndex(v => v.id == this.currentEditVideoId);
-                
                 if (index > -1 && newTitle.trim()) {
                     this.data.videos[index].title = newTitle.trim();
-                    this.closeModals(); 
-                    await this.saveGist(); 
+                    document.getElementById(`title-${this.currentEditVideoId}`).innerText = newTitle.trim();
+                    this.closeModals();
+                    await this.saveGist();
+                    alert("Titre de la vidéo mis à jour.");
                     this.goAdminPanel(); 
-                }
+                } else { alert("Titre invalide ou vidéo non trouvée."); }
             },
-
             deleteVideo: async function(id) {
                 if (!confirm("Voulez-vous vraiment supprimer cette vidéo ?")) return;
                 this.data.videos = this.data.videos.filter(v => v.id != id);
-                await this.saveGist(); 
+                await this.saveGist();
+                alert("Vidéo supprimée.");
                 this.goAdminPanel(); 
             },
-
             renderAdminList: function() {
                 const list = document.getElementById('adminList');
+                const isPrimary = this.data.user && this.data.user.email === PRIMARY_ADMIN_EMAIL;
                 list.innerHTML = `<table class="admin-table">
-                    <thead><tr><th>Email</th><th>Action</th></tr></thead>
+                    <thead><tr><th>Email Admin</th><th>Actions</th></tr></thead>
                     <tbody>${this.data.admins.map(email => `
-                        <tr>
-                            <td>${email}</td>
-                            <td>${email === PRIMARY_ADMIN_EMAIL ? '⭐ Admin Principal' : `<button class="action-pill btn-red" onclick="app.removeAdmin('${email}')">❌ Retirer</button>`}</td>
-                        </tr>
-                    `).join('')}</tbody>
-                </table>`;
+                            <tr>
+                                <td>${email}</td>
+                                <td>
+                                    ${email === PRIMARY_ADMIN_EMAIL ? '⭐ Admin Principal' :
+                                        (isPrimary ? `<button class="action-pill btn-red" onclick="app.removeAdmin('${email}')">❌ Retirer</button>` : 'Opération non autorisée')
+                                    }
+                                </td>
+                            </tr>
+                        `).join('')}</tbody>
+                    </table>`;
             },
-
             addAdmin: async function() {
                 if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut ajouter des admins.");
                 const newEmail = document.getElementById('newAdminEmail').value.trim();
-                
                 if (newEmail && !this.data.admins.includes(newEmail)) {
-                    this.data.admins.push(newEmail); 
+                    this.data.admins.push(newEmail);
                     document.getElementById('newAdminEmail').value = '';
-                    await this.saveGist(); 
+                    await this.saveGist();
+                    alert(`Admin ${newEmail} ajouté !`);
                     this.renderAdminList();
+                    // CORRECTION: Met à jour l'interface pour afficher le lien admin immédiatement
                     this.updateAuthUI(); 
-                } else { 
-                    alert("Email invalide ou déjà admin."); 
-                }
+                } else { alert("Email invalide ou déjà admin."); }
             },
-
             removeAdmin: async function(email) {
                 if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut retirer des admins.");
                 if (email === PRIMARY_ADMIN_EMAIL) return alert("Impossible de retirer l'Admin Principal.");
-                
                 this.data.admins = this.data.admins.filter(e => e !== email);
-                await this.saveGist(); 
+                await this.saveGist();
+                alert(`Admin ${email} retiré.`);
                 this.renderAdminList();
-                this.updateAuthUI(); 
             },
-
-            // --- FONCTIONS UTILITAIRES (INCHANGÉES) ---
-            
-            getAvatar: function(name) { 
-                return this.data.users[name]?.avatar || 'https://via.placeholder.com/36?text=U'; 
-            },
-            hideAll: function() { 
-                ['videoGrid', 'shortsGrid', 'profileView', 'adminPanel', 'statsView'].forEach(id => document.getElementById(id).style.display = 'none');
-            },
-            toggleAccountMenu: function() { 
-                const m = document.getElementById('accountMenu'); 
-                m.style.display = m.style.display === 'none' ? 'block' : 'none'; 
-            },
-            closeModals: function() { 
-                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
-            },
-            openUpload: function() { 
-                if(!this.data.user) return this.openLogin(); 
-                document.getElementById('modalUpload').style.display='flex'; 
-                document.getElementById('uploadProgressBar').style.display = 'none';
-            },
-            openLogin: function() { 
-                document.getElementById('modalLoginEmail').style.display='flex'; 
-            },
-            
-            // ... (Fonctions viewProfile, saveProfile, uploadCloudinary, publish) - Incluses mais masquées pour la concision
-
         };
 
-        // Lancement de l'application au chargement de la page
         app.init();
     </script>
 </body>
