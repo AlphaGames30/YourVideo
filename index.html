@@ -701,18 +701,19 @@
     <script>
         // --- CONFIGURATION ---
         // Worker proxy pour la mise à jour du Gist (si vous l'utilisez)
-        const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; 
-        
+       
+    
         // Configuration Cloudinary pour l'upload (doit être configuré)
         const CLOUDINARY_CLOUD_NAME = "dvbsmh8qq"; 
         const CLOUDINARY_UPLOAD_PRESET = "mytube_upload"; 
-        
-        // URL de votre Gist brut (le fichier JSON contenant les données)
-        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0c560faad87c92/raw/video.json"; 
-        const GIST_FILE_NAME = "video.json"; 
-        
+ 
         // Email de l'administrateur principal (ne peut pas être retiré)
         const PRIMARY_ADMIN_EMAIL = "edonis.imbert@gmail.com"; 
+
+        // Lignes de configuration importantes (vers la ligne 774)
+       const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; 
+       const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json"; 
+       const GIST_FILE_NAME = "video.json";
         
         // Récupération des identifiants locaux pour la connexion
         let localUserCreds = JSON.parse(localStorage.getItem('mt_user_creds')) || {};
