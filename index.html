@@ -227,7 +227,7 @@
         const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; 
         const CLOUDINARY_CLOUD_NAME = "dvbsmh8qq"; 
         const CLOUDINARY_UPLOAD_PRESET = "mytube_upload"; 
-        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0c560faad87c92/raw/video.json"; 
+        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json"; 
         const GIST_FILE_NAME = "video.json"; 
         const PRIMARY_ADMIN_EMAIL = "edonis.imbert@gmail.com"; 
         const VIEW_COOLDOWN_MS = 60 * 60 * 1000; 
@@ -269,20 +269,29 @@
             },
 
             saveGist: async function() {
-                if(!WORKER_PROXY_URL) {
-                    alert("ERREUR CRITIQUE : Le lien du Worker (WORKER_PROXY_URL) est vide dans le code ! La sauvegarde ne marchera pas.");
+                if(!WORKER_PROXY_URL || WORKER_PROXY_URL.trim() === "") {
+                    console.error("ERREUR CRITIQUE : WORKER_PROXY_URL n'est pas configuré.");
+                    alert("ERREUR CRITIQUE: Le lien du Worker est manquant. La sauvegarde est impossible.");
                     return;
                 }
                 const content = { videos: this.data.videos, users: this.data.users, admins: this.data.admins };
                 try {
-                    await fetch(WORKER_PROXY_URL, {
+                    const response = await fetch(WORKER_PROXY_URL, {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
                     });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error(`Échec de la sauvegarde Gist. Statut: ${response.status}`, errorText);
+                        alert(`Erreur de sauvegarde Gist (Statut: ${response.status}). Vérifiez la console (F12) et votre Worker Cloudflare pour l'erreur CORS ou de token.`);
+                    } else {
+                        console.log("Sauvegarde Gist réussie.", response);
+                    }
                 } catch(e) {
-                    console.error("Erreur lors de la sauvegarde du Gist.", e);
-                    alert("Erreur de sauvegarde : " + e.message);
+                    console.error("Erreur réseau lors de la sauvegarde du Gist (problème CORS/Worker/Réseau).", e);
+                    alert("Erreur de sauvegarde: Problème réseau ou CORS (Worker). Regardez la console (F12).");
                 }
             },
 
@@ -660,7 +669,7 @@
                     this.goHome();
                 } catch (e) {
                     console.error(e);
-                    alert("Erreur publication.");
+                    alert("Erreur publication. Voir la console (F12).");
                 } finally { publishBtn.disabled = false; progressBar.style.display = 'none'; }
             },
 
@@ -784,7 +793,7 @@
             },
 
             viewProfile: function(authorName) {
-                this.closePlayer(); // Fix: Ferme le player pour afficher le profil
+                this.closePlayer(); 
                 this.hideAll();
                 const v = document.getElementById('profileView');
                 v.style.display = 'block';
@@ -844,7 +853,7 @@
                     alert("Profil mis à jour !");
                     location.reload();
                 } catch (e) {
-                    alert("Erreur lors de la mise à jour du profil.");
+                    alert("Erreur lors de la mise à jour du profil. Voir la console (F12).");
                     console.error(e);
                 } finally { status.innerText = ""; }
             }
