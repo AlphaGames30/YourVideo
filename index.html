@@ -5,76 +5,525 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Visiona - AlphaGames30</title>
     <style>
-        :root { --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa; --hover: #272727; --blue: #3ea6ff; --red: #ff0000; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, Arial, sans-serif; overflow-x: hidden; padding-bottom: 60px; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; height: 56px; background: var(--header); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
-        .logo { font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; }
-        .logo::before { content: '▶'; color: var(--red); font-size: 24px; margin-right: 5px; }
-        .search-box { display: flex; flex: 1; max-width: 500px; margin: 0 10px; }
-        .search-box input { width: 100%; background: #121212; border: 1px solid #333; color: white; padding: 8px 15px; border-radius: 40px 0 0 40px; }
-        .search-box button { background: #222; border: 1px solid #333; border-left: none; padding: 0 20px; border-radius: 0 40px 40px 0; cursor: pointer; color: var(--sec-text); }
-        .header-btns button { background: none; border: none; color: white; font-size: 20px; margin-left: 10px; cursor: pointer; }
-        .btn-login { border: 1px solid var(--blue) !important; color: var(--blue) !important; font-size: 14px !important; padding: 5px 10px; border-radius: 20px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        /* ========================================================= */
+        /* --- SECTION CSS : DÉFINITION DES VARIABLES GLOBALES  --- */
+        /* ========================================================= */
+        :root { 
+            --bg: #0f0f0f; 
+            --header: #0f0f0f; 
+            --text: #ffffff; 
+            --sec-text: #aaaaaa; 
+            --hover: #272727; 
+            --blue: #3ea6ff; 
+            --red: #ff0000; 
+        }
+
+        /* ========================================================= */
+        /* --- CSS : STYLE DU CORPS ET DE LA MISE EN PAGE GÉNÉRALE --- */
+        /* ========================================================= */
+        body { 
+            margin: 0; 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: Roboto, Arial, sans-serif; 
+            overflow-x: hidden; 
+            padding-bottom: 60px; /* Espace pour la navigation mobile */
+        }
+
+        /* --- HEADER ET NAVIGATION SUPÉRIEURE --- */
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0 16px; 
+            height: 56px; 
+            background: var(--header); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            border-bottom: 1px solid #222; 
+        }
+
+        .logo { 
+            font-size: 20px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+        }
+
+        .logo::before { 
+            content: '▶'; 
+            color: var(--red); 
+            font-size: 24px; 
+            margin-right: 5px; 
+        }
+
+        /* --- BARRE DE RECHERCHE --- */
+        .search-box { 
+            display: flex; 
+            flex: 1; 
+            max-width: 500px; 
+            margin: 0 10px; 
+        }
+
+        .search-box input { 
+            width: 100%; 
+            background: #121212; 
+            border: 1px solid #333; 
+            color: white; 
+            padding: 8px 15px; 
+            border-radius: 40px 0 0 40px; 
+            border-right: none; 
+        }
+
+        .search-box button { 
+            background: #222; 
+            border: 1px solid #333; 
+            border-left: none; 
+            padding: 0 20px; 
+            border-radius: 0 40px 40px 0; 
+            cursor: pointer; 
+            color: var(--sec-text); 
+            transition: background 0.2s;
+        }
+
+        .search-box button:hover {
+            background: #333;
+        }
+
+        .header-btns button { 
+            background: none; 
+            border: none; 
+            color: white; 
+            font-size: 20px; 
+            margin-left: 10px; 
+            cursor: pointer; 
+        }
+
+        .btn-login { 
+            border: 1px solid var(--blue) !important; 
+            color: var(--blue) !important; 
+            font-size: 14px !important; 
+            padding: 5px 10px; 
+            border-radius: 20px; 
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            transition: background 0.2s, color 0.2s;
+        }
+
+        /* --- CONTENEUR PRINCIPAL (SIDEBAR + CONTENT) --- */
+        .container { 
+            display: flex; 
+            height: calc(100vh - 56px); 
+        }
+
+        /* --- SIDEBAR (NAVIGATION LATÉRALE) --- */
+        .sidebar { 
+            width: 220px; 
+            background: var(--bg); 
+            padding: 10px; 
+            overflow-y: auto; 
+            flex-shrink: 0; 
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-item { 
+            padding: 10px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            margin-bottom: 5px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover { 
+            background: var(--hover); 
+        }
+
+        /* --- ZONE DE CONTENU PRINCIPAL --- */
+        .content { 
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+        }
+
+        /* --- GRILLES DE VIDÉOS --- */
+        .video-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .video-card { 
+            cursor: pointer; 
+            transition: transform 0.2s; 
+            overflow: hidden; 
+        }
+
+        .video-card:hover { 
+            transform: scale(1.01); 
+        }
+
+        .thumb-container { 
+            position: relative; 
+            width: 100%; 
+            aspect-ratio: 16/9; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            background: #333; 
+        }
+
+        .thumb { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            transition: opacity 0.3s;
+        }
+
+        /* --- GRILLE DES SHORTS --- */
+        .shorts-grid { 
+            display: flex; 
+            gap: 15px; 
+            overflow-x: auto; 
+            padding-bottom: 10px; 
+        }
+
+        .short-card { 
+            flex-shrink: 0; 
+            width: 160px; 
+            height: 300px; 
+            cursor: pointer; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            background: #333; 
+            position: relative; 
+            transition: transform 0.2s;
+        }
         
-        .container { display: flex; height: calc(100vh - 56px); }
-        .sidebar { width: 220px; background: var(--bg); padding: 10px; overflow-y: auto; flex-shrink: 0; }
-        @media(max-width: 768px) { .sidebar { display: none; } .mobile-nav { display: flex !important; } .search-box { display: none; } }
-        .nav-item { padding: 10px; border-radius: 10px; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
-        .nav-item:hover { background: var(--hover); }
-        .content { flex: 1; padding: 20px; overflow-y: auto; }
+        .short-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .short-card img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+        }
+
+        /* --- PLAYER MODAL ET VIDÉO --- */
+        .player-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: black; 
+            z-index: 500; 
+            overflow-y: auto; 
+            padding-bottom: 50px; 
+        }
+
+        .player-content { 
+            width: 95%; 
+            max-width: 1200px; 
+            margin: 20px auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+        }
+
+        .video-wrapper { 
+            width: 100%; 
+            aspect-ratio: 16/9; 
+            background: #000; 
+        }
+
+        .short-player-wrapper { 
+            width: 100%; 
+            max-width: 400px; 
+            aspect-ratio: 9/16; 
+            background: #000; 
+            margin: 0 auto; 
+        }
+
+        video { 
+            width: 100%; 
+            height: 100%; 
+            background: #000;
+        }
+
+        /* --- SECTION COMMENTAIRES --- */
+        .comment-section { 
+            background: #1a1a1a; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-top: 20px;
+        }
+
+        .comment-input-area { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            align-items: center;
+        }
+
+        .comment-input-area input { 
+            flex: 1; 
+            background: none; 
+            border: none; 
+            border-bottom: 1px solid #333; 
+            color: white; 
+            padding: 8px; 
+            transition: border-bottom-color 0.3s;
+        }
+
+        .comment-input-area input:focus {
+            outline: none;
+            border-bottom-color: var(--text);
+        }
+
+        /* --- BOUTONS D'ACTION (PILLS) --- */
+        .action-pill { 
+            background: #272727; 
+            color: white; 
+            border: none; 
+            padding: 6px 12px; 
+            border-radius: 18px; 
+            font-size: 13px; 
+            cursor: pointer; 
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .action-pill:hover {
+            background: #3a3a3a;
+        }
+
+        .liked { 
+            color: var(--blue); 
+            background: rgba(62, 166, 255, 0.2);
+        }
+
+        .disliked { 
+            color: var(--red); 
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        .followed { 
+            background: #fff; 
+            color: #000; 
+            font-weight: bold;
+        }
+
+        .btn-red { 
+            background: var(--red); 
+            color: white; 
+        }
+
+        .btn-green { 
+            background: #00a854; 
+            color: white; 
+        }
+
+        /* --- MODALS ET FENÊTRES POP-UP --- */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.8); 
+            z-index: 600; 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        .modal-box { 
+            background: #212121; 
+            padding: 25px; 
+            border-radius: 15px; 
+            width: 90%; 
+            max-width: 450px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
         
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        @media (max-width: 768px) { .video-grid { grid-template-columns: 1fr; } }
-        .video-card { cursor: pointer; transition: transform 0.2s; }
-        .video-card:hover { transform: scale(1.02); }
-        .thumb-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #333; }
-        .thumb { width: 100%; height: 100%; object-fit: cover; }
+        /* --- VUES SPÉCIFIQUES (PROFIL / ADMIN) --- */
+        .profile-view { 
+            display: none; 
+            padding-bottom: 50px;
+        }
+
+        .admin-view { 
+            display: none; 
+            padding: 20px; 
+        }
+
+        .admin-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+
+        .admin-table th, .admin-table td { 
+            border: 1px solid #333; 
+            padding: 10px; 
+            text-align: left; 
+        }
+
+        .admin-table th { 
+            background: #222; 
+        }
         
-        .shorts-grid { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; }
-        .short-card { flex-shrink: 0; width: 160px; height: 300px; cursor: pointer; border-radius: 12px; overflow: hidden; background: #333; position: relative; }
-        .short-card img { width: 100%; height: 100%; object-fit: cover; }
+        /* --- INPUTS GÉNÉRAUX --- */
+        input[type="text"], 
+        input[type="password"], 
+        input[type="email"], 
+        textarea { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            background: #121212; 
+            border: 1px solid #333; 
+            color: white; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+        }
 
-        .player-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 500; overflow-y: auto; padding-bottom: 50px; }
-        .player-content { width: 95%; max-width: 1200px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; }
-        .video-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; }
-        .short-player-wrapper { width: 100%; max-width: 400px; aspect-ratio: 9/16; background: #000; margin: 0 auto; }
-        video { width: 100%; height: 100%; }
+        .btn-blue { 
+            width: 100%; 
+            padding: 12px; 
+            background: var(--blue); 
+            color: black; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: opacity 0.2s;
+        }
 
-        .comment-section { background: #1a1a1a; padding: 20px; border-radius: 12px; }
-        .comment-input-area { display: flex; gap: 10px; margin-bottom: 20px; }
-        .comment-input-area input { flex: 1; background: none; border: none; border-bottom: 1px solid #333; color: white; padding: 8px; }
+        .btn-blue:hover {
+            opacity: 0.9;
+        }
 
-        .action-pill { background: #272727; color: white; border: none; padding: 6px 12px; border-radius: 18px; font-size: 13px; cursor: pointer; }
-        .liked { color: var(--blue); }
-        .disliked { color: var(--red); }
-        .followed { background: #fff; color: #000; }
-        .btn-red { background: var(--red); color: white; }
-        .btn-green { background: #00a854; color: white; }
+        /* --- AVATARS ET BANNIÈRE --- */
+        .avatar-big { 
+            width: 120px; 
+            height: 120px; 
+            border-radius: 50%; 
+            border: 4px solid var(--bg); 
+            background: #555; 
+            object-fit: cover; 
+            cursor: pointer; 
+        }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 600; justify-content: center; align-items: center; }
-        .modal-box { background: #212121; padding: 25px; border-radius: 15px; width: 90%; max-width: 450px; }
+        .avatar-small { 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            cursor: pointer; 
+        }
+
+        .banner { 
+            width: 100%; 
+            height: 200px; 
+            background: #333; 
+            border-radius: 15px; 
+            margin-bottom: -60px; 
+            object-fit: cover; 
+        }
+
+        .profile-head { 
+            display: flex; 
+            align-items: flex-end; 
+            gap: 20px; 
+            padding: 0 20px; 
+        }
+
+        /* --- NAVIGATION MOBILE (MEDIA QUERIES) --- */
+        @media(max-width: 768px) { 
+            .sidebar { 
+                display: none; 
+            } 
+            .mobile-nav { 
+                display: flex !important; 
+            } 
+            .search-box { 
+                display: none; 
+            }
+            .video-grid { 
+                grid-template-columns: 1fr; 
+            } 
+            .content {
+                padding: 10px;
+            }
+            .profile-head {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 0 10px;
+            }
+            .banner {
+                margin-bottom: -40px;
+                height: 120px;
+                border-radius: 0;
+            }
+            .avatar-big {
+                margin-top: 10px;
+            }
+        }
         
-        .profile-view { display: none; }
-        .admin-view { display: none; padding: 20px; }
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .admin-table th, .admin-table td { border: 1px solid #333; padding: 10px; text-align: left; }
-        .admin-table th { background: #222; }
-        
-        input[type="text"], input[type="password"], input[type="email"], textarea { width: 100%; padding: 12px; margin: 10px 0; background: #121212; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
-        .btn-blue { width: 100%; padding: 12px; background: var(--blue); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .mobile-nav { 
+            display: none; 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 60px; 
+            background: #0f0f0f; 
+            border-top: 1px solid #222; 
+            justify-content: space-around; 
+            align-items: center; 
+            z-index: 1000; 
+        }
 
-        .avatar-big { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--bg); background: #555; object-fit: cover; cursor: pointer; }
-        .avatar-small { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; cursor: pointer; }
+        .mobile-nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            font-size: 10px; 
+            color: var(--sec-text); 
+            cursor: pointer; 
+        }
 
-        .banner { width: 100%; height: 200px; background: #333; border-radius: 15px; margin-bottom: -60px; object-fit: cover; }
-        .profile-head { display: flex; align-items: flex-end; gap: 20px; padding: 0 20px; }
+        .mobile-nav-item span { 
+            font-size: 20px; 
+            color: white; 
+            margin-bottom: 2px; 
+        }
 
-        .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: #0f0f0f; border-top: 1px solid #222; justify-content: space-around; align-items: center; z-index: 1000; }
-        .mobile-nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--sec-text); cursor: pointer; }
-        .mobile-nav-item span { font-size: 20px; color: white; margin-bottom: 2px; }
+        /* --- BARRE DE PROGRESSION UPLOAD --- */
+        .progress-bar { 
+            height: 15px; 
+            background: #444; 
+            border-radius: 8px; 
+            margin-bottom: 10px; 
+            overflow: hidden; 
+            width: 100%;
+        }
 
-        .progress-bar { height: 15px; background: #444; border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--blue); width: 0%; transition: width 0.1s; }
+        .progress-fill { 
+            height: 100%; 
+            background: var(--blue); 
+            width: 0%; 
+            transition: width 0.1s; 
+        }
     </style>
 </head>
 <body>
@@ -91,18 +540,20 @@
         </div>
     </header>
 
-    <div class="mobile-nav">
-        <div class="mobile-nav-item" onclick="app.goHome()"><span>🏠</span>Accueil</div>
-        <div class="mobile-nav-item" onclick="app.goShorts()"><span>⚡</span>Zapp</div>
-        <div class="mobile-nav-item" onclick="app.goHistory()"><span>🕒</span>Historique</div>
-        <div class="mobile-nav-item" onclick="app.goMyProfile()"><span>👤</span>Moi</div>
-    </div>
-
-    <div id="accountMenu" style="display:none; position:absolute; right:10px; top:60px; background:#282828; padding:15px; border-radius:10px; z-index:1000;">
-        <div id="menuUserName" style="font-weight:bold; margin-bottom:10px;"></div>
+    <div id="accountMenu" style="display:none; position:absolute; right:10px; top:60px; background:#282828; padding:15px; border-radius:10px; z-index:1000; min-width: 150px;">
+        <div id="menuUserName" style="font-weight:bold; margin-bottom:10px; border-bottom: 1px solid #333; padding-bottom: 10px;"></div>
         <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
         <div id="adminLink" class="nav-item" onclick="app.goAdminPanel()" style="display:none;">🔑 Admin Panel</div>
         <div class="nav-item" onclick="app.doLogout()">🚪 Déconnexion</div>
+    </div>
+
+
+    <div class="mobile-nav">
+        <div class="mobile-nav-item" onclick="app.goHome()"><span>🏠</span>Accueil</div>
+        <div class="mobile-nav-item" onclick="app.goShorts()"><span>⚡</span>Zapp</div>
+        <div class="mobile-nav-item" onclick="app.goSubs()"><span>📺</span>Suivis</div>
+        <div class="mobile-nav-item" onclick="app.goHistory()"><span>🕒</span>Historique</div>
+        <div class="mobile-nav-item" onclick="app.goMyProfile()"><span>👤</span>Moi</div>
     </div>
 
     <div class="container">
@@ -111,24 +562,25 @@
             <div class="nav-item" onclick="app.goShorts()">⚡ Zapp</div>
             <div class="nav-item" onclick="app.goSubs()">📺 Suivis</div>
             <div class="nav-item" onclick="app.goHistory()">🕒 Historique</div>
-            <hr style="border-color: #333;">
+            <hr style="border-color: #333; margin: 10px 0;">
             <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
         </nav>
 
         <main class="content">
             <div id="mainTitle"></div>
+            
             <div id="videoGrid" class="video-grid"></div>
             <div id="shortsGrid" class="shorts-grid" style="display:none;"></div>
             
             <div id="profileView" class="profile-view">
                 <img class="banner" id="pBanner" src="">
                 <div class="profile-head">
-                    <img id="profileAvatar" src="" class="avatar-big" onclick="app.goMyProfile()">
+                    <img id="profileAvatar" src="" class="avatar-big">
                     <div>
                         <h1 id="pName" style="margin:0;">Nom</h1>
                         <p id="pStats" style="color:var(--sec-text); margin:5px 0;"></p>
                         <p id="pBio" style="color:#aaa;"></p>
-                        <div id="profileActions"></div>
+                        <div id="profileActions" style="margin-top: 10px;"></div>
                     </div>
                 </div>
                 <h3 style="margin-top:30px; padding: 0 20px;">Vidéos</h3>
@@ -137,12 +589,15 @@
 
             <div id="adminPanel" class="admin-view">
                 <h2>🔑 Panneau d'Administration</h2>
+                
                 <h3 style="margin-top:20px;">Gestion des Vidéos</h3>
                 <div id="adminVideoList"></div>
+                
                 <h3 style="margin-top:30px;">Gestion des Admins</h3>
                 <div id="adminList"></div>
-                <div style="margin-top:15px;">
-                    <input type="email" id="newAdminEmail" placeholder="Email du nouvel Admin" style="width:250px; padding:8px; border-radius:8px;">
+                
+                <div style="margin-top:15px; display:flex; gap:10px; align-items:center;">
+                    <input type="email" id="newAdminEmail" placeholder="Email du nouvel Admin">
                     <button class="action-pill btn-green" onclick="app.addAdmin()">Ajouter Admin</button>
                 </div>
             </div>
@@ -162,14 +617,16 @@
         <div style="padding: 15px;"><button class="action-pill" onclick="app.closePlayer()">✕ Fermer</button></div>
         <div class="player-content">
             <div id="videoContainer" class="video-wrapper"><video id="mainVideoPlayer" controls autoplay></video></div>
+            
             <h2 id="playerTitle" style="margin-bottom:5px;"></h2>
             <p id="playerMeta" style="color:var(--sec-text); font-size:14px; margin-top:0;"></p>
-            <div id="playerActions" style="display:flex; gap:10px; align-items:center;"></div>
+            <div id="playerActions" style="display:flex; gap:15px; align-items:center;"></div>
+            
             <div class="comment-section">
                 <h4 id="commentCount">Commentaires</h4>
                 <div class="comment-input-area">
                     <img src="" id="userCommentAvatar" class="avatar-small">
-                    <input type="text" id="newCommentInput" placeholder="Commenter...">
+                    <input type="text" id="newCommentInput" placeholder="Ajouter un commentaire...">
                     <button class="action-pill" onclick="app.addComment()">Publier</button>
                 </div>
                 <div id="commentList"></div>
@@ -180,13 +637,17 @@
     <div id="modalUpload" class="modal">
         <div class="modal-box">
             <h2>Publier une vidéo</h2>
-            <p id="uploadStatus" style="color: var(--blue);"></p>
+            <p id="uploadStatus" style="color: var(--blue); font-size:14px; text-align:center;"></p>
             <div class="progress-bar" id="uploadProgressBar" style="display: none;"><div class="progress-fill" id="uploadProgressFill"></div></div>
-            <input type="text" id="upTitle" placeholder="Titre">
-            <label style="color:#aaa; font-size:12px;">Fichier Vidéo (Auto-détection Short)</label>
-            <input type="file" id="upVideoFile" accept="video/*">
-            <label style="color:#aaa; font-size:12px;">Miniature</label>
-            <input type="file" id="upThumbFile" accept="image/*">
+            
+            <input type="text" id="upTitle" placeholder="Titre de la vidéo">
+            
+            <label style="color:#aaa; font-size:12px; display:block; margin-top:10px;">Fichier Vidéo (.mp4, .mov)</label>
+            <input type="file" id="upVideoFile" accept="video/*" style="margin-bottom: 20px;">
+            
+            <label style="color:#aaa; font-size:12px; display:block;">Miniature (Image de couverture)</label>
+            <input type="file" id="upThumbFile" accept="image/*" style="margin-bottom: 20px;">
+            
             <button class="btn-blue" id="publishBtn" onclick="app.publish()">PUBLIER</button>
             <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Annuler</button>
         </div>
@@ -196,43 +657,87 @@
         <div class="modal-box">
             <h2>Personnaliser ma chaîne</h2>
             <p id="profileUploadStatus" style="color: var(--blue);"></p>
+            
             <input type="text" id="editName" placeholder="Nom de la chaîne">
             <textarea id="editBio" placeholder="Description (Bio)"></textarea>
+            
             <label style="color:#aaa; font-size:12px;">Photo de Profil</label>
             <input type="file" id="editPPFile" accept="image/*">
+            
             <label style="color:#aaa; font-size:12px;">Bannière</label>
             <input type="file" id="editBannerFile" accept="image/*">
+            
             <button class="btn-blue" onclick="app.saveProfile()">Enregistrer</button>
             <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Fermer</button>
         </div>
     </div>
 
-    <div id="modalLoginEmail" class="modal"><div class="modal-box"><h2>Connexion</h2><input type="email" id="logEmail" placeholder="Email"><button class="btn-blue" onclick="app.loginStep(1)">Suivant</button></div></div>
-    <div id="modalLoginRegister" class="modal"><div class="modal-box"><h2>Créer</h2><input type="text" id="logNewName" placeholder="Nom"><input type="password" id="logNewPass" placeholder="Mot de passe"><button class="btn-blue" onclick="app.loginStep(2)">C'est parti</button></div></div>
-    <div id="modalLoginPass" class="modal"><div class="modal-box"><h2>Mot de passe</h2><input type="password" id="logPass" placeholder="Mot de passe"><button class="btn-blue" onclick="app.loginStep(3)">Entrer</button></div></div>
+    <div id="modalLoginEmail" class="modal">
+        <div class="modal-box">
+            <h2>Connexion</h2>
+            <input type="email" id="logEmail" placeholder="Email">
+            <button class="btn-blue" onclick="app.loginStep(1)">Suivant</button>
+        </div>
+    </div>
+    
+    <div id="modalLoginRegister" class="modal">
+        <div class="modal-box">
+            <h2>Créer profil</h2>
+            <input type="text" id="logNewName" placeholder="Nom">
+            <input type="password" id="logNewPass" placeholder="Mot de passe">
+            <button class="btn-blue" onclick="app.loginStep(2)">C'est parti</button>
+        </div>
+    </div>
+    
+    <div id="modalLoginPass" class="modal">
+        <div class="modal-box">
+            <h2>Mot de passe</h2>
+            <input type="password" id="logPass" placeholder="Mot de passe">
+            <button class="btn-blue" onclick="app.loginStep(3)">Entrer</button>
+        </div>
+    </div>
+
 
     <script>
         // --- CONFIGURATION ---
+        // Worker proxy pour la mise à jour du Gist (si vous l'utilisez)
         const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; 
+        
+        // Configuration Cloudinary pour l'upload (doit être configuré)
         const CLOUDINARY_CLOUD_NAME = "dvbsmh8qq"; 
         const CLOUDINARY_UPLOAD_PRESET = "mytube_upload"; 
+        
+        // URL de votre Gist brut (le fichier JSON contenant les données)
         const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0c560faad87c92/raw/video.json"; 
         const GIST_FILE_NAME = "video.json"; 
+        
+        // Email de l'administrateur principal (ne peut pas être retiré)
         const PRIMARY_ADMIN_EMAIL = "edonis.imbert@gmail.com"; 
         
+        // Récupération des identifiants locaux pour la connexion
         let localUserCreds = JSON.parse(localStorage.getItem('mt_user_creds')) || {};
 
+        // Définition de l'objet principal de l'application
         const app = {
             data: {
+                // Données utilisateur connecté
                 user: JSON.parse(localStorage.getItem('mt_user')), 
+                // Liste de toutes les vidéos
                 videos: [],
+                // Liste de tous les utilisateurs/créateurs
                 users: {}, 
+                // Liste des emails des administrateurs
                 admins: [PRIMARY_ADMIN_EMAIL], 
+                // Votes de l'utilisateur (stockés localement)
                 votes: JSON.parse(localStorage.getItem('mt_votes')) || {},
+                // Abonnements de l'utilisateur (stockés localement)
                 subs: JSON.parse(localStorage.getItem('mt_subs')) || [], 
-                history: JSON.parse(localStorage.getItem('mt_history')) || [], // NOUVEAU: Historique
+                // Historique des vidéos regardées (NOUVEAU - stocké localement)
+                history: JSON.parse(localStorage.getItem('mt_history')) || [], 
             },
             currentEditVideoId: null,
+
+            // --- FONCTIONS DE DÉMARRAGE ET DE GESTION DES DONNÉES ---
 
             init: async function() {
                 await this.loadData();
@@ -241,27 +746,45 @@
             },
 
             loadData: async function() {
+                // Charge les données principales depuis le Gist
                 try {
                     const res = await fetch(GIST_URL + "?t=" + Date.now()); 
                     const json = await res.json();
                     this.data.videos = json.videos || [];
                     this.data.users = json.users || {};
                     this.data.admins = json.admins || [PRIMARY_ADMIN_EMAIL];
-                } catch(e) { console.error("Load Error", e); }
+                } catch(e) { 
+                    console.error("Erreur lors du chargement des données depuis le Gist.", e); 
+                    alert("Erreur de chargement des données. Vérifiez l'URL du Gist.");
+                }
             },
 
             saveGist: async function() {
+                // Enregistre les données (vidéos, users, admins) sur le Gist via le Worker
                 if(!WORKER_PROXY_URL) return;
                 const content = { videos: this.data.videos, users: this.data.users, admins: this.data.admins };
-                await fetch(WORKER_PROXY_URL, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
-                });
+                try {
+                    await fetch(WORKER_PROXY_URL, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
+                    });
+                } catch(e) {
+                    console.error("Erreur lors de la sauvegarde du Gist.", e);
+                }
             },
 
-            // NOUVEAU: Calcul de la date relative (Il y a...)
+            saveLocal: function() {
+                // Sauvegarde les données utilisateur et les préférences dans le localStorage
+                localStorage.setItem('mt_user', JSON.stringify(this.data.user));
+                localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
+                localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
+                localStorage.setItem('mt_history', JSON.stringify(this.data.history)); // Sauvegarde Historique
+            },
+
+            // --- NOUVELLE FONCTION : CALCUL DU TEMPS ÉCOULÉ ---
             timeAgo: function(timestamp) {
+                // Calcule la différence de temps entre le timestamp et maintenant
                 const seconds = Math.floor((Date.now() - timestamp) / 1000);
                 if (seconds < 60) return "quelques secondes";
                 const minutes = Math.floor(seconds / 60);
@@ -273,9 +796,13 @@
                 const months = Math.floor(days / 30);
                 return months + " mois";
             },
+
+            // --- FONCTIONS DE GESTION DE L'AUTHENTIFICATION ---
             
             loginStep: async function(s) {
+                // Gestion de la connexion/inscription en 3 étapes
                 const email = document.getElementById('logEmail').value.toLowerCase();
+                
                 if (s == 1) { 
                     if (!email.includes('@')) return alert("Email invalide");
                     this.closeModals();
@@ -288,42 +815,49 @@
                         document.getElementById('logNewPass').value = '';
                     }
                 } else if (s == 2) { 
+                    // Étape 2: Inscription
                     const name = document.getElementById('logNewName').value;
                     const pass = document.getElementById('logNewPass').value;
                     if (!name || pass.length < 4) return alert("Nom et mot de passe (min 4 caractères) sont requis.");
+                    
+                    // Enregistrement des identifiants (local)
                     localUserCreds[email] = { email, name, pass };
                     localStorage.setItem('mt_user_creds', JSON.stringify(localUserCreds));
+                    
+                    // Création du profil utilisateur (Gist)
                     this.data.users[name] = { name, email, bio: "Nouveau créateur Visiona", avatar: "", banner: "", subs: [] };
                     this.data.user = localUserCreds[email];
-                    this.saveLocal(); await this.saveGist(); location.reload();
+                    this.saveLocal(); 
+                    await this.saveGist(); 
+                    location.reload();
                 } else if (s == 3) { 
+                    // Étape 3: Connexion avec mot de passe
                     const pass = document.getElementById('logPass').value;
                     const creds = localUserCreds[email];
+                    
                     if (creds && creds.pass === pass) {
                         this.data.user = creds; 
-                        this.saveLocal(); location.reload();
+                        this.saveLocal(); 
+                        location.reload();
                     } else { alert("Mauvais mot de passe."); }
                 }
             },
             
             doLogout: function() { 
+                // Déconnexion complète
                 localStorage.removeItem('mt_user'); 
                 localStorage.removeItem('mt_subs'); 
                 localStorage.removeItem('mt_votes'); 
+                localStorage.removeItem('mt_history'); 
                 location.reload(); 
             },
             
-            saveLocal: function() {
-                localStorage.setItem('mt_user', JSON.stringify(this.data.user));
-                localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
-                localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
-                localStorage.setItem('mt_history', JSON.stringify(this.data.history)); // Sauvegarde Historique
-            },
-            
             updateAuthUI: function() {
+                // Met à jour les éléments du header (bouton login/nom d'utilisateur, lien Admin)
                 const b = document.getElementById('loginBtn');
                 const adminLink = document.getElementById('adminLink');
                 const menuUserName = document.getElementById('menuUserName');
+                
                 if(this.data.user && this.data.user.name) { 
                     b.innerText = this.data.user.name;
                     menuUserName.innerText = this.data.user.name; 
@@ -334,49 +868,100 @@
                     adminLink.style.display = 'none';
                 }
             },
+
+            // --- FONCTIONS DE NAVIGATION ---
+            
+            goHome: function() { 
+                this.hideAll(); 
+                document.getElementById('videoGrid').style.display = 'grid'; 
+                document.getElementById('mainTitle').innerHTML = "<h2>Accueil</h2>"; 
+                // Affiche uniquement les vidéos "normales"
+                this.render(this.data.videos.filter(v => !v.isShort));
+            },
+            
+            goShorts: function() { 
+                this.hideAll(); 
+                const g = document.getElementById('shortsGrid'); 
+                g.style.display = 'flex'; 
+                document.getElementById('mainTitle').innerHTML = "<h2>⚡ Zapp</h2>"; 
+                // Affiche les shorts
+                g.innerHTML = this.data.videos.filter(x => x.isShort).map(s => `
+                    <div class="short-card" onclick="app.openVideoOverlay(${s.id})">
+                        <img src="${s.thumb}">
+                        <div style="position:absolute; bottom:10px; left:10px; font-size:12px; font-weight:bold; color:white; text-shadow: 1px 1px 2px black;">${s.title}</div>
+                    </div>
+                `).join(''); 
+            },
+
+            goSubs: function() { 
+                if(!this.data.user) return this.openLogin(); 
+                this.hideAll(); 
+                document.getElementById('videoGrid').style.display = 'grid'; 
+                document.getElementById('mainTitle').innerHTML = "<h2>Mes suivis</h2>"; 
+                // Affiche les vidéos des auteurs suivis
+                this.render(this.data.videos.filter(x => this.data.subs.includes(x.author))); 
+            },
+
+            goHistory: function() {
+                // NOUVEAU: Affiche la liste des vidéos regardées
+                this.hideAll();
+                document.getElementById('videoGrid').style.display = 'grid';
+                document.getElementById('mainTitle').innerHTML = "<h2>🕒 Mon Historique</h2>";
+                
+                // Récupère les objets vidéos à partir des IDs de l'historique
+                const list = this.data.history.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
+                this.render(list);
+            },
+            
+            search: function() {
+                // Effectue la recherche sur les titres et les auteurs
+                const term = document.getElementById('searchInput').value.toLowerCase();
+                this.hideAll();
+                document.getElementById('videoGrid').style.display = 'grid';
+                document.getElementById('mainTitle').innerHTML = `<h2>Résultats pour "${term}"</h2>`;
+                this.render(this.data.videos.filter(v => 
+                    v.title.toLowerCase().includes(term) || 
+                    v.author.toLowerCase().includes(term)
+                ));
+            },
+            
+            // --- FONCTION DE RENDU PRINCIPALE ---
+            
+            render: function(list, target = 'videoGrid') {
+                // Génère le HTML pour la grille de vidéos
+                const targetElement = document.getElementById(target);
+                
+                if (list.length === 0) { 
+                    targetElement.innerHTML = "<p style='color:#aaa; padding:20px;'>Aucune vidéo à afficher pour le moment.</p>"; 
+                    return; 
+                }
+                
+                targetElement.innerHTML = list.map(v => `
+                    <div class="video-card" onclick="app.openVideoOverlay(${v.id})">
+                        <div class="thumb-container"><img src="${v.thumb}" class="thumb"></div>
+                        <div style="padding-top: 8px;">
+                            <h3 style="margin: 0 0 4px 0; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${v.title}</h3>
+                            <p style="margin: 0; font-size: 14px; color: var(--sec-text);">${v.author}</p>
+                            <p style="margin: 0; font-size: 12px; color: var(--sec-text);">${v.views || 0} vues • Il y a ${this.timeAgo(v.id)}</p>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            // --- FONCTIONS DE GESTION DU PROFIL ---
             
             goMyProfile: function() {
                 if(!this.data.user || !this.data.user.name) return this.openLogin(); 
                 this.viewProfile(this.data.user.name);
             },
 
-            saveProfile: async function() {
-                if(!this.data.user) return;
-                const name = document.getElementById('editName').value;
-                const bio = document.getElementById('editBio').value;
-                const pp = document.getElementById('editPPFile').files[0];
-                const ban = document.getElementById('editBannerFile').files[0];
-                const status = document.getElementById('profileUploadStatus');
-                const userName = this.data.user.name; 
-                let userData = this.data.users[userName] || { name: userName, email: this.data.user.email, subs: [] }; 
-                if(bio) userData.bio = bio;
-                status.innerText = "";
-                try {
-                    if(pp) {
-                        status.innerText = "Upload PDP...";
-                        const newAvatarUrl = await this.uploadCloudinary(pp, 'image', status);
-                        if (newAvatarUrl) userData.avatar = newAvatarUrl;
-                    }
-                    if(ban) {
-                        status.innerText = "Upload Bannière...";
-                        const newBannerUrl = await this.uploadCloudinary(ban, 'image', status);
-                        if (newBannerUrl) userData.banner = newBannerUrl;
-                    }
-                    this.data.users[userName] = userData; 
-                    await this.saveGist();
-                    alert("Profil mis à jour !");
-                    location.reload();
-                } catch (e) {
-                    alert("Erreur upload profil.");
-                    console.error(e);
-                }
-            },
-            
             viewProfile: function(authorName) {
+                // Affiche la vue du profil d'un utilisateur
                 this.hideAll();
                 const v = document.getElementById('profileView');
                 v.style.display = 'block';
-                const profile = this.data.users[authorName] || { name: authorName, bio: "", avatar: "", banner: "" };
+                
+                const profile = this.data.users[authorName] || { name: authorName, bio: "Aucune biographie.", avatar: "", banner: "" };
                 const videos = this.data.videos.filter(x => x.author === authorName);
                 const isMyProfile = this.data.user && this.data.user.name === authorName;
 
@@ -393,91 +978,77 @@
 
                 const actions = document.getElementById('profileActions');
                 actions.innerHTML = '';
-                if (isMyProfile) actions.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
-                else if (this.data.user) {
+                
+                if (isMyProfile) {
+                    actions.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
+                } else if (this.data.user) {
                     const isSubscribed = this.data.subs.includes(authorName);
                     actions.innerHTML = `<button class="action-pill ${isSubscribed ? 'followed' : 'btn-red'}" onclick="app.toggleSub('${authorName}')">${isSubscribed ? '✅ Abonné' : 'S\'abonner'}</button>`;
                 }
+                
                 this.render(videos, 'pVideos');
             },
 
-            getAvatar: function(name) {
-                return this.data.users[name]?.avatar || 'https://via.placeholder.com/36?text=U';
+            openEditProfile: function() { 
+                // Ouvre la modal pour éditer le profil
+                if(!this.data.user) return this.openLogin();
+                const profile = this.data.users[this.data.user.name] || {};
+                document.getElementById('editName').value = profile.name || this.data.user.name;
+                document.getElementById('editBio').value = profile.bio || '';
+                document.getElementById('modalEditProfile').style.display='flex'; 
             },
 
-            uploadCloudinary: async function(file, type, statusElement = null, progressFill = null, progressBar = null) {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type}/upload`);
-                if(progressBar) progressBar.style.display = 'block';
-                return new Promise((resolve, reject) => {
-                    xhr.upload.addEventListener('progress', (e) => {
-                        if (e.lengthComputable) {
-                            const percent = Math.round((e.loaded / e.total) * 100);
-                            if (progressFill) progressFill.style.width = `${percent}%`;
-                        }
-                    });
-                    xhr.onload = () => resolve(JSON.parse(xhr.responseText).secure_url);
-                    xhr.onerror = () => reject("Erreur reseau");
-                    xhr.send(formData);
-                });
-            },
-
-            publish: async function() {
-                if(!this.data.user) return alert("Connectez-vous.");
-                const title = document.getElementById('upTitle').value;
-                const videoFile = document.getElementById('upVideoFile').files[0];
-                const thumbFile = document.getElementById('upThumbFile').files[0];
-                const status = document.getElementById('uploadStatus');
-                const publishBtn = document.getElementById('publishBtn');
-                const progressBar = document.getElementById('uploadProgressBar');
-                const progressFill = document.getElementById('uploadProgressFill');
-
-                if (!title || !videoFile || !thumbFile) return alert("Champs requis.");
-                publishBtn.disabled = true;
+            saveProfile: async function() {
+                // Enregistre les modifications du profil
+                if(!this.data.user) return;
+                const bio = document.getElementById('editBio').value;
+                const pp = document.getElementById('editPPFile').files[0];
+                const ban = document.getElementById('editBannerFile').files[0];
+                const status = document.getElementById('profileUploadStatus');
+                const userName = this.data.user.name; 
+                let userData = this.data.users[userName] || { name: userName, email: this.data.user.email, subs: [] }; 
+                
+                if(bio) userData.bio = bio;
+                status.innerText = "Traitement...";
                 
                 try {
-                    status.innerText = "Upload Miniature...";
-                    const thumbUrl = await this.uploadCloudinary(thumbFile, 'image');
-                    status.innerText = "Upload Vidéo...";
-                    const videoUrl = await this.uploadCloudinary(videoFile, 'video', status, progressFill, progressBar);
-
-                    let isShort = false;
-                    const videoElement = document.createElement('video');
-                    videoElement.src = URL.createObjectURL(videoFile);
-                    await new Promise(resolve => videoElement.onloadedmetadata = resolve);
-                    if (videoElement.videoHeight > videoElement.videoWidth) isShort = true;
+                    if(pp) {
+                        status.innerText = "Upload Photo de Profil...";
+                        const newAvatarUrl = await this.uploadCloudinary(pp, 'image');
+                        if (newAvatarUrl) userData.avatar = newAvatarUrl;
+                    }
+                    if(ban) {
+                        status.innerText = "Upload Bannière...";
+                        const newBannerUrl = await this.uploadCloudinary(ban, 'image');
+                        if (newBannerUrl) userData.banner = newBannerUrl;
+                    }
                     
-                    const newVideo = {
-                        id: Date.now(),
-                        title: title,
-                        url: videoUrl,
-                        thumb: thumbUrl,
-                        author: this.data.user.name,
-                        likes: 0,
-                        dislikes: 0,
-                        views: 0, // Initialisation des vues
-                        isShort: isShort,
-                        comments: []
-                    };
-                    this.data.videos.unshift(newVideo);
+                    this.data.users[userName] = userData; 
                     await this.saveGist();
-                    this.closeModals();
-                    this.goHome();
+                    
+                    alert("Profil mis à jour !");
+                    location.reload();
                 } catch (e) {
+                    alert("Erreur lors de la mise à jour du profil.");
                     console.error(e);
-                    alert("Erreur publication.");
-                } finally { publishBtn.disabled = false; progressBar.style.display = 'none'; }
+                } finally {
+                    status.innerText = "";
+                }
             },
 
+            // --- FONCTIONS DE GESTION DES LIKES/ABONNEMENTS ---
+
             toggleVote: async function(id, type) {
+                // Gère l'ajout/retrait de like ou dislike
                 if(!this.data.user) return this.openLogin();
+                
                 const v = this.data.videos.find(x => x.id == id);
                 if (!v) return;
+                
                 const currentVote = this.data.votes[id] || 0;
-                v.likes = v.likes || 0; v.dislikes = v.dislikes || 0;
+                v.likes = v.likes || 0; 
+                v.dislikes = v.dislikes || 0;
+                
                 if (type === 'like') {
                     if (currentVote === 1) { v.likes--; this.data.votes[id] = 0; } 
                     else if (currentVote === -1) { v.dislikes--; v.likes++; this.data.votes[id] = 1; } 
@@ -487,108 +1058,52 @@
                     else if (currentVote === 1) { v.likes--; v.dislikes++; this.data.votes[id] = -1; } 
                     else { v.dislikes++; this.data.votes[id] = -1; }
                 }
-                this.saveLocal(); await this.saveGist(); this.openVideoOverlay(id);
+                
+                this.saveLocal(); 
+                await this.saveGist(); 
+                this.openVideoOverlay(id);
             },
             
             toggleSub: async function(author) {
+                // Gère l'abonnement/désabonnement à un auteur
                 if(!this.data.user) return this.openLogin();
+                
                 const index = this.data.subs.indexOf(author);
+                
                 if (index > -1) this.data.subs.splice(index, 1);
                 else this.data.subs.push(author);
+                
                 this.saveLocal(); 
+                
+                // Mettre à jour la liste d'abonnements dans la BDD (Gist)
                 if (!this.data.users[this.data.user.name]) this.data.users[this.data.user.name] = { name: this.data.user.name, email: this.data.user.email };
                 this.data.users[this.data.user.name].subs = this.data.subs;
-                await this.saveGist(); this.viewProfile(author); 
+                
+                await this.saveGist(); 
+                this.viewProfile(author); 
             },
 
-            isAdmin: function() { return this.data.user && this.data.admins.includes(this.data.user.email); },
-            
-            goAdminPanel: function() {
-                if (!this.isAdmin()) return alert("Accès refusé.");
-                this.hideAll(); document.getElementById('adminPanel').style.display = 'block';
-                this.renderAdminVideoList(); this.renderAdminList();
-            },
-            
-            // NOUVEAU: Fonction Historique
-            goHistory: function() {
-                this.hideAll();
-                document.getElementById('videoGrid').style.display = 'grid';
-                document.getElementById('mainTitle').innerHTML = "<h2>🕒 Mon Historique</h2>";
-                // Récupère les objets vidéos à partir des IDs de l'historique
-                const list = this.data.history.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
-                this.render(list);
-            },
 
-            render: function(list, target = 'videoGrid') {
-                const targetElement = document.getElementById(target);
-                if (list.length === 0) { targetElement.innerHTML = "<p style='color:#aaa; padding:20px;'>Rien à afficher.</p>"; return; }
-                targetElement.innerHTML = list.map(v => `
-                    <div class="video-card" onclick="app.openVideoOverlay(${v.id})">
-                        <div class="thumb-container"><img src="${v.thumb}" class="thumb"></div>
-                        <div style="padding-top: 8px;">
-                            <h3 style="margin: 0 0 4px 0; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${v.title}</h3>
-                            <p style="margin: 0; font-size: 14px; color: var(--sec-text);">${v.author}</p>
-                            <p style="margin: 0; font-size: 12px; color: var(--sec-text);">${v.views || 0} vues • Il y a ${this.timeAgo(v.id)}</p>
-                        </div>
-                    </div>
-                `).join('');
-            },
-
-            goHome: function() { 
-                this.hideAll(); 
-                document.getElementById('videoGrid').style.display = 'grid'; 
-                document.getElementById('mainTitle').innerHTML = "<h2>Accueil</h2>"; 
-                this.render(this.data.videos.filter(v => !v.isShort));
-            },
-            
-            goShorts: function() { 
-                this.hideAll(); 
-                const g = document.getElementById('shortsGrid'); 
-                g.style.display = 'flex'; 
-                document.getElementById('mainTitle').innerHTML = "<h2>⚡ Zapp</h2>"; 
-                g.innerHTML = this.data.videos.filter(x => x.isShort).map(s => `
-                    <div class="short-card" onclick="app.openVideoOverlay(${s.id})">
-                        <img src="${s.thumb}">
-                        <div style="position:absolute; bottom:10px; left:10px; font-size:12px; font-weight:bold; color:white; text-shadow: 1px 1px 2px black;">${s.title}</div>
-                    </div>
-                `).join(''); 
-            },
-
-            goSubs: function() { 
-                if(!this.data.user) return this.openLogin(); 
-                this.hideAll(); 
-                document.getElementById('videoGrid').style.display = 'grid'; 
-                document.getElementById('mainTitle').innerHTML = "<h2>Mes suivis</h2>"; 
-                this.render(this.data.videos.filter(x => this.data.subs.includes(x.author))); 
-            },
-            
-            search: function() {
-                const term = document.getElementById('searchInput').value.toLowerCase();
-                this.hideAll();
-                document.getElementById('videoGrid').style.display = 'grid';
-                document.getElementById('mainTitle').innerHTML = `<h2>Résultats pour "${term}"</h2>`;
-                this.render(this.data.videos.filter(v => v.title.toLowerCase().includes(term) || v.author.toLowerCase().includes(term)));
-            },
-
-            hideAll: function() { 
-                ['videoGrid', 'shortsGrid', 'profileView', 'adminPanel'].forEach(id => document.getElementById(id).style.display = 'none');
-            },
+            // --- FONCTIONS DU PLAYER ET COMMENTAIRES ---
             
             openVideoOverlay: async function(id) {
+                // Ouvre le lecteur vidéo (modal)
                 const v = this.data.videos.find(x => x.id == id);
                 if (!v) return;
                 
-                // NOUVEAU: Gestion des vues
+                // NOUVEAU: INCÉMENTATION DES VUES
                 v.views = (v.views || 0) + 1;
                 
-                // NOUVEAU: Gestion Historique
+                // NOUVEAU: ENREGISTREMENT DANS L'HISTORIQUE (max 50 vidéos)
                 this.data.history = [id, ...this.data.history.filter(x => x !== id)].slice(0, 50);
                 this.saveLocal();
 
                 document.getElementById('playerModal').style.display = 'block';
                 const player = document.getElementById('mainVideoPlayer');
                 player.src = v.url;
+                
                 document.getElementById('playerTitle').innerText = v.title;
+                // AJOUT : VUES ET DATE RELATIVE DANS LE PLAYER
                 document.getElementById('playerMeta').innerText = `${v.views} vues • Il y a ${this.timeAgo(v.id)}`;
 
                 const currentVote = this.data.votes[id] || 0;
@@ -598,26 +1113,37 @@
                     <button class="action-pill ${currentVote === 1 ? 'liked' : ''}" onclick="app.toggleVote(${id}, 'like')">👍 ${v.likes || 0}</button>
                     <button class="action-pill ${currentVote === -1 ? 'disliked' : ''}" onclick="app.toggleVote(${id}, 'dislike')">👎 ${v.dislikes || 0}</button>
                 `;
+                
+                // Ajuste la taille du player pour les shorts
                 document.getElementById('videoContainer').className = v.isShort ? 'short-player-wrapper' : 'video-wrapper';
                 this.renderComments(v);
-                await this.saveGist(); // Enregistre la nouvelle vue sur le Gist
+                
+                await this.saveGist(); // Sauvegarde les vues
             },
             
             closePlayer: function() { 
+                // Ferme le lecteur vidéo
                 document.getElementById('playerModal').style.display='none'; 
                 document.getElementById('mainVideoPlayer').pause();
                 document.getElementById('mainVideoPlayer').src = "";
             },
 
             renderComments: function(video) {
+                // Affiche la liste des commentaires
                 const list = document.getElementById('commentList');
                 document.getElementById('commentCount').innerText = `Commentaires (${video.comments?.length || 0})`;
-                if (this.data.user) document.getElementById('userCommentAvatar').src = this.getAvatar(this.data.user.name);
+                
+                if (this.data.user) {
+                    document.getElementById('userCommentAvatar').src = this.getAvatar(this.data.user.name);
+                } else {
+                    document.getElementById('userCommentAvatar').src = 'https://via.placeholder.com/36?text=U';
+                }
+                
                 list.innerHTML = (video.comments || []).map(c => `
                     <div style="display:flex; gap:10px; margin-bottom:15px;">
-                        <img src="${this.getAvatar(c.author)}" class="avatar-small">
+                        <img src="${this.getAvatar(c.author)}" class="avatar-small" onclick="app.viewProfile('${c.author}')">
                         <div>
-                            <span style="font-weight:bold; font-size:14px;">${c.author}</span>
+                            <span style="font-weight:bold; font-size:14px; cursor:pointer;" onclick="app.viewProfile('${c.author}')">${c.author}</span>
                             <span style="font-size:12px; color:#999; margin-left:8px;">${new Date(c.time).toLocaleDateString()}</span>
                             <p style="margin:2px 0 0 0;">${c.text}</p>
                         </div>
@@ -626,37 +1152,146 @@
             },
             
             addComment: async function() {
+                // Ajoute un nouveau commentaire à la vidéo
                 if(!this.data.user) return this.openLogin();
+                
                 const text = document.getElementById('newCommentInput').value.trim();
                 const video = this.data.videos.find(v => v.url === document.getElementById('mainVideoPlayer').src);
+                
                 if (!text || !video) return;
+                
+                if (!video.comments) video.comments = [];
                 video.comments.unshift({ author: this.data.user.name, text: text, time: Date.now() });
+                
                 document.getElementById('newCommentInput').value = '';
-                this.renderComments(video); await this.saveGist();
+                this.renderComments(video); 
+                await this.saveGist();
             },
             
-            toggleAccountMenu: function() { const m = document.getElementById('accountMenu'); m.style.display = m.style.display === 'none' ? 'block' : 'none'; },
-            closeModals: function() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); },
-            openUpload: function() { if(!this.data.user) return this.openLogin(); document.getElementById('modalUpload').style.display='flex'; },
-            openEditProfile: function() { 
-                if(!this.data.user) return this.openLogin();
-                const profile = this.data.users[this.data.user.name] || {};
-                document.getElementById('editName').value = profile.name || this.data.user.name;
-                document.getElementById('editBio').value = profile.bio || '';
-                document.getElementById('modalEditProfile').style.display='flex'; 
-            },
-            openLogin: function() { document.getElementById('modalLoginEmail').style.display='flex'; },
+            // --- FONCTIONS D'UPLOAD CLOUDINARY / PUBLICATION ---
 
-            // --- FONCTIONS ADMIN ---
+            uploadCloudinary: async function(file, type, statusElement = null, progressFill = null, progressBar = null) {
+                // Fonction générique pour l'upload d'un fichier (vidéo ou image)
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+                
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type}/upload`);
+                
+                if(progressBar) progressBar.style.display = 'block';
+                
+                return new Promise((resolve, reject) => {
+                    xhr.upload.addEventListener('progress', (e) => {
+                        if (e.lengthComputable) {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            if (progressFill) progressFill.style.width = `${percent}%`;
+                        }
+                    });
+                    
+                    xhr.onload = () => {
+                        if (xhr.status === 200) {
+                            resolve(JSON.parse(xhr.responseText).secure_url);
+                        } else {
+                            reject(`Erreur d'upload Cloudinary: ${xhr.responseText}`);
+                        }
+                    };
+                    
+                    xhr.onerror = () => reject("Erreur réseau ou CORS.");
+                    xhr.send(formData);
+                });
+            },
+
+            publish: async function() {
+                // Gère la soumission du formulaire d'upload
+                if(!this.data.user) return alert("Veuillez vous connecter pour publier.");
+                
+                const title = document.getElementById('upTitle').value;
+                const videoFile = document.getElementById('upVideoFile').files[0];
+                const thumbFile = document.getElementById('upThumbFile').files[0];
+                
+                const status = document.getElementById('uploadStatus');
+                const publishBtn = document.getElementById('publishBtn');
+                const progressBar = document.getElementById('uploadProgressBar');
+                const progressFill = document.getElementById('uploadProgressFill');
+
+                if (!title || !videoFile || !thumbFile) return alert("Tous les champs sont requis.");
+                
+                publishBtn.disabled = true;
+                
+                try {
+                    // Upload de la miniature
+                    status.innerText = "1/2 Upload Miniature...";
+                    const thumbUrl = await this.uploadCloudinary(thumbFile, 'image');
+                    
+                    // Upload de la vidéo (avec progression)
+                    status.innerText = "2/2 Upload Vidéo...";
+                    const videoUrl = await this.uploadCloudinary(videoFile, 'video', status, progressFill, progressBar);
+
+                    // Détection du format (Short ou Vidéo normale)
+                    let isShort = false;
+                    const videoElement = document.createElement('video');
+                    videoElement.src = URL.createObjectURL(videoFile);
+                    await new Promise(resolve => videoElement.onloadedmetadata = resolve);
+                    if (videoElement.videoHeight > videoElement.videoWidth) isShort = true;
+                    
+                    // Création de l'objet vidéo
+                    const newVideo = {
+                        id: Date.now(),
+                        title: title,
+                        url: videoUrl,
+                        thumb: thumbUrl,
+                        author: this.data.user.name,
+                        likes: 0,
+                        dislikes: 0,
+                        views: 0, 
+                        isShort: isShort,
+                        comments: []
+                    };
+                    
+                    this.data.videos.unshift(newVideo);
+                    await this.saveGist();
+                    
+                    alert("Vidéo publiée !");
+                    this.closeModals();
+                    this.goHome();
+                } catch (e) {
+                    console.error("Erreur de publication:", e);
+                    alert("Erreur de publication: " + e);
+                } finally { 
+                    publishBtn.disabled = false; 
+                    progressBar.style.display = 'none'; 
+                    status.innerText = "";
+                }
+            },
+
+            // --- FONCTIONS ADMINISTRATEUR ---
+
+            isAdmin: function() { 
+                // Vérifie si l'utilisateur est un admin
+                return this.data.user && this.data.admins.includes(this.data.user.email); 
+            },
+            
+            goAdminPanel: function() {
+                // Affiche le panneau d'administration
+                if (!this.isAdmin()) return alert("Accès refusé.");
+                this.hideAll(); 
+                document.getElementById('adminPanel').style.display = 'block';
+                this.renderAdminVideoList(); 
+                this.renderAdminList();
+            },
+
             renderAdminVideoList: function() {
+                // Affiche la liste des vidéos pour l'administration
                 const list = document.getElementById('adminVideoList');
                 list.innerHTML = `<table class="admin-table">
-                    <thead><tr><th>ID</th><th>Titre</th><th>Auteur</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>ID (Date)</th><th>Titre</th><th>Auteur</th><th>Vues</th><th>Actions</th></tr></thead>
                     <tbody>${this.data.videos.map(v => `
                         <tr>
                             <td>${v.id}</td>
                             <td>${v.title}</td>
                             <td>${v.author}</td>
+                            <td>${v.views || 0}</td>
                             <td>
                                 <button class="action-pill" onclick="app.openAdminEditModal(${v.id}, '${v.title.replace(/'/g, "\\'")}')">✎</button>
                                 <button class="action-pill btn-red" onclick="app.deleteVideo(${v.id})">❌</button>
@@ -665,49 +1300,113 @@
                     `).join('')}</tbody>
                 </table>`;
             },
+
             openAdminEditModal: function(id, title) {
+                // Ouvre la modal pour éditer le titre d'une vidéo
                 this.currentEditVideoId = id;
                 document.getElementById('editVideoTitle').value = title;
                 document.getElementById('modalEditVideo').style.display = 'flex';
             },
+
             saveAdminVideoEdit: async function() {
+                // Enregistre le nouveau titre
                 const newTitle = document.getElementById('editVideoTitle').value;
                 const index = this.data.videos.findIndex(v => v.id == this.currentEditVideoId);
+                
                 if (index > -1 && newTitle.trim()) {
                     this.data.videos[index].title = newTitle.trim();
-                    this.closeModals(); await this.saveGist(); this.goAdminPanel(); 
+                    this.closeModals(); 
+                    await this.saveGist(); 
+                    this.goAdminPanel(); 
                 }
             },
+
             deleteVideo: async function(id) {
-                if (!confirm("Supprimer ?")) return;
+                // Supprime une vidéo
+                if (!confirm("Voulez-vous vraiment supprimer cette vidéo ?")) return;
                 this.data.videos = this.data.videos.filter(v => v.id != id);
-                await this.saveGist(); this.goAdminPanel(); 
+                await this.saveGist(); 
+                this.goAdminPanel(); 
             },
+
             renderAdminList: function() {
+                // Affiche la liste des administrateurs
                 const list = document.getElementById('adminList');
                 list.innerHTML = `<table class="admin-table">
                     <thead><tr><th>Email</th><th>Action</th></tr></thead>
                     <tbody>${this.data.admins.map(email => `
                         <tr>
                             <td>${email}</td>
-                            <td>${email === PRIMARY_ADMIN_EMAIL ? '⭐' : `<button class="action-pill btn-red" onclick="app.removeAdmin('${email}')">❌</button>`}</td>
+                            <td>${email === PRIMARY_ADMIN_EMAIL ? '⭐ Admin Principal' : `<button class="action-pill btn-red" onclick="app.removeAdmin('${email}')">❌ Retirer</button>`}</td>
                         </tr>
                     `).join('')}</tbody>
                 </table>`;
             },
+
             addAdmin: async function() {
-                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut le faire.");
+                // Ajoute un nouvel administrateur
+                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut ajouter des admins.");
                 const newEmail = document.getElementById('newAdminEmail').value.trim();
+                
                 if (newEmail && !this.data.admins.includes(newEmail)) {
-                    this.data.admins.push(newEmail); await this.saveGist(); this.renderAdminList();
+                    this.data.admins.push(newEmail); 
+                    document.getElementById('newAdminEmail').value = '';
+                    await this.saveGist(); 
+                    this.renderAdminList();
+                    this.updateAuthUI(); 
+                } else { 
+                    alert("Email invalide ou déjà admin."); 
                 }
             },
+
             removeAdmin: async function(email) {
+                // Retire un administrateur
+                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut retirer des admins.");
+                if (email === PRIMARY_ADMIN_EMAIL) return alert("Impossible de retirer l'Admin Principal.");
+                
                 this.data.admins = this.data.admins.filter(e => e !== email);
-                await this.saveGist(); this.renderAdminList();
+                await this.saveGist(); 
+                this.renderAdminList();
+                this.updateAuthUI(); 
             },
+
+            // --- FONCTIONS UTILITAIRES ---
+
+            getAvatar: function(name) { 
+                // Récupère l'URL de l'avatar ou un placeholder
+                return this.data.users[name]?.avatar || 'https://via.placeholder.com/36?text=U'; 
+            },
+
+            hideAll: function() { 
+                // Cache tous les conteneurs principaux de la page
+                ['videoGrid', 'shortsGrid', 'profileView', 'adminPanel'].forEach(id => document.getElementById(id).style.display = 'none');
+            },
+
+            toggleAccountMenu: function() { 
+                // Affiche/cache le menu du compte
+                const m = document.getElementById('accountMenu'); 
+                m.style.display = m.style.display === 'none' ? 'block' : 'none'; 
+            },
+
+            closeModals: function() { 
+                // Ferme toutes les modals
+                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
+            },
+
+            openUpload: function() { 
+                // Ouvre la modal d'upload
+                if(!this.data.user) return this.openLogin(); 
+                document.getElementById('modalUpload').style.display='flex'; 
+                document.getElementById('uploadProgressBar').style.display = 'none';
+            },
+
+            openLogin: function() { 
+                // Ouvre la première étape de la modal de connexion
+                document.getElementById('modalLoginEmail').style.display='flex'; 
+            }
         };
 
+        // Lancement de l'application au chargement de la page
         app.init();
     </script>
 </body>
