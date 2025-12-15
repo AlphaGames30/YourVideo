@@ -2,21 +2,11 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Visiona - AlphaGames30</title>
     <style>
         :root { --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa; --hover: #272727; --blue: #3ea6ff; --red: #ff0000; }
-        
-        /* AJOUT: padding-bottom pour laisser de l'espace à la barre de navigation mobile */
-        body { 
-            margin: 0; 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: Roboto, Arial, sans-serif; 
-            overflow-x: hidden; 
-            padding-bottom: 60px; 
-        }
-
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, Arial, sans-serif; overflow-x: hidden; padding-bottom: 60px; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; height: 56px; background: var(--header); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
         .logo { font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; }
         .logo::before { content: '▶'; color: var(--red); font-size: 24px; margin-right: 5px; }
@@ -28,28 +18,26 @@
         
         .container { display: flex; height: calc(100vh - 56px); }
         .sidebar { width: 220px; background: var(--bg); padding: 10px; overflow-y: auto; flex-shrink: 0; }
-        
-        .nav-item { padding: 10px; border-radius: 10px; cursor: pointer; margin-bottom: 5px; }
+        @media(max-width: 768px) { .sidebar { display: none; } .mobile-nav { display: flex !important; } .search-box { display: none; } }
+        .nav-item { padding: 10px; border-radius: 10px; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
         .nav-item:hover { background: var(--hover); }
         .content { flex: 1; padding: 20px; overflow-y: auto; }
         
         .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        @media (max-width: 768px) { .video-grid { grid-template-columns: 1fr; } }
         .video-card { cursor: pointer; transition: transform 0.2s; }
         .video-card:hover { transform: scale(1.02); }
         .thumb-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #333; }
         .thumb { width: 100%; height: 100%; object-fit: cover; }
         
         .shorts-grid { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; }
-        .short-card { flex-shrink: 0; width: 160px; height: 300px; cursor: pointer; border-radius: 12px; overflow: hidden; background: #333; }
+        .short-card { flex-shrink: 0; width: 160px; height: 300px; cursor: pointer; border-radius: 12px; overflow: hidden; background: #333; position: relative; }
         .short-card img { width: 100%; height: 100%; object-fit: cover; }
 
         .player-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 500; overflow-y: auto; padding-bottom: 50px; }
         .player-content { width: 95%; max-width: 1200px; margin: 20px auto; display: flex; flex-direction: column; gap: 15px; }
-        
         .video-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; }
         .short-player-wrapper { width: 100%; max-width: 400px; aspect-ratio: 9/16; background: #000; margin: 0 auto; }
-        .short-player-wrapper video { width: 100%; height: 100%; }
-
         video { width: 100%; height: 100%; }
 
         .comment-section { background: #1a1a1a; padding: 20px; border-radius: 12px; }
@@ -80,52 +68,13 @@
 
         .banner { width: 100%; height: 200px; background: #333; border-radius: 15px; margin-bottom: -60px; object-fit: cover; }
         .profile-head { display: flex; align-items: flex-end; gap: 20px; padding: 0 20px; }
-        #profileActions button { margin-top: 10px; }
+
+        .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: #0f0f0f; border-top: 1px solid #222; justify-content: space-around; align-items: center; z-index: 1000; }
+        .mobile-nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: var(--sec-text); cursor: pointer; }
+        .mobile-nav-item span { font-size: 20px; color: white; margin-bottom: 2px; }
 
         .progress-bar { height: 15px; background: #444; border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--blue); width: 0%; transition: width 0.1s; }
-
-
-        /* NOUVEAU: Navigation mobile (Barre du bas) */
-        .mobile-nav { 
-            display: none; /* Caché par défaut */
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 60px; 
-            background: #0f0f0f; 
-            border-top: 1px solid #222; 
-            justify-content: space-around; 
-            align-items: center; 
-            z-index: 1000; 
-        }
-        .mobile-nav-item { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            font-size: 10px; 
-            color: var(--sec-text); 
-            cursor: pointer; 
-        }
-        .mobile-nav-item span {
-            font-size: 20px;
-            color: white; /* Icônes en blanc */
-            margin-bottom: 2px;
-        }
-
-        /* MEDIA QUERY POUR LES TÉLÉPHONES (768px et moins) */
-        @media (max-width: 768px) { 
-            .sidebar { display: none; } /* Cache la barre latérale */
-            .mobile-nav { display: flex; } /* Affiche la barre de navigation du bas */
-            .search-box { display: none; } /* Cache la recherche du header */
-            .container { height: auto; } /* Enlève la hauteur fixe */
-            .content { padding: 10px; } /* Moins de padding */
-            .video-grid { grid-template-columns: 1fr; } /* Une seule colonne de vidéo sur mobile */
-            .profile-head { flex-direction: column; align-items: flex-start; }
-            .avatar-big { margin-top: -60px; } 
-            .header-btns .btn-login { display: none; } /* On cache le bouton de connexion/nom, on utilise l'icône dans la barre du bas */
-        }
     </style>
 </head>
 <body>
@@ -137,7 +86,7 @@
             <button onclick="app.search()">🔍</button>
         </div>
         <div class="header-btns">
-            <button onclick="app.openUpload()">➕</button> 
+            <button onclick="app.openUpload()">➕</button>
             <button id="loginBtn" class="btn-login" onclick="app.toggleAccountMenu()">👤 Se connecter</button>
         </div>
     </header>
@@ -145,8 +94,8 @@
     <div class="mobile-nav">
         <div class="mobile-nav-item" onclick="app.goHome()"><span>🏠</span>Accueil</div>
         <div class="mobile-nav-item" onclick="app.goShorts()"><span>⚡</span>Zapp</div>
-        <div class="mobile-nav-item" onclick="app.goSubs()"><span>📺</span>Suivis</div>
-        <div class="mobile-nav-item" onclick="app.goMyProfile()"><span>👤</span>Moi</div> 
+        <div class="mobile-nav-item" onclick="app.goHistory()"><span>🕒</span>Historique</div>
+        <div class="mobile-nav-item" onclick="app.goMyProfile()"><span>👤</span>Moi</div>
     </div>
 
     <div id="accountMenu" style="display:none; position:absolute; right:10px; top:60px; background:#282828; padding:15px; border-radius:10px; z-index:1000;">
@@ -159,8 +108,9 @@
     <div class="container">
         <nav class="sidebar">
             <div class="nav-item" onclick="app.goHome()">🏠 Accueil</div>
-            <div class="nav-item" onclick="app.goShorts()">⚡ Zapp</div> 
+            <div class="nav-item" onclick="app.goShorts()">⚡ Zapp</div>
             <div class="nav-item" onclick="app.goSubs()">📺 Suivis</div>
+            <div class="nav-item" onclick="app.goHistory()">🕒 Historique</div>
             <hr style="border-color: #333;">
             <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
         </nav>
@@ -169,6 +119,7 @@
             <div id="mainTitle"></div>
             <div id="videoGrid" class="video-grid"></div>
             <div id="shortsGrid" class="shorts-grid" style="display:none;"></div>
+            
             <div id="profileView" class="profile-view">
                 <img class="banner" id="pBanner" src="">
                 <div class="profile-head">
@@ -186,9 +137,8 @@
 
             <div id="adminPanel" class="admin-view">
                 <h2>🔑 Panneau d'Administration</h2>
-                <h3 style="margin-top:20px;">Gestion des Vidéos (${app.data?.videos?.length || 0})</h3>
+                <h3 style="margin-top:20px;">Gestion des Vidéos</h3>
                 <div id="adminVideoList"></div>
-                
                 <h3 style="margin-top:30px;">Gestion des Admins</h3>
                 <div id="adminList"></div>
                 <div style="margin-top:15px;">
@@ -196,7 +146,6 @@
                     <button class="action-pill btn-green" onclick="app.addAdmin()">Ajouter Admin</button>
                 </div>
             </div>
-
         </main>
     </div>
 
@@ -212,10 +161,9 @@
     <div id="playerModal" class="player-overlay">
         <div style="padding: 15px;"><button class="action-pill" onclick="app.closePlayer()">✕ Fermer</button></div>
         <div class="player-content">
-            <div id="videoContainer" class="video-wrapper"> 
-                <video id="mainVideoPlayer" controls autoplay></video>
-            </div>
-            <h2 id="playerTitle"></h2>
+            <div id="videoContainer" class="video-wrapper"><video id="mainVideoPlayer" controls autoplay></video></div>
+            <h2 id="playerTitle" style="margin-bottom:5px;"></h2>
+            <p id="playerMeta" style="color:var(--sec-text); font-size:14px; margin-top:0;"></p>
             <div id="playerActions" style="display:flex; gap:10px; align-items:center;"></div>
             <div class="comment-section">
                 <h4 id="commentCount">Commentaires</h4>
@@ -233,9 +181,7 @@
         <div class="modal-box">
             <h2>Publier une vidéo</h2>
             <p id="uploadStatus" style="color: var(--blue);"></p>
-            <div class="progress-bar" id="uploadProgressBar" style="display: none;">
-                <div class="progress-fill" id="uploadProgressFill"></div>
-            </div>
+            <div class="progress-bar" id="uploadProgressBar" style="display: none;"><div class="progress-fill" id="uploadProgressFill"></div></div>
             <input type="text" id="upTitle" placeholder="Titre">
             <label style="color:#aaa; font-size:12px;">Fichier Vidéo (Auto-détection Short)</label>
             <input type="file" id="upVideoFile" accept="video/*">
@@ -270,7 +216,7 @@
         const WORKER_PROXY_URL = "https://mytubeupload.edonis-imbert.workers.dev/"; 
         const CLOUDINARY_CLOUD_NAME = "dvbsmh8qq"; 
         const CLOUDINARY_UPLOAD_PRESET = "mytube_upload"; 
-        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json"; 
+        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0c560faad87c92/raw/video.json"; 
         const GIST_FILE_NAME = "video.json"; 
         const PRIMARY_ADMIN_EMAIL = "edonis.imbert@gmail.com"; 
         
@@ -284,14 +230,14 @@
                 admins: [PRIMARY_ADMIN_EMAIL], 
                 votes: JSON.parse(localStorage.getItem('mt_votes')) || {},
                 subs: JSON.parse(localStorage.getItem('mt_subs')) || [], 
+                history: JSON.parse(localStorage.getItem('mt_history')) || [], // NOUVEAU: Historique
             },
             currentEditVideoId: null,
 
-            // CORRECTION: Assure l'affichage des vidéos au démarrage
             init: async function() {
                 await this.loadData();
                 this.updateAuthUI();
-                this.goHome(); // Affiche les vidéos dès le début
+                this.goHome();
             },
 
             loadData: async function() {
@@ -305,11 +251,7 @@
             },
 
             saveGist: async function() {
-                if(!WORKER_PROXY_URL) {
-                    console.error("WORKER_PROXY_URL est vide. Le Gist ne sera pas mis à jour.");
-                    alert("ERREUR: Le lien Cloudflare Worker est vide. Le Gist ne sera pas mis à jour.");
-                    return;
-                }
+                if(!WORKER_PROXY_URL) return;
                 const content = { videos: this.data.videos, users: this.data.users, admins: this.data.admins };
                 await fetch(WORKER_PROXY_URL, {
                     method: 'PATCH',
@@ -317,11 +259,23 @@
                     body: JSON.stringify({ files: { [GIST_FILE_NAME]: { content: JSON.stringify(content, null, 2) } } })
                 });
             },
+
+            // NOUVEAU: Calcul de la date relative (Il y a...)
+            timeAgo: function(timestamp) {
+                const seconds = Math.floor((Date.now() - timestamp) / 1000);
+                if (seconds < 60) return "quelques secondes";
+                const minutes = Math.floor(seconds / 60);
+                if (minutes < 60) return minutes + " minutes";
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return hours + " heures";
+                const days = Math.floor(hours / 24);
+                if (days < 30) return days + " jours";
+                const months = Math.floor(days / 30);
+                return months + " mois";
+            },
             
-            // --- AUTHENTIFICATION / LOCAL STORAGE ---
             loginStep: async function(s) {
                 const email = document.getElementById('logEmail').value.toLowerCase();
-                
                 if (s == 1) { 
                     if (!email.includes('@')) return alert("Email invalide");
                     this.closeModals();
@@ -337,29 +291,18 @@
                     const name = document.getElementById('logNewName').value;
                     const pass = document.getElementById('logNewPass').value;
                     if (!name || pass.length < 4) return alert("Nom et mot de passe (min 4 caractères) sont requis.");
-
                     localUserCreds[email] = { email, name, pass };
                     localStorage.setItem('mt_user_creds', JSON.stringify(localUserCreds));
-                    
-                    this.data.users[name] = { name, email, bio: "Nouveau créateur MyTube", avatar: "", banner: "", subs: [] };
-
+                    this.data.users[name] = { name, email, bio: "Nouveau créateur Visiona", avatar: "", banner: "", subs: [] };
                     this.data.user = localUserCreds[email];
-                    this.saveLocal(); 
-                    
-                    await this.saveGist(); 
-                    location.reload();
-
+                    this.saveLocal(); await this.saveGist(); location.reload();
                 } else if (s == 3) { 
                     const pass = document.getElementById('logPass').value;
                     const creds = localUserCreds[email];
-
                     if (creds && creds.pass === pass) {
                         this.data.user = creds; 
-                        this.saveLocal();
-                        location.reload();
-                    } else {
-                        alert("Mauvais mot de passe.");
-                    }
+                        this.saveLocal(); location.reload();
+                    } else { alert("Mauvais mot de passe."); }
                 }
             },
             
@@ -374,13 +317,13 @@
                 localStorage.setItem('mt_user', JSON.stringify(this.data.user));
                 localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
                 localStorage.setItem('mt_votes', JSON.stringify(this.data.votes));
+                localStorage.setItem('mt_history', JSON.stringify(this.data.history)); // Sauvegarde Historique
             },
             
             updateAuthUI: function() {
                 const b = document.getElementById('loginBtn');
                 const adminLink = document.getElementById('adminLink');
                 const menuUserName = document.getElementById('menuUserName');
-                
                 if(this.data.user && this.data.user.name) { 
                     b.innerText = this.data.user.name;
                     menuUserName.innerText = this.data.user.name; 
@@ -397,7 +340,6 @@
                 this.viewProfile(this.data.user.name);
             },
 
-            // --- GESTION PROFIL / BANNER / PDP ---
             saveProfile: async function() {
                 if(!this.data.user) return;
                 const name = document.getElementById('editName').value;
@@ -405,52 +347,28 @@
                 const pp = document.getElementById('editPPFile').files[0];
                 const ban = document.getElementById('editBannerFile').files[0];
                 const status = document.getElementById('profileUploadStatus');
-
                 const userName = this.data.user.name; 
                 let userData = this.data.users[userName] || { name: userName, email: this.data.user.email, subs: [] }; 
-
-                if(name && name !== userName) {
-                     alert("Le changement de nom de chaîne n'est pas supporté pour le moment.");
-                     return;
-                }
-
                 if(bio) userData.bio = bio;
-                
                 status.innerText = "";
-                
                 try {
                     if(pp) {
-                        status.innerText = "Téléversement de la photo de profil (1/2)...";
+                        status.innerText = "Upload PDP...";
                         const newAvatarUrl = await this.uploadCloudinary(pp, 'image', status);
-                        if (newAvatarUrl) {
-                            userData.avatar = newAvatarUrl;
-                        } else {
-                             alert("Erreur lors de l'upload de la photo de profil. L'ancienne photo est conservée.");
-                        }
+                        if (newAvatarUrl) userData.avatar = newAvatarUrl;
                     }
-
                     if(ban) {
-                        status.innerText = "Téléversement de la bannière (2/2)...";
+                        status.innerText = "Upload Bannière...";
                         const newBannerUrl = await this.uploadCloudinary(ban, 'image', status);
-                        if (newBannerUrl) {
-                            userData.banner = newBannerUrl;
-                        } else {
-                            alert("Erreur lors de l'upload de la bannière. L'ancienne bannière est conservée.");
-                        }
+                        if (newBannerUrl) userData.banner = newBannerUrl;
                     }
-
                     this.data.users[userName] = userData; 
-
-                    status.innerText = "Sauvegarde des données du profil...";
                     await this.saveGist();
-                    
                     alert("Profil mis à jour !");
                     location.reload();
-
                 } catch (e) {
-                    alert("Une erreur est survenue pendant l'upload ou la sauvegarde. Voir la console F12.");
-                    console.error("Erreur de sauvegarde de profil:", e);
-                    status.innerText = "Erreur de sauvegarde.";
+                    alert("Erreur upload profil.");
+                    console.error(e);
                 }
             },
             
@@ -458,35 +376,28 @@
                 this.hideAll();
                 const v = document.getElementById('profileView');
                 v.style.display = 'block';
-                
-                const profile = this.data.users[authorName] || { name: authorName, bio: "Créateur sans profil public.", avatar: "", banner: "" };
+                const profile = this.data.users[authorName] || { name: authorName, bio: "", avatar: "", banner: "" };
                 const videos = this.data.videos.filter(x => x.author === authorName);
                 const isMyProfile = this.data.user && this.data.user.name === authorName;
 
                 let followerCount = 0;
                 for (const userName in this.data.users) {
-                    if (this.data.users[userName] && this.data.users[userName].subs && this.data.users[userName].subs.includes(authorName)) {
-                         followerCount++;
-                    }
+                    if (this.data.users[userName] && this.data.users[userName].subs && this.data.users[userName].subs.includes(authorName)) followerCount++;
                 }
                 
                 document.getElementById('pBanner').src = profile.banner || '';
                 document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
                 document.getElementById('pName').innerText = profile.name;
-                
                 document.getElementById('pStats').innerText = `${followerCount} abonnés • ${videos.length} vidéos`; 
                 document.getElementById('pBio').innerText = profile.bio;
 
                 const actions = document.getElementById('profileActions');
                 actions.innerHTML = '';
-
-                if (isMyProfile) {
-                    actions.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
-                } else if (this.data.user) {
+                if (isMyProfile) actions.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
+                else if (this.data.user) {
                     const isSubscribed = this.data.subs.includes(authorName);
                     actions.innerHTML = `<button class="action-pill ${isSubscribed ? 'followed' : 'btn-red'}" onclick="app.toggleSub('${authorName}')">${isSubscribed ? '✅ Abonné' : 'S\'abonner'}</button>`;
                 }
-                
                 this.render(videos, 'pVideos');
             },
 
@@ -494,57 +405,28 @@
                 return this.data.users[name]?.avatar || 'https://via.placeholder.com/36?text=U';
             },
 
-            // --- GESTION UPLOAD ---
             uploadCloudinary: async function(file, type, statusElement = null, progressFill = null, progressBar = null) {
-                if(!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-                    alert("Configuration Cloudinary manquante. Impossible d'uploader.");
-                    return '';
-                }
-                
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type}/upload`);
+                if(progressBar) progressBar.style.display = 'block';
                 return new Promise((resolve, reject) => {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type}/upload`);
-                    
-                    if(progressBar) progressBar.style.display = 'block';
-                    if (progressFill) {
-                        xhr.upload.addEventListener('progress', (e) => {
-                            if (e.lengthComputable) {
-                                const percent = Math.round((e.loaded / e.total) * 100);
-                                progressFill.style.width = `${percent}%`;
-                                if (statusElement) statusElement.innerText = statusElement.innerText.split('(')[0].trim() + ` (${percent}%)`;
-                            }
-                        });
-                    }
-                    
-                    xhr.onload = function() {
-                        if (progressBar) progressBar.style.display = 'none';
-                        if (xhr.status === 200) {
-                            const data = JSON.parse(xhr.responseText);
-                            resolve(data.secure_url);
-                        } else {
-                            if (statusElement) statusElement.innerText = "Erreur d'upload. Code: " + xhr.status;
-                            reject(new Error('Erreur Cloudinary'));
+                    xhr.upload.addEventListener('progress', (e) => {
+                        if (e.lengthComputable) {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            if (progressFill) progressFill.style.width = `${percent}%`;
                         }
-                    };
-
-                    xhr.onerror = function() {
-                        if (progressBar) progressBar.style.display = 'none';
-                        if (statusElement) statusElement.innerText = "Erreur de réseau lors de l'upload.";
-                        reject(new Error('Erreur de réseau'));
-                    };
-
+                    });
+                    xhr.onload = () => resolve(JSON.parse(xhr.responseText).secure_url);
+                    xhr.onerror = () => reject("Erreur reseau");
                     xhr.send(formData);
                 });
             },
 
-            // CORRECTION: Assure l'affichage après la publication
             publish: async function() {
-                if(!this.data.user) return alert("Veuillez vous connecter pour publier.");
-                
+                if(!this.data.user) return alert("Connectez-vous.");
                 const title = document.getElementById('upTitle').value;
                 const videoFile = document.getElementById('upVideoFile').files[0];
                 const thumbFile = document.getElementById('upThumbFile').files[0];
@@ -553,31 +435,20 @@
                 const progressBar = document.getElementById('uploadProgressBar');
                 const progressFill = document.getElementById('uploadProgressFill');
 
-                if (!title || !videoFile || !thumbFile) return alert("Tous les champs sont requis.");
-
+                if (!title || !videoFile || !thumbFile) return alert("Champs requis.");
                 publishBtn.disabled = true;
                 
                 try {
-                    status.innerText = "1. Téléversement de la miniature...";
-                    progressFill.style.width = '0%';
+                    status.innerText = "Upload Miniature...";
                     const thumbUrl = await this.uploadCloudinary(thumbFile, 'image');
-                    if (!thumbUrl) throw new Error("Échec de l'upload de la miniature.");
-
-                    status.innerText = "2. Téléversement de la vidéo...";
-                    progressFill.style.width = '0%';
+                    status.innerText = "Upload Vidéo...";
                     const videoUrl = await this.uploadCloudinary(videoFile, 'video', status, progressFill, progressBar);
-                    if (!videoUrl) throw new Error("Échec de l'upload de la vidéo.");
 
                     let isShort = false;
                     const videoElement = document.createElement('video');
                     videoElement.src = URL.createObjectURL(videoFile);
                     await new Promise(resolve => videoElement.onloadedmetadata = resolve);
-                    if (videoElement.videoHeight > videoElement.videoWidth) {
-                        isShort = true;
-                    }
-                    URL.revokeObjectURL(videoElement.src);
-                    
-                    status.innerText = "3. Publication sur le Gist...";
+                    if (videoElement.videoHeight > videoElement.videoWidth) isShort = true;
                     
                     const newVideo = {
                         id: Date.now(),
@@ -587,36 +458,26 @@
                         author: this.data.user.name,
                         likes: 0,
                         dislikes: 0,
+                        views: 0, // Initialisation des vues
                         isShort: isShort,
                         comments: []
                     };
-
                     this.data.videos.unshift(newVideo);
                     await this.saveGist();
-
-                    status.innerText = "Publication réussie !";
                     this.closeModals();
-                    this.goHome(); // Affiche la nouvelle vidéo dans la grille
-                    alert("Vidéo publiée !");
-
+                    this.goHome();
                 } catch (e) {
-                    status.innerText = "Erreur lors de la publication. Voir la console F12.";
-                    console.error("Erreur de publication:", e);
-                } finally {
-                    publishBtn.disabled = false;
-                    progressBar.style.display = 'none';
-                }
+                    console.error(e);
+                    alert("Erreur publication.");
+                } finally { publishBtn.disabled = false; progressBar.style.display = 'none'; }
             },
-
-            // --- GESTION DES ABONNEMENTS ET VOTES ---
 
             toggleVote: async function(id, type) {
                 if(!this.data.user) return this.openLogin();
                 const v = this.data.videos.find(x => x.id == id);
                 if (!v) return;
                 const currentVote = this.data.votes[id] || 0;
-                v.likes = v.likes || 0;
-                v.dislikes = v.dislikes || 0;
+                v.likes = v.likes || 0; v.dislikes = v.dislikes || 0;
                 if (type === 'like') {
                     if (currentVote === 1) { v.likes--; this.data.votes[id] = 0; } 
                     else if (currentVote === -1) { v.dislikes--; v.likes++; this.data.votes[id] = 1; } 
@@ -626,57 +487,48 @@
                     else if (currentVote === 1) { v.likes--; v.dislikes++; this.data.votes[id] = -1; } 
                     else { v.dislikes++; this.data.votes[id] = -1; }
                 }
-                this.saveLocal();
-                await this.saveGist();
-                this.openVideoOverlay(id);
+                this.saveLocal(); await this.saveGist(); this.openVideoOverlay(id);
             },
             
             toggleSub: async function(author) {
                 if(!this.data.user) return this.openLogin();
-                const myUserName = this.data.user.name;
-
                 const index = this.data.subs.indexOf(author);
-                if (index > -1) {
-                    this.data.subs.splice(index, 1); 
-                } else {
-                    this.data.subs.push(author); 
-                }
+                if (index > -1) this.data.subs.splice(index, 1);
+                else this.data.subs.push(author);
                 this.saveLocal(); 
-
-                if (!this.data.users[myUserName]) {
-                    this.data.users[myUserName] = { name: myUserName, email: this.data.user.email };
-                }
-                this.data.users[myUserName].subs = this.data.subs;
-                
-                await this.saveGist();
-                this.viewProfile(author); 
+                if (!this.data.users[this.data.user.name]) this.data.users[this.data.user.name] = { name: this.data.user.name, email: this.data.user.email };
+                this.data.users[this.data.user.name].subs = this.data.subs;
+                await this.saveGist(); this.viewProfile(author); 
             },
 
-            // --- GESTION ADMIN ---
-            isAdmin: function() {
-                return this.data.user && this.data.admins.includes(this.data.user.email);
-            },
+            isAdmin: function() { return this.data.user && this.data.admins.includes(this.data.user.email); },
+            
             goAdminPanel: function() {
-                if (!this.isAdmin()) return alert("Accès refusé. Vous n'êtes pas administrateur.");
-                this.hideAll();
-                document.getElementById('adminPanel').style.display = 'block';
-                this.renderAdminVideoList();
-                this.renderAdminList();
+                if (!this.isAdmin()) return alert("Accès refusé.");
+                this.hideAll(); document.getElementById('adminPanel').style.display = 'block';
+                this.renderAdminVideoList(); this.renderAdminList();
             },
             
-            // --- RENDERING ET NAVIGATION (Mise à jour des noms des fonctions pour la lisibilité) ---
+            // NOUVEAU: Fonction Historique
+            goHistory: function() {
+                this.hideAll();
+                document.getElementById('videoGrid').style.display = 'grid';
+                document.getElementById('mainTitle').innerHTML = "<h2>🕒 Mon Historique</h2>";
+                // Récupère les objets vidéos à partir des IDs de l'historique
+                const list = this.data.history.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
+                this.render(list);
+            },
 
             render: function(list, target = 'videoGrid') {
                 const targetElement = document.getElementById(target);
+                if (list.length === 0) { targetElement.innerHTML = "<p style='color:#aaa; padding:20px;'>Rien à afficher.</p>"; return; }
                 targetElement.innerHTML = list.map(v => `
                     <div class="video-card" onclick="app.openVideoOverlay(${v.id})">
-                        <div class="thumb-container">
-                            <img src="${v.thumb}" class="thumb" alt="${v.title}">
-                        </div>
+                        <div class="thumb-container"><img src="${v.thumb}" class="thumb"></div>
                         <div style="padding-top: 8px;">
                             <h3 style="margin: 0 0 4px 0; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${v.title}</h3>
-                            <p style="margin: 0; font-size: 14px; color: var(--sec-text); cursor:pointer;" onclick="event.stopPropagation(); app.viewProfile('${v.author}')">${v.author}</p>
-                            <p style="margin: 0; font-size: 13px; color: var(--sec-text);">${v.likes || 0} J'aime</p>
+                            <p style="margin: 0; font-size: 14px; color: var(--sec-text);">${v.author}</p>
+                            <p style="margin: 0; font-size: 12px; color: var(--sec-text);">${v.views || 0} vues • Il y a ${this.timeAgo(v.id)}</p>
                         </div>
                     </div>
                 `).join('');
@@ -686,8 +538,7 @@
                 this.hideAll(); 
                 document.getElementById('videoGrid').style.display = 'grid'; 
                 document.getElementById('mainTitle').innerHTML = "<h2>Accueil</h2>"; 
-                // Affiche toutes les vidéos qui ne sont PAS des shorts
-                this.render(this.data.videos.filter(v => !v.isShort)); 
+                this.render(this.data.videos.filter(v => !v.isShort));
             },
             
             goShorts: function() { 
@@ -695,10 +546,10 @@
                 const g = document.getElementById('shortsGrid'); 
                 g.style.display = 'flex'; 
                 document.getElementById('mainTitle').innerHTML = "<h2>⚡ Zapp</h2>"; 
-                
                 g.innerHTML = this.data.videos.filter(x => x.isShort).map(s => `
                     <div class="short-card" onclick="app.openVideoOverlay(${s.id})">
-                        <img src="${s.thumb}" alt="${s.title}">
+                        <img src="${s.thumb}">
+                        <div style="position:absolute; bottom:10px; left:10px; font-size:12px; font-weight:bold; color:white; text-shadow: 1px 1px 2px black;">${s.title}</div>
                     </div>
                 `).join(''); 
             },
@@ -708,55 +559,48 @@
                 this.hideAll(); 
                 document.getElementById('videoGrid').style.display = 'grid'; 
                 document.getElementById('mainTitle').innerHTML = "<h2>Mes suivis</h2>"; 
-                const vids = this.data.videos.filter(x => this.data.subs.includes(x.author)); 
-                this.render(vids); 
+                this.render(this.data.videos.filter(x => this.data.subs.includes(x.author))); 
             },
             
             search: function() {
                 const term = document.getElementById('searchInput').value.toLowerCase();
-                const results = this.data.videos.filter(v => 
-                    v.title.toLowerCase().includes(term) || 
-                    v.author.toLowerCase().includes(term)
-                );
                 this.hideAll();
                 document.getElementById('videoGrid').style.display = 'grid';
                 document.getElementById('mainTitle').innerHTML = `<h2>Résultats pour "${term}"</h2>`;
-                this.render(results);
+                this.render(this.data.videos.filter(v => v.title.toLowerCase().includes(term) || v.author.toLowerCase().includes(term)));
             },
 
             hideAll: function() { 
                 ['videoGrid', 'shortsGrid', 'profileView', 'adminPanel'].forEach(id => document.getElementById(id).style.display = 'none');
             },
             
-            // --- GESTION DU LECTEUR ET COMMENTAIRES ---
-            openVideoOverlay: function(id) {
+            openVideoOverlay: async function(id) {
                 const v = this.data.videos.find(x => x.id == id);
                 if (!v) return;
                 
+                // NOUVEAU: Gestion des vues
+                v.views = (v.views || 0) + 1;
+                
+                // NOUVEAU: Gestion Historique
+                this.data.history = [id, ...this.data.history.filter(x => x !== id)].slice(0, 50);
+                this.saveLocal();
+
                 document.getElementById('playerModal').style.display = 'block';
-                
-                const videoContainer = document.getElementById('videoContainer');
                 const player = document.getElementById('mainVideoPlayer');
-                
-                videoContainer.className = ''; 
-
-                if (v.isShort) {
-                    videoContainer.classList.add('short-player-wrapper');
-                } else {
-                    videoContainer.classList.add('video-wrapper');
-                }
-
                 player.src = v.url;
                 document.getElementById('playerTitle').innerText = v.title;
+                document.getElementById('playerMeta').innerText = `${v.views} vues • Il y a ${this.timeAgo(v.id)}`;
+
                 const currentVote = this.data.votes[id] || 0;
-                const likeBtn = `<button class="action-pill ${currentVote === 1 ? 'liked' : ''}" onclick="app.toggleVote(${id}, 'like')">👍 ${v.likes || 0}</button>`;
-                const dislikeBtn = `<button class="action-pill ${currentVote === -1 ? 'disliked' : ''}" onclick="app.toggleVote(${id}, 'dislike')">👎 ${v.dislikes || 0}</button>`;
                 document.getElementById('playerActions').innerHTML = `
-                    <img src="${this.getAvatar(v.author)}" class="avatar-small" onclick="event.stopPropagation(); app.viewProfile('${v.author}')" style="margin-right: 10px;">
-                    <h4 style="margin: 0; cursor:pointer;" onclick="event.stopPropagation(); app.viewProfile('${v.author}')">${v.author}</h4>
-                    ${likeBtn} ${dislikeBtn}
+                    <img src="${this.getAvatar(v.author)}" class="avatar-small" onclick="app.viewProfile('${v.author}')">
+                    <h4 style="margin: 0; cursor:pointer;" onclick="app.viewProfile('${v.author}')">${v.author}</h4>
+                    <button class="action-pill ${currentVote === 1 ? 'liked' : ''}" onclick="app.toggleVote(${id}, 'like')">👍 ${v.likes || 0}</button>
+                    <button class="action-pill ${currentVote === -1 ? 'disliked' : ''}" onclick="app.toggleVote(${id}, 'dislike')">👎 ${v.dislikes || 0}</button>
                 `;
+                document.getElementById('videoContainer').className = v.isShort ? 'short-player-wrapper' : 'video-wrapper';
                 this.renderComments(v);
+                await this.saveGist(); // Enregistre la nouvelle vue sur le Gist
             },
             
             closePlayer: function() { 
@@ -767,19 +611,10 @@
 
             renderComments: function(video) {
                 const list = document.getElementById('commentList');
-                const count = document.getElementById('commentCount');
-                count.innerText = `Commentaires (${video.comments?.length || 0})`;
-                
-                const commentInputArea = document.querySelector('.comment-input-area');
-                if (this.data.user) {
-                    document.getElementById('userCommentAvatar').src = this.getAvatar(this.data.user.name);
-                    commentInputArea.style.display = 'flex'; // Affiche l'input si connecté
-                } else {
-                    commentInputArea.style.display = 'none'; // Cache l'input si déconnecté
-                }
-
-                list.innerHTML = video.comments.map(c => `
-                    <div style="display:flex; gap:10px; margin-bottom:15px; align-items:flex-start;">
+                document.getElementById('commentCount').innerText = `Commentaires (${video.comments?.length || 0})`;
+                if (this.data.user) document.getElementById('userCommentAvatar').src = this.getAvatar(this.data.user.name);
+                list.innerHTML = (video.comments || []).map(c => `
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
                         <img src="${this.getAvatar(c.author)}" class="avatar-small">
                         <div>
                             <span style="font-weight:bold; font-size:14px;">${c.author}</span>
@@ -792,70 +627,39 @@
             
             addComment: async function() {
                 if(!this.data.user) return this.openLogin();
-                const commentInput = document.getElementById('newCommentInput');
-                const text = commentInput.value.trim();
-                const videoElement = document.getElementById('mainVideoPlayer');
-                if (!text || !videoElement.src) return;
-                
-                const currentVideoUrl = videoElement.src;
-                const video = this.data.videos.find(v => v.url === currentVideoUrl);
-                if (!video) return;
-                
-                const newComment = {
-                    author: this.data.user.name,
-                    text: text,
-                    time: Date.now()
-                };
-                
-                // Si 'comments' n'existe pas, l'initialiser
-                if (!video.comments) {
-                    video.comments = [];
-                }
-
-                video.comments.push(newComment);
-                commentInput.value = '';
-                this.renderComments(video);
-                await this.saveGist();
+                const text = document.getElementById('newCommentInput').value.trim();
+                const video = this.data.videos.find(v => v.url === document.getElementById('mainVideoPlayer').src);
+                if (!text || !video) return;
+                video.comments.unshift({ author: this.data.user.name, text: text, time: Date.now() });
+                document.getElementById('newCommentInput').value = '';
+                this.renderComments(video); await this.saveGist();
             },
             
-            // --- MODAL UTILS ---
             toggleAccountMenu: function() { const m = document.getElementById('accountMenu'); m.style.display = m.style.display === 'none' ? 'block' : 'none'; },
-            
-            closeModals: function() { 
-                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-                document.getElementById('upTitle').value = '';
-                document.getElementById('upVideoFile').value = '';
-                document.getElementById('upThumbFile').value = '';
-                document.getElementById('uploadStatus').innerText = '';
-                document.getElementById('uploadProgressBar').style.display = 'none';
-            },
-
+            closeModals: function() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); },
             openUpload: function() { if(!this.data.user) return this.openLogin(); document.getElementById('modalUpload').style.display='flex'; },
             openEditProfile: function() { 
                 if(!this.data.user) return this.openLogin();
                 const profile = this.data.users[this.data.user.name] || {};
                 document.getElementById('editName').value = profile.name || this.data.user.name;
                 document.getElementById('editBio').value = profile.bio || '';
-                document.getElementById('editPPFile').value = '';
-                document.getElementById('editBannerFile').value = '';
                 document.getElementById('modalEditProfile').style.display='flex'; 
             },
-            openLogin: function() { this.closeModals(); document.getElementById('modalLoginEmail').style.display='flex'; },
+            openLogin: function() { document.getElementById('modalLoginEmail').style.display='flex'; },
 
             // --- FONCTIONS ADMIN ---
             renderAdminVideoList: function() {
                 const list = document.getElementById('adminVideoList');
-                const videos = this.data.videos;
                 list.innerHTML = `<table class="admin-table">
                     <thead><tr><th>ID</th><th>Titre</th><th>Auteur</th><th>Actions</th></tr></thead>
-                    <tbody>${videos.map(v => `
+                    <tbody>${this.data.videos.map(v => `
                         <tr>
                             <td>${v.id}</td>
-                            <td id="title-${v.id}">${v.title}</td>
+                            <td>${v.title}</td>
                             <td>${v.author}</td>
                             <td>
-                                <button class="action-pill" onclick="app.openAdminEditModal(${v.id}, '${v.title.replace(/'/g, "\\'")}')">✎ Modifier</button>
-                                <button class="action-pill btn-red" onclick="app.deleteVideo(${v.id})">❌ Supprimer</button>
+                                <button class="action-pill" onclick="app.openAdminEditModal(${v.id}, '${v.title.replace(/'/g, "\\'")}')">✎</button>
+                                <button class="action-pill btn-red" onclick="app.deleteVideo(${v.id})">❌</button>
                             </td>
                         </tr>
                     `).join('')}</tbody>
@@ -871,61 +675,40 @@
                 const index = this.data.videos.findIndex(v => v.id == this.currentEditVideoId);
                 if (index > -1 && newTitle.trim()) {
                     this.data.videos[index].title = newTitle.trim();
-                    document.getElementById(`title-${this.currentEditVideoId}`).innerText = newTitle.trim();
-                    this.closeModals();
-                    await this.saveGist();
-                    alert("Titre de la vidéo mis à jour.");
-                    this.goAdminPanel(); 
-                } else { alert("Titre invalide ou vidéo non trouvée."); }
+                    this.closeModals(); await this.saveGist(); this.goAdminPanel(); 
+                }
             },
             deleteVideo: async function(id) {
-                if (!confirm("Voulez-vous vraiment supprimer cette vidéo ?")) return;
+                if (!confirm("Supprimer ?")) return;
                 this.data.videos = this.data.videos.filter(v => v.id != id);
-                await this.saveGist();
-                alert("Vidéo supprimée.");
-                this.goAdminPanel(); 
+                await this.saveGist(); this.goAdminPanel(); 
             },
             renderAdminList: function() {
                 const list = document.getElementById('adminList');
-                const isPrimary = this.data.user && this.data.user.email === PRIMARY_ADMIN_EMAIL;
                 list.innerHTML = `<table class="admin-table">
-                    <thead><tr><th>Email Admin</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Email</th><th>Action</th></tr></thead>
                     <tbody>${this.data.admins.map(email => `
-                            <tr>
-                                <td>${email}</td>
-                                <td>
-                                    ${email === PRIMARY_ADMIN_EMAIL ? '⭐ Admin Principal' :
-                                        (isPrimary ? `<button class="action-pill btn-red" onclick="app.removeAdmin('${email}')">❌ Retirer</button>` : 'Opération non autorisée')
-                                    }
-                                </td>
-                            </tr>
-                        `).join('')}</tbody>
-                    </table>`;
+                        <tr>
+                            <td>${email}</td>
+                            <td>${email === PRIMARY_ADMIN_EMAIL ? '⭐' : `<button class="action-pill btn-red" onclick="app.removeAdmin('${email}')">❌</button>`}</td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>`;
             },
             addAdmin: async function() {
-                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut ajouter des admins.");
+                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut le faire.");
                 const newEmail = document.getElementById('newAdminEmail').value.trim();
                 if (newEmail && !this.data.admins.includes(newEmail)) {
-                    this.data.admins.push(newEmail);
-                    document.getElementById('newAdminEmail').value = '';
-                    await this.saveGist();
-                    alert(`Admin ${newEmail} ajouté !`);
-                    this.renderAdminList();
-                    this.updateAuthUI(); 
-                } else { alert("Email invalide ou déjà admin."); }
+                    this.data.admins.push(newEmail); await this.saveGist(); this.renderAdminList();
+                }
             },
             removeAdmin: async function(email) {
-                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut retirer des admins.");
-                if (email === PRIMARY_ADMIN_EMAIL) return alert("Impossible de retirer l'Admin Principal.");
                 this.data.admins = this.data.admins.filter(e => e !== email);
-                await this.saveGist();
-                alert(`Admin ${email} retiré.`);
-                this.renderAdminList();
+                await this.saveGist(); this.renderAdminList();
             },
         };
 
         app.init();
     </script>
 </body>
-</html>
 </html>
