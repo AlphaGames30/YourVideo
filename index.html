@@ -159,11 +159,15 @@
                 </div>
 
                 <div class="profile-tabs">
-                    <div class="profile-tab active" id="tabVideos" onclick="app.showProfileTab('videos')">Vidéos (Publications)</div>
+                    <div class="profile-tab active" id="tabContent" onclick="app.showProfileTab('content')">Vidéos & Zapp</div>
+                    <div class="profile-tab" id="tabPosts" onclick="app.showProfileTab('posts')">Publications (Posts)</div>
                     <div class="profile-tab" id="tabAbout" onclick="app.showProfileTab('about')">À Propos</div>
                 </div>
 
-                <div id="pVideos" class="video-grid" style="padding: 20px;"></div>
+                <div id="pContent" class="video-grid" style="padding: 20px;"></div>
+                <div id="pPosts" style="padding: 20px; display: none;">
+                    <p style='color:#aaa;'>Cette section est dédiée aux posts de type "Communauté" (texte, image, sondage) du créateur. Aucune publication disponible pour le moment.</p>
+                </div>
                 <div id="pAbout" style="padding: 20px; display: none;">
                     <h3 style="margin-top:0;">Description</h3>
                     <p id="pAboutBio"></p>
@@ -441,7 +445,7 @@
 
                     localUserCreds[email] = { email, name, pass };
                     localStorage.setItem('mt_user_creds', JSON.stringify(localUserCreds));
-                    this.data.users[name] = { name, email, bio: "Nouveau créateur Visiona", avatar: "", banner: "" };
+                    this.data.users[name] = { name, email, bio: "Nouveau créateur Visiona", avatar: "", banner: "", followers: {} };
                     this.data.user = localUserCreds[email];
                     this.saveLocal(); await this.saveGist(); location.reload();
                 } else if (s == 3) { 
@@ -694,80 +698,6 @@
                     </div>
                 `).join('');
             },
-            // =================================================================
-            // BLOC MANQUANT À INSÉRER ENTRE app.render et app.openShortsPlayer
-            // =================================================================
-
-            openLogin: function() {
-                document.getElementById('modalLogin').style.display = 'flex';
-                document.getElementById('logEmail').value = '';
-            },
-
-            closeModals: function() {
-                ['modalLogin', 'modalLoginPass', 'modalLoginRegister', 'modalEditVideo', 'modalBroadcast', 'modalEditProfile'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.style.display = 'none';
-                });
-                // Fermer l'overlay du lecteur si ouvert
-                this.closePlayer(); 
-                // Fermer le menu latéral
-                document.getElementById('sidebar').style.left = '-250px';
-            },
-
-            openEditProfile: function() {
-                if(!this.data.user) return this.openLogin();
-                const userName = this.data.user.name;
-                const profile = this.data.users[userName] || { name: userName, bio: "" };
-                
-                document.getElementById('editBio').value = profile.bio || '';
-                
-                document.getElementById('modalEditProfile').style.display = 'flex';
-            },
-
-            // FONCTION viewProfile CORRIGÉE ET COMPLÉTÉE
-            viewProfile: function(authorName) {
-                this.closePlayer(); 
-                this.hideAll();
-                this.currentProfileAuthor = authorName; 
-                const v = document.getElementById('profileView');
-                v.style.display = 'block';
-
-                // CORRECTION 1: Ajout de 'followers: {}' aux valeurs par défaut
-                const profile = this.data.users[authorName] || { name: authorName, bio: "Créateur sans profil public.", avatar: "", banner: "", followers: {} };
-                
-                const videos = this.data.videos.filter(x => x.author === authorName);
-                const isMyProfile = this.data.user && this.data.user.name === authorName;
-                
-                // CORRECTION 2: Lecture du compteur à partir de l'objet 'followers' global (remplace l'ancienne boucle)
-                const followerCount = Object.keys(profile.followers || {}).length;
-
-                document.getElementById('pBanner').src = profile.banner || '';
-                document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
-                document.getElementById('pName').innerText = profile.name;
-                document.getElementById('pStats').innerText = `${followerCount} abonnés • ${videos.length} vidéos`; 
-                
-                const actions = document.getElementById('profileActions');
-                actions.innerHTML = '';
-                if (isMyProfile) {
-                    actions.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
-                } else if (this.data.user) {
-                    actions.innerHTML = this.getSubscriptionButton(authorName);
-                }
-
-                // Populate About tab
-                document.getElementById('pAboutBio').innerText = profile.bio;
-                document.getElementById('pAboutStats').innerHTML = `
-                    <p>Total vues : ${videos.reduce((sum, v) => sum + (v.views || 0), 0)}</p>
-                    <p>Total abonnés : ${followerCount}</p>
-                `;
-
-                this.render(videos, 'pVideos');
-                this.showProfileTab('videos'); 
-            },
-
-            // =================================================================
-            // FIN DU BLOC À INSÉRER
-            // =================================================================
 
             openShortsPlayer: function(id, listIds, index) {
                 this.currentShortsList = listIds;
@@ -1169,14 +1099,23 @@
 
             // NEW: Profile Tabs Logic
             showProfileTab: function(tabName) {
-                document.getElementById('tabVideos').classList.remove('active');
+                // Remove active class from all tabs
+                document.getElementById('tabContent').classList.remove('active');
+                document.getElementById('tabPosts').classList.remove('active');
                 document.getElementById('tabAbout').classList.remove('active');
-                document.getElementById('pVideos').style.display = 'none';
+
+                // Hide all content areas
+                document.getElementById('pContent').style.display = 'none';
+                document.getElementById('pPosts').style.display = 'none';
                 document.getElementById('pAbout').style.display = 'none';
 
-                if (tabName === 'videos') {
-                    document.getElementById('tabVideos').classList.add('active');
-                    document.getElementById('pVideos').style.display = 'grid';
+                // Show active tab and content
+                if (tabName === 'content') {
+                    document.getElementById('tabContent').classList.add('active');
+                    document.getElementById('pContent').style.display = 'grid';
+                } else if (tabName === 'posts') {
+                    document.getElementById('tabPosts').classList.add('active');
+                    document.getElementById('pPosts').style.display = 'block';
                 } else if (tabName === 'about') {
                     document.getElementById('tabAbout').classList.add('active');
                     document.getElementById('pAbout').style.display = 'block';
@@ -1211,11 +1150,9 @@
                 const profile = this.data.users[authorName] || { name: authorName, bio: "Aucune description.", avatar: "", banner: "" };
                 const videos = this.data.videos.filter(x => x.author === authorName);
                 const isMyProfile = this.data.user && this.data.user.name === authorName;
-                let followerCount = 0;
-                for (const userName in this.data.users) {
-                    // Check if *other* users have this author in their subs list with level > 0
-                    if (this.data.users[userName]?.subs && (this.data.users[userName].subs[authorName] > 0)) followerCount++;
-                }
+
+                // FIX: Logique de comptage d'abonnés
+                const followerCount = Object.keys(profile.followers || {}).length;
 
                 document.getElementById('pBanner').src = profile.banner || '';
                 document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
@@ -1237,8 +1174,10 @@
                     <p>Total abonnés : ${followerCount}</p>
                 `;
 
-                this.render(videos, 'pVideos');
-                this.showProfileTab('videos'); 
+                // Rendre les Vidéos et Zapp (Publications Vidéo) dans le nouvel ID pContent
+                this.render(videos, 'pContent');
+                // Afficher le nouvel onglet par défaut
+                this.showProfileTab('content'); 
             },
 
             openEditProfile: function() { 
@@ -1256,7 +1195,7 @@
                 const ban = document.getElementById('editBannerFile').files[0];
                 const status = document.getElementById('profileUploadStatus');
                 const userName = this.data.user.name; 
-                let userData = this.data.users[userName] || { name: userName, email: this.data.user.email, subs: {} }; 
+                let userData = this.data.users[userName] || { name: userName, email: this.data.user.email, followers: {} }; 
                 if(bio) userData.bio = bio;
                 status.innerText = "Traitement...";
                 try {
