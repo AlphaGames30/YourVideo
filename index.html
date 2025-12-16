@@ -694,6 +694,80 @@
                     </div>
                 `).join('');
             },
+            // =================================================================
+            // BLOC MANQUANT À INSÉRER ENTRE app.render et app.openShortsPlayer
+            // =================================================================
+
+            openLogin: function() {
+                document.getElementById('modalLogin').style.display = 'flex';
+                document.getElementById('logEmail').value = '';
+            },
+
+            closeModals: function() {
+                ['modalLogin', 'modalLoginPass', 'modalLoginRegister', 'modalEditVideo', 'modalBroadcast', 'modalEditProfile'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+                // Fermer l'overlay du lecteur si ouvert
+                this.closePlayer(); 
+                // Fermer le menu latéral
+                document.getElementById('sidebar').style.left = '-250px';
+            },
+
+            openEditProfile: function() {
+                if(!this.data.user) return this.openLogin();
+                const userName = this.data.user.name;
+                const profile = this.data.users[userName] || { name: userName, bio: "" };
+                
+                document.getElementById('editBio').value = profile.bio || '';
+                
+                document.getElementById('modalEditProfile').style.display = 'flex';
+            },
+
+            // FONCTION viewProfile CORRIGÉE ET COMPLÉTÉE
+            viewProfile: function(authorName) {
+                this.closePlayer(); 
+                this.hideAll();
+                this.currentProfileAuthor = authorName; 
+                const v = document.getElementById('profileView');
+                v.style.display = 'block';
+
+                // CORRECTION 1: Ajout de 'followers: {}' aux valeurs par défaut
+                const profile = this.data.users[authorName] || { name: authorName, bio: "Créateur sans profil public.", avatar: "", banner: "", followers: {} };
+                
+                const videos = this.data.videos.filter(x => x.author === authorName);
+                const isMyProfile = this.data.user && this.data.user.name === authorName;
+                
+                // CORRECTION 2: Lecture du compteur à partir de l'objet 'followers' global (remplace l'ancienne boucle)
+                const followerCount = Object.keys(profile.followers || {}).length;
+
+                document.getElementById('pBanner').src = profile.banner || '';
+                document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
+                document.getElementById('pName').innerText = profile.name;
+                document.getElementById('pStats').innerText = `${followerCount} abonnés • ${videos.length} vidéos`; 
+                
+                const actions = document.getElementById('profileActions');
+                actions.innerHTML = '';
+                if (isMyProfile) {
+                    actions.innerHTML = `<button class="action-pill btn-blue" onclick="app.openEditProfile()">Personnaliser la chaîne</button>`;
+                } else if (this.data.user) {
+                    actions.innerHTML = this.getSubscriptionButton(authorName);
+                }
+
+                // Populate About tab
+                document.getElementById('pAboutBio').innerText = profile.bio;
+                document.getElementById('pAboutStats').innerHTML = `
+                    <p>Total vues : ${videos.reduce((sum, v) => sum + (v.views || 0), 0)}</p>
+                    <p>Total abonnés : ${followerCount}</p>
+                `;
+
+                this.render(videos, 'pVideos');
+                this.showProfileTab('videos'); 
+            },
+
+            // =================================================================
+            // FIN DU BLOC À INSÉRER
+            // =================================================================
 
             openShortsPlayer: function(id, listIds, index) {
                 this.currentShortsList = listIds;
