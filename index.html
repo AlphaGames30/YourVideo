@@ -166,8 +166,7 @@
 
                 <div id="pContent" class="video-grid" style="padding: 20px;"></div>
                 <div id="pPosts" style="padding: 20px; display: none;">
-                    <p style='color:#aaa;'>Cette section est dédiée aux posts de type "Communauté" (texte, image, sondage) du créateur. Aucune publication disponible pour le moment.</p>
-                </div>
+                    </div>
                 <div id="pAbout" style="padding: 20px; display: none;">
                     <h3 style="margin-top:0;">Description</h3>
                     <p id="pAboutBio"></p>
@@ -254,6 +253,15 @@
             </div>
         </div>
     </div>
+    
+    <div id="modalUploadChoice" class="modal">
+        <div class="modal-box">
+            <h2>Que voulez-vous créer ?</h2>
+            <button class="btn-blue" style="margin-top:10px;" onclick="app.openUpload('video')">🎬 Vidéo / Zapp</button>
+            <button class="btn-blue" style="margin-top:10px; background:#444;" onclick="app.openUpload('post')">📝 Publication Communautaire</button>
+            <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Annuler</button>
+        </div>
+    </div>
 
     <div id="modalUpload" class="modal">
         <div class="modal-box">
@@ -266,6 +274,18 @@
             <label style="color:#aaa; font-size:12px; display:block;">Miniature (Image de couverture)</label>
             <input type="file" id="upThumbFile" accept="image/*" style="margin-bottom: 20px;">
             <button class="btn-blue" id="publishBtn" onclick="app.publish()">PUBLIER</button>
+            <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Annuler</button>
+        </div>
+    </div>
+    
+    <div id="modalNewPost" class="modal">
+        <div class="modal-box">
+            <h2>Créer une Publication (Post)</h2>
+            <p id="postUploadStatus" style="color: var(--blue); font-size:14px; text-align:center;"></p>
+            <textarea id="postContent" placeholder="Quoi de neuf ? Partagez vos pensées..." rows="4"></textarea>
+            <label style="color:#aaa; font-size:12px; display:block; margin-top:10px;">Image optionnelle</label>
+            <input type="file" id="postImageFile" accept="image/*" style="margin-bottom: 20px;">
+            <button class="btn-blue" id="publishPostBtn" onclick="app.publishPost()">PUBLIER LE POST</button>
             <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Annuler</button>
         </div>
     </div>
@@ -340,7 +360,7 @@
                 this.updateAuthUI();
                 this.trackSessionTime();
                 this.checkAnnouncement();
-                this.goHome(); // Navigue à l'accueil au démarrage
+                this.goHome(); 
                 
                 if (this.isAdmin()) {
                     document.getElementById('adminFloatButton').style.display = 'flex';
@@ -445,7 +465,7 @@
 
                     localUserCreds[email] = { email, name, pass };
                     localStorage.setItem('mt_user_creds', JSON.stringify(localUserCreds));
-                    this.data.users[name] = { name, email, bio: "Nouveau créateur Visiona", avatar: "", banner: "", followers: {} };
+                    this.data.users[name] = { name, email, bio: "Nouveau créateur Visiona", avatar: "", banner: "", followers: {}, posts: [] }; // Ajout de posts
                     this.data.user = localUserCreds[email];
                     this.saveLocal(); await this.saveGist(); location.reload();
                 } else if (s == 3) { 
@@ -494,7 +514,7 @@
             },
 
             // =================================================================
-            // FIX: FONCTIONS DE NAVIGATION COMPLÈTES ET ROBUSTES
+            // FONCTIONS DE NAVIGATION
             // =================================================================
             
             hideAll: function() { 
@@ -509,7 +529,6 @@
                 this.hideAll();
                 document.getElementById('videoGrid').style.display = 'grid';
                 document.getElementById('mainTitle').innerHTML = "<h2>Accueil</h2>";
-                // Affiche toutes les vidéos qui ne sont PAS des Shorts
                 this.render(this.data.videos.filter(v => !v.isShort)); 
             },
 
@@ -526,10 +545,9 @@
                      return;
                 }
                 
-                // Rendu de la grille Shorts (avec l'index et la liste pour la navigation)
                 shortsGrid.innerHTML = shorts.map((v, index) => `
                     <div class="short-card" onclick="app.openShortsPlayer(${v.id}, [${shorts.map(s => s.id)}], ${index})">
-                        <img src="${v.thumb}" alt="${v.title}">
+                        <div class="thumb-container" style="aspect-ratio: 9/16; border-radius: 0;"><img src="${v.thumb}" class="thumb"></div>
                         <div style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 10px; background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0)); color: white;">
                             <h3 style="margin: 0; font-size: 14px;">${v.title}</h3>
                             <p style="margin: 2px 0 0 0; font-size: 12px; color: #ccc;">${v.author}</p>
@@ -543,7 +561,6 @@
                 this.hideAll(); 
                 document.getElementById('videoGrid').style.display = 'grid'; 
                 document.getElementById('mainTitle').innerHTML = "<h2>Mes suivis</h2>"; 
-                // Filtre les vidéos par les auteurs auxquels l'utilisateur est abonné (level > 0)
                 const subscribedAuthors = Object.keys(this.data.subs);
                 this.render(this.data.videos.filter(x => subscribedAuthors.includes(x.author))); 
             },
@@ -553,10 +570,9 @@
                 this.hideAll(); 
                 document.getElementById('videoGrid').style.display = 'grid'; 
                 document.getElementById('mainTitle').innerHTML = "<h2>Historique</h2>"; 
-                // Récupère les vidéos dans l'ordre de l'historique
                 const historyVideos = this.data.history
                     .map(id => this.data.videos.find(v => v.id == id))
-                    .filter(v => v); // Retire les vidéos qui n'existent plus
+                    .filter(v => v); 
                 this.render(historyVideos); 
             },
             
@@ -573,10 +589,8 @@
                 const videosWatched = this.data.history.length;
                 const channelsFollowed = Object.keys(this.data.subs).length; 
                 
-                // CORRECTION: LECTURE DIRECTE DU NOMBRE D'ABONNÉS DEPUIS LE PROFIL
                 const myProfile = this.data.users[userName];
                 let followers = Object.keys(myProfile?.followers || {}).length; 
-                // FIN DE LA CORRECTION
 
                 let likesReceived = 0;
                 let dislikesReceived = 0;
@@ -624,7 +638,7 @@
 
                 const followerName = this.data.user.name;
                 let userProfile = this.data.users[author];
-                userProfile.followers = userProfile.followers || {}; // Initialisation
+                userProfile.followers = userProfile.followers || {}; 
 
                 let currentLevel = this.data.subs[author] || 0;
                 let nextLevel;
@@ -636,10 +650,10 @@
 
                 if (nextLevel === 0) {
                     delete this.data.subs[author];
-                    delete userProfile.followers[followerName]; // Suppression de l'abonné
+                    delete userProfile.followers[followerName]; 
                 } else {
                     this.data.subs[author] = nextLevel;
-                    userProfile.followers[followerName] = nextLevel; // Ajout/Mise à jour de l'abonné
+                    userProfile.followers[followerName] = nextLevel; 
                 }
 
                 this.saveLocal(); 
@@ -669,7 +683,6 @@
                 let subButton = '';
                 if (this.data.user && this.data.user.name !== v.author) {
                     subButton = this.getSubscriptionButton(v.author);
-                    // Important: Close player to refresh context on the profile page
                     subButton = subButton.replace("onclick=\"app.toggleSub", "onclick=\"app.closePlayer(); app.toggleSub"); 
                 }
                 
@@ -739,7 +752,7 @@
                 const player = document.getElementById('mainVideoPlayer');
                 
                 player.src = v.url;
-                player.load(); // Force re-load for smooth navigation
+                player.load(); 
                 player.play().catch(e => console.log("Autoplay bloqué (navigateur)", e)); 
 
                 document.getElementById('playerTitle').innerText = v.title;
@@ -833,6 +846,51 @@
                     xhr.send(formData);
                 });
             },
+            
+            // NOUVELLE FONCTION : Publier un Post
+            publishPost: async function() {
+                if(!this.data.user) return alert("Connectez-vous.");
+                const content = document.getElementById('postContent').value.trim();
+                const imageFile = document.getElementById('postImageFile').files[0];
+                const status = document.getElementById('postUploadStatus');
+                const publishBtn = document.getElementById('publishPostBtn');
+
+                if (!content && !imageFile) return alert("Le post doit contenir du texte ou une image.");
+                publishBtn.disabled = true;
+                
+                try {
+                    let imageUrl = '';
+                    if (imageFile) {
+                        status.innerText = "Upload Image...";
+                        imageUrl = await this.uploadCloudinary(imageFile, 'image');
+                    }
+
+                    const newPost = {
+                        id: Date.now(),
+                        content: content,
+                        image: imageUrl,
+                        time: Date.now(),
+                    };
+                    
+                    const userName = this.data.user.name;
+                    let userData = this.data.users[userName] || { name: userName, email: this.data.user.email, followers: {} };
+                    userData.posts = userData.posts || [];
+                    userData.posts.unshift(newPost); // Ajout au début
+                    this.data.users[userName] = userData;
+
+                    await this.saveGist();
+                    this.closeModals();
+                    
+                    if (this.currentProfileAuthor === userName) {
+                        this.viewProfile(userName);
+                        this.showProfileTab('posts'); 
+                    }
+                    alert("Publication réussie !");
+                } catch (e) {
+                    console.error(e);
+                    alert("Erreur lors de la publication du post.");
+                } finally { publishBtn.disabled = false; status.innerText = ""; }
+            },
 
             publish: async function() {
                 if(!this.data.user) return alert("Connectez-vous.");
@@ -885,21 +943,13 @@
             },
             
             sendNewVideoNotifications: function(video) {
-                // Pour l'implémentation Monofichier, on affiche une notification pour l'auteur lui-même
-                // et on prépare la notif pour les abonnés de niveau 2 et 3 pour le prochain chargement
-                // (Bien que l'implémentation "push" en temps réel soit impossible sans serveur)
-                
-                // Si l'utilisateur est abonné à lui-même (peu probable), on le notifie.
                 const subLevel = this.data.subs[video.author] || 0;
                 
-                // Si l'utilisateur est abonné de niveau 2 ou 3 à la chaîne de l'auteur
                 if (subLevel >= 2) {
                     let message = `"${video.title.substring(0, 30)}..." est en ligne !`;
                     if (subLevel === 3) {
-                         // Suivre ++: La notification sera cliquable pour aller à la vidéo
                         this.showNotification(message, video.id); 
                     } else {
-                        // Suivre +: Simple notification d'alerte
                         this.showNotification(message);
                     }
                 }
@@ -921,10 +971,9 @@
             handleNotificationClick: function() {
                 document.getElementById('notificationToast').style.display = 'none';
                 if (this.activeNotificationVideoId) {
-                    // Pour Suivre ++, on ouvre la vidéo
                     this.openVideoOverlay(this.activeNotificationVideoId);
                 }
-                this.activeNotificationVideoId = null; // Clear ID
+                this.activeNotificationVideoId = null; 
             },
             
             toggleBanUser: async function() {
@@ -1099,17 +1148,14 @@
 
             // NEW: Profile Tabs Logic
             showProfileTab: function(tabName) {
-                // Remove active class from all tabs
                 document.getElementById('tabContent').classList.remove('active');
                 document.getElementById('tabPosts').classList.remove('active');
                 document.getElementById('tabAbout').classList.remove('active');
 
-                // Hide all content areas
                 document.getElementById('pContent').style.display = 'none';
                 document.getElementById('pPosts').style.display = 'none';
                 document.getElementById('pAbout').style.display = 'none';
 
-                // Show active tab and content
                 if (tabName === 'content') {
                     document.getElementById('tabContent').classList.add('active');
                     document.getElementById('pContent').style.display = 'grid';
@@ -1121,6 +1167,29 @@
                     document.getElementById('pAbout').style.display = 'block';
                 }
             },
+            
+            // NOUVELLE FONCTION : Rendu des publications communautaires
+            renderPosts: function(posts, target = 'pPosts', authorName) {
+                const targetElement = document.getElementById(target);
+                if (posts.length === 0) {
+                     targetElement.innerHTML = `<p style='color:#aaa;'>${authorName === this.data.user?.name ? 'Vous n\'avez encore fait aucune publication.' : 'Ce créateur n\'a fait aucune publication communautaire.'}</p>`;
+                     return;
+                }
+                
+                targetElement.innerHTML = posts.map(post => `
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <img src="${this.getAvatar(authorName)}" class="avatar-small">
+                            <div>
+                                <h4 style="margin: 0;">${authorName}</h4>
+                                <p style="margin: 0; font-size: 12px; color: var(--sec-text);">Il y a ${this.timeAgo(post.time)}</p>
+                            </div>
+                        </div>
+                        <p style="white-space: pre-wrap; margin-bottom: 15px;">${post.content}</p>
+                        ${post.image ? `<img src="${post.image}" style="width: 100%; max-height: 400px; object-fit: contain; border-radius: 8px; margin-top: 10px;">` : ''}
+                    </div>
+                `).join('');
+            },
 
             toggleAccountMenu: function() { 
                 const m = document.getElementById('accountMenu'); 
@@ -1131,10 +1200,21 @@
                 document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
             },
 
-            openUpload: function() { 
+            // FONCTION MISE À JOUR : Choix d'Upload
+            openUpload: function(type = 'choice') { 
                 if(!this.data.user) return this.openLogin(); 
-                document.getElementById('modalUpload').style.display='flex'; 
-                document.getElementById('uploadProgressBar').style.display = 'none';
+                this.closeModals();
+                if (type === 'video') {
+                    document.getElementById('modalUpload').style.display='flex'; 
+                    document.getElementById('uploadProgressBar').style.display = 'none';
+                } else if (type === 'post') {
+                    document.getElementById('modalNewPost').style.display='flex'; 
+                    document.getElementById('postContent').value = ''; 
+                    document.getElementById('postImageFile').value = ''; 
+                    document.getElementById('postUploadStatus').innerText = '';
+                } else {
+                    document.getElementById('modalUploadChoice').style.display='flex';
+                }
             },
 
             openLogin: function() { 
@@ -1147,17 +1227,16 @@
                 this.currentProfileAuthor = authorName; 
                 const v = document.getElementById('profileView');
                 v.style.display = 'block';
-                const profile = this.data.users[authorName] || { name: authorName, bio: "Aucune description.", avatar: "", banner: "" };
+                const profile = this.data.users[authorName] || { name: authorName, bio: "Aucune description.", avatar: "", banner: "", posts: [] };
                 const videos = this.data.videos.filter(x => x.author === authorName);
                 const isMyProfile = this.data.user && this.data.user.name === authorName;
 
-                // FIX: Logique de comptage d'abonnés
                 const followerCount = Object.keys(profile.followers || {}).length;
 
                 document.getElementById('pBanner').src = profile.banner || '';
                 document.getElementById('profileAvatar').src = profile.avatar || 'https://via.placeholder.com/120?text=U'; 
                 document.getElementById('pName').innerText = profile.name;
-                document.getElementById('pStats').innerText = `${followerCount} abonnés • ${videos.length} vidéos`; 
+                document.getElementById('pStats').innerText = `${followerCount} abonnés • ${videos.length} vidéos • ${profile.posts.length} publications`; 
                 
                 const actions = document.getElementById('profileActions');
                 actions.innerHTML = '';
@@ -1167,16 +1246,14 @@
                     actions.innerHTML = this.getSubscriptionButton(authorName);
                 }
 
-                // Populate About tab
                 document.getElementById('pAboutBio').innerText = profile.bio;
                 document.getElementById('pAboutStats').innerHTML = `
                     <p>Total vues : ${videos.reduce((sum, v) => sum + (v.views || 0), 0)}</p>
                     <p>Total abonnés : ${followerCount}</p>
                 `;
 
-                // Rendre les Vidéos et Zapp (Publications Vidéo) dans le nouvel ID pContent
                 this.render(videos, 'pContent');
-                // Afficher le nouvel onglet par défaut
+                this.renderPosts(profile.posts || [], 'pPosts', authorName); // Appel à la nouvelle fonction de rendu des posts
                 this.showProfileTab('content'); 
             },
 
