@@ -138,7 +138,7 @@
         <main class="content">
             <div id="mainTitle"></div>
             
-            <div id="videoGrid" class="video-grid"></div>
+            <div id="videoGrid" class="video-grid" style="display:none;"></div>
             <div id="shortsGrid" class="shorts-grid" style="display:none;"></div>
             
             <div id="statsView" class="stats-view">
@@ -302,10 +302,9 @@
                 videos: [],
                 users: {}, 
                 admins: [PRIMARY_ADMIN_EMAIL], 
-                bannedEmails: [], // NEW
-                announcement: null, // NEW
+                bannedEmails: [], 
+                announcement: null, 
                 votes: JSON.parse(localStorage.getItem('mt_votes')) || {},
-                // subs is now an object: { 'authorName': level (1, 2, or 3) }
                 subs: JSON.parse(localStorage.getItem('mt_subs')) || {}, 
                 history: JSON.parse(localStorage.getItem('mt_history')) || [], 
                 lastViewTimes: JSON.parse(localStorage.getItem('mt_last_views')) || {},
@@ -313,13 +312,12 @@
             },
             currentEditVideoId: null,
             currentPlayingVideoId: null,
-            currentProfileAuthor: null, // NEW: Stores the author name for the current profile view
+            currentProfileAuthor: null, 
             currentShortsList: [], 
             currentShortIndex: -1,
-            activeNotificationVideoId: null, // NEW: Video ID associated with the notification
+            activeNotificationVideoId: null, 
 
             init: async function() {
-                // Ensure subscriptions are properly initialized as an object (migration from old array)
                 if (Array.isArray(this.data.subs)) {
                     const newSubs = {};
                     this.data.subs.forEach(author => newSubs[author] = 1); 
@@ -329,7 +327,6 @@
                 
                 await this.loadData();
                 
-                // Ban Check: If user is banned, force log out
                 if (this.data.user && this.data.bannedEmails.includes(this.data.user.email)) {
                     alert("Votre compte a été banni. Déconnexion forcée.");
                     this.doLogout();
@@ -338,10 +335,9 @@
 
                 this.updateAuthUI();
                 this.trackSessionTime();
-                this.checkAnnouncement(); // NEW: Check for global announcement
-                this.goHome();
+                this.checkAnnouncement();
+                this.goHome(); // Navigue à l'accueil au démarrage
                 
-                // Show admin float button if user is admin
                 if (this.isAdmin()) {
                     document.getElementById('adminFloatButton').style.display = 'flex';
                 }
@@ -354,8 +350,8 @@
                     this.data.videos = json.videos || [];
                     this.data.users = json.users || {};
                     this.data.admins = json.admins || [PRIMARY_ADMIN_EMAIL];
-                    this.data.bannedEmails = json.bannedEmails || []; // NEW
-                    this.data.announcement = json.announcement || null; // NEW
+                    this.data.bannedEmails = json.bannedEmails || []; 
+                    this.data.announcement = json.announcement || null; 
                 } catch(e) { console.error("Load Error", e); }
             },
 
@@ -365,7 +361,6 @@
                     alert("ERREUR CRITIQUE: Le lien du Worker est manquant. La sauvegarde est impossible.");
                     return;
                 }
-                // Include new data fields
                 const content = { 
                     videos: this.data.videos, 
                     users: this.data.users, 
@@ -422,7 +417,6 @@
                 if (s == 1) { 
                     if (!email.includes('@')) return alert("Email invalide");
 
-                    // NEW: Ban check on log in attempt
                     if (this.data.bannedEmails.includes(email)) {
                         return alert("Vous êtes banni de Visiona.");
                     }
@@ -441,7 +435,6 @@
                     const pass = document.getElementById('logNewPass').value;
                     if (!name || pass.length < 4) return alert("Nom et mot de passe (min 4 caractères) sont requis.");
                     
-                    // NEW: Ban check before creating profile
                     if (this.data.bannedEmails.includes(email)) {
                         return alert("L'email que vous tentez d'utiliser est banni.");
                     }
@@ -468,7 +461,7 @@
                 localStorage.removeItem('mt_history'); 
                 localStorage.removeItem('mt_last_views'); 
                 localStorage.removeItem('mt_stats');
-                localStorage.removeItem('announcementDismissed'); // Reset announcement status
+                localStorage.removeItem('announcementDismissed');
                 location.reload(); 
             },
             
@@ -495,21 +488,88 @@
                     adminFloatButton.style.display = 'none';
                 }
             },
+
+            // =================================================================
+            // FIX: FONCTIONS DE NAVIGATION COMPLÈTES ET ROBUSTES
+            // =================================================================
+            
+            hideAll: function() { 
+                ['videoGrid', 'shortsGrid', 'profileView', 'adminPanel', 'statsView'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+            },
+
+            goHome: function() {
+                this.closePlayer();
+                this.hideAll();
+                document.getElementById('videoGrid').style.display = 'grid';
+                document.getElementById('mainTitle').innerHTML = "<h2>Accueil</h2>";
+                // Affiche toutes les vidéos qui ne sont PAS des Shorts
+                this.render(this.data.videos.filter(v => !v.isShort)); 
+            },
+
+            goShorts: function() {
+                this.closePlayer();
+                this.hideAll();
+                const shortsGrid = document.getElementById('shortsGrid');
+                shortsGrid.style.display = 'flex';
+                document.getElementById('mainTitle').innerHTML = "<h2>⚡ Zapp</h2>";
+                
+                const shorts = this.data.videos.filter(v => v.isShort);
+                if (shorts.length === 0) {
+                     shortsGrid.innerHTML = "<p style='color:#aaa; padding:20px;'>Aucun Short à afficher pour le moment.</p>";
+                     return;
+                }
+                
+                // Rendu de la grille Shorts (avec l'index et la liste pour la navigation)
+                shortsGrid.innerHTML = shorts.map((v, index) => `
+                    <div class="short-card" onclick="app.openShortsPlayer(${v.id}, [${shorts.map(s => s.id)}], ${index})">
+                        <img src="${v.thumb}" alt="${v.title}">
+                        <div style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 10px; background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0)); color: white;">
+                            <h3 style="margin: 0; font-size: 14px;">${v.title}</h3>
+                            <p style="margin: 2px 0 0 0; font-size: 12px; color: #ccc;">${v.author}</p>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            goSubs: function() { 
+                if(!this.data.user) return this.openLogin(); 
+                this.hideAll(); 
+                document.getElementById('videoGrid').style.display = 'grid'; 
+                document.getElementById('mainTitle').innerHTML = "<h2>Mes suivis</h2>"; 
+                // Filtre les vidéos par les auteurs auxquels l'utilisateur est abonné (level > 0)
+                const subscribedAuthors = Object.keys(this.data.subs);
+                this.render(this.data.videos.filter(x => subscribedAuthors.includes(x.author))); 
+            },
+
+            goHistory: function() {
+                if(!this.data.user) return this.openLogin(); 
+                this.hideAll(); 
+                document.getElementById('videoGrid').style.display = 'grid'; 
+                document.getElementById('mainTitle').innerHTML = "<h2>Historique</h2>"; 
+                // Récupère les vidéos dans l'ordre de l'historique
+                const historyVideos = this.data.history
+                    .map(id => this.data.videos.find(v => v.id == id))
+                    .filter(v => v); // Retire les vidéos qui n'existent plus
+                this.render(historyVideos); 
+            },
             
             goStats: function() {
                 if(!this.data.user) return this.openLogin(); 
                 this.hideAll();
                 document.getElementById('statsView').style.display = 'block';
                 document.getElementById('mainTitle').innerHTML = "<h2>📊 Mes Statistiques</h2>";
+                // Reste de la logique de stats...
                 const userName = this.data.user.name;
                 const totalTimeSeconds = this.data.stats.timeSpentSeconds;
                 const timeFormatted = `${Math.floor(totalTimeSeconds / 3600)}h ${Math.floor((totalTimeSeconds % 3600) / 60)}m`;
                 const likesGiven = Object.values(this.data.votes).filter(v => v === 1).length;
                 const videosWatched = this.data.history.length;
-                const channelsFollowed = Object.keys(this.data.subs).length; // Updated count
+                const channelsFollowed = Object.keys(this.data.subs).length; 
                 let followers = 0;
                 for (const author in this.data.users) { 
-                    // Check if current user is in any other user's subscription list (Level > 0)
                     if (this.data.users[author]?.subs && Object.keys(this.data.users[author].subs).includes(userName)) {
                          followers++;
                     }
@@ -527,9 +587,14 @@
                     <h3>Top 3 Visionnage</h3>${topAuthors.length > 0 ? `<ol style="margin-top:5px; padding-left:20px;">${topAuthors.map(item => `<li>${item}</li>`).join('')}</ol>` : '<p>Pas assez de données.</p>'}
                 `;
             },
-
+            
+            goMyProfile: function() {
+                if(!this.data.user || !this.data.user.name) return this.openLogin(); 
+                this.viewProfile(this.data.user.name);
+            },
+            // =================================================================
+            
             toggleVote: async function(id, type) {
-                // ... (vote logic remains the same) ...
                 if(!this.data.user) return this.openLogin();
                 const v = this.data.videos.find(x => x.id == id);
                 if (!v) return;
@@ -549,18 +614,16 @@
                 this.updatePlayerActions(id); 
             },
 
-            // NEW: Advanced Subscription Logic
             toggleSub: async function(author) {
                 if(!this.data.user) return this.openLogin();
                 
                 let currentLevel = this.data.subs[author] || 0;
                 let nextLevel;
                 
-                // Cycle: 0 -> 1 -> 2 -> 3 -> 0
-                if (currentLevel === 0) nextLevel = 1; // S'abonner
-                else if (currentLevel === 1) nextLevel = 2; // Suivre +
-                else if (currentLevel === 2) nextLevel = 3; // Suivre ++
-                else nextLevel = 0; // Se désabonner
+                if (currentLevel === 0) nextLevel = 1; 
+                else if (currentLevel === 1) nextLevel = 2; 
+                else if (currentLevel === 2) nextLevel = 3; 
+                else nextLevel = 0; 
 
                 if (nextLevel === 0) {
                     delete this.data.subs[author];
@@ -575,7 +638,6 @@
 
             getSubscriptionButton: function(author) {
                 const level = this.data.subs[author] || 0;
-                const isSubscribed = level > 0;
                 
                 let text = "S'abonner";
                 let style = "btn-red";
@@ -588,17 +650,16 @@
             },
 
             updatePlayerActions: function(id) {
-                // ... (remains mostly the same, uses new logic for sub button in viewProfile)
                 const v = this.data.videos.find(x => x.id == id);
                 if (!v) return;
                 this.currentPlayingVideoId = id;
                 const currentVote = this.data.votes[id] || 0;
                 
-                // Add follow button logic here too (optional, but good UX)
                 let subButton = '';
                 if (this.data.user && this.data.user.name !== v.author) {
                     subButton = this.getSubscriptionButton(v.author);
-                    subButton = subButton.replace("onclick=\"app.toggleSub", "onclick=\"app.closePlayer(); app.toggleSub"); // Close player before full refresh
+                    // Important: Close player to refresh context on the profile page
+                    subButton = subButton.replace("onclick=\"app.toggleSub", "onclick=\"app.closePlayer(); app.toggleSub"); 
                 }
                 
                 document.getElementById('playerActions').innerHTML = `
@@ -627,19 +688,6 @@
                 `).join('');
             },
 
-            // ... (other go* functions remain mostly the same) ...
-
-            goSubs: function() { 
-                if(!this.data.user) return this.openLogin(); 
-                this.hideAll(); 
-                document.getElementById('videoGrid').style.display = 'grid'; 
-                document.getElementById('mainTitle').innerHTML = "<h2>Mes suivis</h2>"; 
-                // Filter videos based on keys in the new subs object (level > 0)
-                const subscribedAuthors = Object.keys(this.data.subs);
-                this.render(this.data.videos.filter(x => subscribedAuthors.includes(x.author))); 
-            },
-
-            // NEW: Shorts navigation fix is implemented inside openVideoOverlay, but these stay simple
             openShortsPlayer: function(id, listIds, index) {
                 this.currentShortsList = listIds;
                 this.currentShortIndex = index;
@@ -650,7 +698,7 @@
                 if (this.currentShortIndex < this.currentShortsList.length - 1) {
                     this.currentShortIndex++;
                     const nextId = this.currentShortsList[this.currentShortIndex];
-                    this.openVideoOverlay(nextId, true, true);
+                    this.openVideoOverlay(nextId, true);
                 }
             },
             
@@ -658,11 +706,11 @@
                 if (this.currentShortIndex > 0) {
                     this.currentShortIndex--;
                     const prevId = this.currentShortsList[this.currentShortIndex];
-                    this.openVideoOverlay(prevId, true, true);
+                    this.openVideoOverlay(prevId, true);
                 }
             },
 
-            openVideoOverlay: async function(id, isShort = false) { // Removed isSequentialNav parameter to simplify logic
+            openVideoOverlay: async function(id, isShort = false) { 
                 const v = this.data.videos.find(x => x.id == id);
                 if (!v) return;
                 this.currentPlayingVideoId = id;
@@ -679,8 +727,8 @@
                 document.getElementById('playerModal').style.display = 'block';
                 const player = document.getElementById('mainVideoPlayer');
                 
-                // SHORTS FIX: Always set src and attempt to play
                 player.src = v.url;
+                player.load(); // Force re-load for smooth navigation
                 player.play().catch(e => console.log("Autoplay bloqué (navigateur)", e)); 
 
                 document.getElementById('playerTitle').innerText = v.title;
@@ -699,8 +747,81 @@
                 }
                 this.renderComments(v);
             },
+
+            closePlayer: function() {
+                document.getElementById('mainVideoPlayer').pause();
+                document.getElementById('playerModal').style.display = 'none';
+                this.currentPlayingVideoId = null;
+            },
             
-            // ... (rest of the file remains the same until publish function) ...
+            addComment: async function() {
+                if(!this.data.user) return this.openLogin();
+                const input = document.getElementById('newCommentInput');
+                const text = input.value.trim();
+                if (!text) return;
+                const v = this.data.videos.find(x => x.id == this.currentPlayingVideoId);
+                if (!v) return;
+                v.comments = v.comments || [];
+                v.comments.push({ user: this.data.user.name, text: text, time: Date.now() });
+                input.value = '';
+                this.renderComments(v);
+                await this.saveGist();
+            },
+
+            renderComments: function(video) {
+                const list = document.getElementById('commentList');
+                const count = document.getElementById('commentCount');
+                if (!video.comments || video.comments.length === 0) {
+                    count.innerText = "Commentaires (0)";
+                    list.innerHTML = "<p style='color:#aaa;'>Soyez le premier à commenter !</p>";
+                    return;
+                }
+                count.innerText = `Commentaires (${video.comments.length})`;
+                list.innerHTML = video.comments.map(c => `
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <img src="${this.getAvatar(c.user)}" class="avatar-small">
+                        <div>
+                            <p style="margin:0; font-weight:bold; font-size:14px;">${c.user} <span style="font-weight:normal; color:#aaa; font-size:12px;">il y a ${this.timeAgo(c.time)}</span></p>
+                            <p style="margin:2px 0 0 0;">${c.text}</p>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('userCommentAvatar').src = this.getAvatar(this.data.user?.name);
+            },
+
+            uploadCloudinary: function(file, resourceType, statusEl = null, progressFillEl = null, progressEl = null) {
+                return new Promise((resolve, reject) => {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+                    
+                    if (progressEl) progressEl.style.display = 'block';
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`);
+
+                    xhr.upload.addEventListener('progress', (e) => {
+                        if (e.lengthComputable && progressFillEl) {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            progressFillEl.style.width = `${percent}%`;
+                            if (statusEl) statusEl.innerText = `Upload en cours... ${percent}%`;
+                        }
+                    });
+
+                    xhr.onreadystatechange = () => {
+                        if (xhr.readyState === 4) {
+                            if (progressEl) progressEl.style.display = 'none';
+                            if (xhr.status === 200) {
+                                const response = JSON.parse(xhr.responseText);
+                                resolve(response.secure_url);
+                            } else {
+                                reject(new Error("Erreur Cloudinary: " + xhr.responseText));
+                            }
+                        }
+                    };
+                    xhr.send(formData);
+                });
+            },
 
             publish: async function() {
                 if(!this.data.user) return alert("Connectez-vous.");
@@ -741,7 +862,6 @@
                     };
                     this.data.videos.unshift(newVideo);
                     
-                    // NEW: Send notifications to subscribers
                     this.sendNewVideoNotifications(newVideo);
 
                     await this.saveGist();
@@ -753,26 +873,27 @@
                 } finally { publishBtn.disabled = false; progressBar.style.display = 'none'; }
             },
             
-            // NEW: Notification logic on video publish
             sendNewVideoNotifications: function(video) {
-                const authorName = video.author;
-                const subscribers = [];
-                // Check all users' local storage for those who follow the author
-                // NOTE: In a single file, we can't notify users who aren't currently online.
-                // We'll store a 'pending notification' in localStorage for the author to check later.
+                // Pour l'implémentation Monofichier, on affiche une notification pour l'auteur lui-même
+                // et on prépare la notif pour les abonnés de niveau 2 et 3 pour le prochain chargement
+                // (Bien que l'implémentation "push" en temps réel soit impossible sans serveur)
                 
-                // For this single-file implementation, we'll assume the *current* user is the author
-                // and for simplicity, only notify the *next* user to load the site.
+                // Si l'utilisateur est abonné à lui-même (peu probable), on le notifie.
+                const subLevel = this.data.subs[video.author] || 0;
                 
-                // To properly implement this, the notification status should be saved globally (e.g., in Gist), 
-                // but that's overkill. We'll simply rely on the user seeing it when they next load the page, 
-                // which is not possible without a server/database.
-                
-                // L'idée la plus simple pour l'implémentation Monofichier est de laisser le système
-                // fonctionner par lui-même, mais sans notification push en temps réel.
+                // Si l'utilisateur est abonné de niveau 2 ou 3 à la chaîne de l'auteur
+                if (subLevel >= 2) {
+                    let message = `"${video.title.substring(0, 30)}..." est en ligne !`;
+                    if (subLevel === 3) {
+                         // Suivre ++: La notification sera cliquable pour aller à la vidéo
+                        this.showNotification(message, video.id); 
+                    } else {
+                        // Suivre +: Simple notification d'alerte
+                        this.showNotification(message);
+                    }
+                }
             },
 
-            // NEW: Notification Pop-up Handler
             showNotification: function(message, videoId = null) {
                 this.activeNotificationVideoId = videoId;
                 document.getElementById('notificationMessage').innerText = message;
@@ -783,18 +904,18 @@
                 setTimeout(() => {
                     toast.style.opacity = 0;
                     setTimeout(() => { toast.style.display = 'none'; }, 500);
-                }, 8000); // Hide after 8 seconds
+                }, 8000); 
             },
 
-            // NEW: Handle click on notification
             handleNotificationClick: function() {
                 document.getElementById('notificationToast').style.display = 'none';
                 if (this.activeNotificationVideoId) {
+                    // Pour Suivre ++, on ouvre la vidéo
                     this.openVideoOverlay(this.activeNotificationVideoId);
                 }
+                this.activeNotificationVideoId = null; // Clear ID
             },
             
-            // NEW: Admin Ban/Unban logic
             toggleBanUser: async function() {
                 if (!this.isAdmin()) return alert("Accès refusé.");
                 const email = document.getElementById('banUserEmail').value.trim().toLowerCase();
@@ -828,11 +949,10 @@
             },
             
             unbanUser: async function(email) {
-                document.getElementById('banUserEmail').value = email; // Set the email for the toggle function
+                document.getElementById('banUserEmail').value = email; 
                 await this.toggleBanUser();
             },
 
-            // NEW: Admin Broadcast Logic
             openBroadcastModal: function() {
                 if (!this.isAdmin()) return;
                 document.getElementById('broadcastMessage').value = this.data.announcement?.message || '';
@@ -848,14 +968,14 @@
             publishBroadcast: async function() {
                 const message = document.getElementById('broadcastMessage').value.trim();
                 if (!message) {
-                    this.data.announcement = null; // Clear announcement
+                    this.data.announcement = null; 
                 } else {
                     this.data.announcement = {
                         message: message,
                         id: Date.now()
                     };
                 }
-                localStorage.removeItem('announcementDismissed'); // Ensure all users see the new message
+                localStorage.removeItem('announcementDismissed'); 
                 await this.saveGist();
                 this.closeModals();
                 alert("Annonce publiée/mise à jour. Elle apparaîtra au prochain chargement de page des utilisateurs.");
@@ -881,10 +1001,51 @@
                 document.getElementById('adminPanel').style.display = 'block';
                 this.renderAdminVideoList(); 
                 this.renderAdminList();
-                this.renderBanList(); // NEW: Render Ban list
+                this.renderBanList(); 
             },
             
-            // ... (renderAdminVideoList, openAdminEditModal, saveAdminVideoEdit, deleteVideo remain the same) ...
+            renderAdminVideoList: function() {
+                const list = document.getElementById('adminVideoList');
+                list.innerHTML = `<table class="admin-table">
+                    <thead><tr><th>ID</th><th>Titre</th><th>Auteur</th><th>Actions</th></tr></thead>
+                    <tbody>${this.data.videos.map(v => `
+                        <tr>
+                            <td>${v.id}</td>
+                            <td>${v.title}</td>
+                            <td>${v.author}</td>
+                            <td>
+                                <button class="action-pill" onclick="app.openAdminEditModal(${v.id})">Modifier</button>
+                                <button class="action-pill btn-red" onclick="app.deleteVideo(${v.id})">Supprimer</button>
+                            </td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>`;
+            },
+            
+            openAdminEditModal: function(id) {
+                const v = this.data.videos.find(x => x.id == id);
+                if (!v) return;
+                this.currentEditVideoId = id;
+                document.getElementById('editVideoTitle').value = v.title;
+                document.getElementById('modalEditVideo').style.display = 'flex';
+            },
+
+            saveAdminVideoEdit: async function() {
+                const title = document.getElementById('editVideoTitle').value;
+                const v = this.data.videos.find(x => x.id == this.currentEditVideoId);
+                if (!v || !title) return;
+                v.title = title;
+                await this.saveGist();
+                this.closeModals();
+                this.renderAdminVideoList();
+            },
+
+            deleteVideo: async function(id) {
+                if (!confirm("Êtes-vous sûr de vouloir supprimer cette vidéo ?")) return;
+                this.data.videos = this.data.videos.filter(v => v.id !== id);
+                await this.saveGist();
+                this.renderAdminVideoList();
+            },
 
             renderAdminList: function() {
                 const list = document.getElementById('adminList');
@@ -899,14 +1060,30 @@
                 </table>`;
             },
 
-            // ... (addAdmin, removeAdmin remain the same) ...
+            addAdmin: async function() {
+                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut ajouter des admins.");
+                const newEmail = document.getElementById('newAdminEmail').value.trim();
+                if (newEmail && !this.data.admins.includes(newEmail)) {
+                    this.data.admins.push(newEmail);
+                    document.getElementById('newAdminEmail').value = '';
+                    await this.saveGist();
+                    alert(`Admin ${newEmail} ajouté !`);
+                    this.renderAdminList();
+                    this.updateAuthUI(); 
+                } else { alert("Email invalide ou déjà admin."); }
+            },
+
+            removeAdmin: async function(email) {
+                if (this.data.user.email !== PRIMARY_ADMIN_EMAIL) return alert("Seul l'Admin Principal peut retirer des admins.");
+                if (email === PRIMARY_ADMIN_EMAIL) return alert("Impossible de retirer l'Admin Principal.");
+                this.data.admins = this.data.admins.filter(e => e !== email);
+                await this.saveGist();
+                alert(`Admin ${email} retiré.`);
+                this.renderAdminList();
+            },
 
             getAvatar: function(name) { 
                 return this.data.users[name]?.avatar || 'https://via.placeholder.com/36?text=U'; 
-            },
-
-            hideAll: function() { 
-                ['videoGrid', 'shortsGrid', 'profileView', 'adminPanel', 'statsView'].forEach(id => document.getElementById(id).style.display = 'none');
             },
 
             // NEW: Profile Tabs Logic
@@ -944,15 +1121,10 @@
                 document.getElementById('modalLoginEmail').style.display='flex'; 
             },
 
-            goMyProfile: function() {
-                if(!this.data.user || !this.data.user.name) return this.openLogin(); 
-                this.viewProfile(this.data.user.name);
-            },
-
             viewProfile: function(authorName) {
                 this.closePlayer(); 
                 this.hideAll();
-                this.currentProfileAuthor = authorName; // Save current author
+                this.currentProfileAuthor = authorName; 
                 const v = document.getElementById('profileView');
                 v.style.display = 'block';
                 const profile = this.data.users[authorName] || { name: authorName, bio: "Aucune description.", avatar: "", banner: "" };
@@ -960,6 +1132,7 @@
                 const isMyProfile = this.data.user && this.data.user.name === authorName;
                 let followerCount = 0;
                 for (const userName in this.data.users) {
+                    // Check if *other* users have this author in their subs list with level > 0
                     if (this.data.users[userName]?.subs && (this.data.users[userName].subs[authorName] > 0)) followerCount++;
                 }
 
@@ -984,7 +1157,7 @@
                 `;
 
                 this.render(videos, 'pVideos');
-                this.showProfileTab('videos'); // Default to "Vidéos" tab
+                this.showProfileTab('videos'); 
             },
 
             openEditProfile: function() { 
@@ -996,7 +1169,6 @@
             },
 
             saveProfile: async function() {
-                // ... (profile save logic remains the same) ...
                 if(!this.data.user) return;
                 const bio = document.getElementById('editBio').value;
                 const pp = document.getElementById('editPPFile').files[0];
