@@ -561,19 +561,19 @@
                 this.hideAll();
                 document.getElementById('statsView').style.display = 'block';
                 document.getElementById('mainTitle').innerHTML = "<h2>📊 Mes Statistiques</h2>";
-                // Reste de la logique de stats...
+                
                 const userName = this.data.user.name;
                 const totalTimeSeconds = this.data.stats.timeSpentSeconds;
                 const timeFormatted = `${Math.floor(totalTimeSeconds / 3600)}h ${Math.floor((totalTimeSeconds % 3600) / 60)}m`;
                 const likesGiven = Object.values(this.data.votes).filter(v => v === 1).length;
                 const videosWatched = this.data.history.length;
                 const channelsFollowed = Object.keys(this.data.subs).length; 
-                let followers = 0;
-                for (const author in this.data.users) { 
-                    if (this.data.users[author]?.subs && Object.keys(this.data.users[author].subs).includes(userName)) {
-                         followers++;
-                    }
-                }
+                
+                // CORRECTION: LECTURE DIRECTE DU NOMBRE D'ABONNÉS DEPUIS LE PROFIL
+                const myProfile = this.data.users[userName];
+                let followers = Object.keys(myProfile?.followers || {}).length; 
+                // FIN DE LA CORRECTION
+
                 let likesReceived = 0;
                 let dislikesReceived = 0;
                 this.data.videos.filter(v => v.author === userName).forEach(v => { likesReceived += (v.likes || 0); dislikesReceived += (v.dislikes || 0); });
@@ -615,8 +615,13 @@
             },
 
             toggleSub: async function(author) {
-                if(!this.data.user) return this.openLogin();
-                
+                if(!this.data.user) return this.openLogin(); 
+                if(!this.data.users[author]) return; 
+
+                const followerName = this.data.user.name;
+                let userProfile = this.data.users[author];
+                userProfile.followers = userProfile.followers || {}; // Initialisation
+
                 let currentLevel = this.data.subs[author] || 0;
                 let nextLevel;
                 
@@ -627,15 +632,17 @@
 
                 if (nextLevel === 0) {
                     delete this.data.subs[author];
+                    delete userProfile.followers[followerName]; // Suppression de l'abonné
                 } else {
                     this.data.subs[author] = nextLevel;
+                    userProfile.followers[followerName] = nextLevel; // Ajout/Mise à jour de l'abonné
                 }
 
                 this.saveLocal(); 
                 await this.saveGist(); 
                 this.viewProfile(author); 
             },
-
+            
             getSubscriptionButton: function(author) {
                 const level = this.data.subs[author] || 0;
                 
