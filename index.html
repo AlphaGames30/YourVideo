@@ -3,63 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Visiona V17 - AlphaGames30 & Edonis</title>
+    <title>Visiona V18 - AlphaGames30 & Edonis</title>
     <style>
         :root { 
             --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa; 
-            --hover: #272727; --blue: #3ea6ff; --red: #ff0000; --gold: #ffd700; --xmas: #d42426;
+            --hover: #272727; --blue: #3ea6ff; --red: #ff0000; --gold: #ffd700;
         }
-
-        /* --- EFFET NOEL (1 chance sur 1000) --- */
-        body.xmas-active { --bg: #050f06; --header: #4a0a0a; }
-        .snowflake { position: fixed; top: -10px; color: white; pointer-events: none; z-index: 9999; animation: fall linear infinite; }
-        @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
 
         body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, Arial, sans-serif; overflow-x: hidden; }
         
-        /* --- HEADER & LOGO --- */
+        /* --- HEADER --- */
         header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; height: 56px; background: var(--header); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #222; }
-        .logo { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 20px; font-weight: bold; }
-        .logo-play { background: var(--red); color: white; padding: 4px 8px; border-radius: 6px; font-size: 14px; }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 20px; font-weight: bold; }
+        .logo-play { background: var(--red); color: white; padding: 5px 10px; border-radius: 8px; font-size: 16px; display: flex; align-items: center; justify-content: center; }
         
         .search-box { display: flex; flex: 1; max-width: 600px; margin: 0 20px; }
         .search-box input { width: 100%; background: #121212; border: 1px solid #333; color: white; padding: 10px 15px; border-radius: 40px 0 0 40px; outline: none; }
         .search-box button { background: #222; border: 1px solid #333; padding: 0 20px; border-radius: 0 40px 40px 0; cursor: pointer; color: white; }
 
-        /* --- SIDEBAR & CONTENT --- */
+        /* --- SIDEBAR --- */
         .container { display: flex; height: calc(100vh - 56px); }
         .sidebar { width: 240px; background: var(--bg); padding: 12px; overflow-y: auto; flex-shrink: 0; border-right: 1px solid #222; }
-        .nav-item { padding: 12px; border-radius: 10px; cursor: pointer; margin-bottom: 4px; display: flex; align-items: center; gap: 15px; transition: 0.2s; font-size: 14px; }
+        .nav-item { padding: 10px 12px; border-radius: 10px; cursor: pointer; margin-bottom: 4px; display: flex; align-items: center; gap: 15px; transition: 0.2s; font-size: 14px; }
         .nav-item:hover { background: var(--hover); }
-        .nav-active { background: var(--hover); font-weight: bold; }
+        .nav-active { background: var(--hover); font-weight: bold; border-left: 3px solid var(--red); }
         
+        /* --- CONTENT --- */
         .content { flex: 1; padding: 24px; overflow-y: auto; }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
 
-        /* --- SHORTS (ZAPP) STYLE --- */
-        .shorts-container { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
-        .short-card { flex: 0 0 200px; height: 350px; background: #222; border-radius: 12px; overflow: hidden; position: relative; scroll-snap-align: start; cursor: pointer; }
-        .short-card img { width: 100%; height: 100%; object-fit: cover; }
+        /* --- ZAPP (SHORTS) --- */
+        .zapp-container { display: flex; flex-direction: column; align-items: center; gap: 20px; overflow-y: auto; height: 100%; scroll-snap-type: y mandatory; }
+        .zapp-card { width: 340px; height: 600px; background: #000; border-radius: 15px; position: relative; scroll-snap-align: start; flex-shrink: 0; }
+        .zapp-card video { width: 100%; height: 100%; object-fit: cover; border-radius: 15px; }
 
         /* --- COMMENTAIRES (STYLE INDEX 13) --- */
-        .comment-item { display: flex; gap: 12px; margin-bottom: 16px; font-size: 14px; }
-        .comment-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #444; }
-        .comment-content { flex: 1; }
-        .comment-header { font-weight: bold; margin-bottom: 4px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-        .heart-badge { display: flex; align-items: center; gap: 4px; background: #222; padding: 2px 6px; border-radius: 10px; border: 1px solid #333; margin-top: 4px; width: fit-content; font-size: 11px; }
-        .heart-badge img { width: 14px; height: 14px; border-radius: 50%; }
+        .comment-item { display: flex; gap: 12px; margin-bottom: 20px; }
+        .comment-avatar { width: 40px; height: 40px; border-radius: 50%; background: #444; flex-shrink: 0; }
+        .comment-header { font-weight: bold; font-size: 13px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
+        .heart-badge { display: flex; align-items: center; gap: 5px; background: #1e1e1e; padding: 3px 8px; border-radius: 12px; border: 1px solid #333; font-size: 11px; margin-top: 5px; width: fit-content; }
+        .heart-badge img { width: 16px; height: 16px; border-radius: 50%; }
 
         /* --- MODALS --- */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-box { background: #212121; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-        .modal-box input, .modal-box textarea { width: 100%; padding: 12px; margin: 10px 0; background: #121212; border: 1px solid #333; color: white; border-radius: 6px; box-sizing: border-box; }
+        .modal-box { background: #212121; padding: 25px; border-radius: 15px; width: 95%; max-width: 500px; border: 1px solid #333; }
+        .modal-box input, .modal-box select, .modal-box textarea { width: 100%; padding: 12px; margin: 10px 0; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; }
 
-        /* --- BUTTONS --- */
         .btn-blue { background: var(--blue); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
         .btn-red { background: var(--red); color: #fff; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .action-pill { background: #272727; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; }
-
-        #accountMenu { display: none; position: fixed; right: 20px; top: 60px; background: #282828; border: 1px solid #444; border-radius: 8px; z-index: 1500; min-width: 180px; }
+        
+        #accountMenu { display: none; position: fixed; right: 20px; top: 60px; background: #282828; border: 1px solid #444; border-radius: 12px; z-index: 1500; min-width: 220px; }
     </style>
 </head>
 <body>
@@ -72,14 +65,14 @@
             <span>Visiona</span>
         </div>
         <div class="search-box">
-            <input type="text" id="searchInp" placeholder="Rechercher...">
+            <input type="text" id="searchInp" placeholder="Rechercher une vidéo...">
             <button onclick="app.search()">🔍</button>
         </div>
-        <div id="authArea"></div>
+        <div id="authArea" style="display:flex; align-items:center; gap:15px;"></div>
     </header>
 
     <div id="accountMenu">
-        <div id="menuName" style="padding:12px; border-bottom:1px solid #444; font-weight:bold;"></div>
+        <div id="menuUser" style="padding:15px; border-bottom:1px solid #444; font-weight:bold; color:var(--blue);"></div>
         <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
         <div class="nav-item" onclick="app.doLogout()" style="color:var(--red);">🚪 Déconnexion</div>
     </div>
@@ -88,95 +81,81 @@
         <nav class="sidebar">
             <div class="nav-item nav-active" id="navHome" onclick="app.goHome()">🏠 Accueil</div>
             <div class="nav-item" id="navShorts" onclick="app.goShorts()">⚡ Zapp</div>
-            <div class="nav-item" id="navStreams" onclick="app.goStreams()">🔴 Streams</div>
+            <div class="nav-item" id="navStreams" onclick="app.goStreams()">🔴 En Direct</div>
             <div class="nav-item" id="navPosts" onclick="app.goCommunity()">📰 Publications</div>
             <hr>
             <div class="nav-item" id="navHistory" onclick="app.goHistory()">🕒 Historique</div>
             <div class="nav-item" id="navStats" onclick="app.goStats()">📊 Statistiques</div>
-            <div class="nav-item" id="navCredits" onclick="app.showCredits()">💳 Crédits</div>
+            <div class="nav-item" id="navCredits" onclick="app.goCredits()">💳 Crédits</div>
             <hr>
-            <div style="font-size:12px; color:var(--sec-text); padding-left:10px; margin-bottom:8px;">ABONNEMENTS</div>
+            <div style="font-size:12px; color:var(--sec-text); padding:0 12px 8px;">ABONNEMENTS</div>
             <div id="sidebarSubs"></div>
             <hr>
-            <div id="adminLink" class="nav-item" style="display:none; color:var(--red);" onclick="app.goAdmin()">🔑 Admin</div>
+            <div id="adminArea" style="display:none;">
+                <div class="nav-item" style="color:var(--gold);" onclick="app.goAdmin()">🔑 Administration</div>
+            </div>
         </nav>
 
         <main class="content">
-            <div id="viewTitle"></div>
             <div id="mainGrid" class="video-grid"></div>
-            <div id="shortsGrid" class="shorts-container" style="display:none;"></div>
+            <div id="zappGrid" class="zapp-container" style="display:none;"></div>
             <div id="communityView" style="display:none;"></div>
+            <div id="historyView" style="display:none;"></div>
             <div id="statsView" style="display:none;"></div>
-            <div id="profileView" style="display:none;"></div>
             <div id="creditsView" style="display:none;"></div>
         </main>
     </div>
 
-    <div id="playerModal" class="player-overlay">
-        <div style="padding:10px;"><button class="action-pill" onclick="app.closePlayer()">✕ FERMER</button></div>
-        <div style="max-width:1200px; margin:0 auto;">
+    <div id="playerModal" class="modal" style="background:#000; align-items: flex-start; overflow-y: auto;">
+        <div style="width:100%; max-width:1200px; margin: 0 auto; padding-top: 20px;">
+            <button class="btn-blue" onclick="app.closePlayer()" style="margin-bottom:10px;">✕ Retour</button>
             <div style="position:relative; width:100%; aspect-ratio:16/9; background:#000;">
-                <video id="vidPlayer" controls autoplay style="width:100%; height:100%;"></video>
-                <canvas id="liveCvs" style="position:absolute; top:0; left:0; width:100%; height:100%; display:none;"></canvas>
+                <video id="mainVid" controls autoplay style="width:100%; height:100%;"></video>
+                <canvas id="liveCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; display:none;"></canvas>
             </div>
-            <h2 id="vidTitle" style="margin:20px 0 10px 0;"></h2>
-            <div id="vidMeta" style="color:var(--sec-text); font-size:14px; margin-bottom:15px;"></div>
-            <div id="vidActions" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; padding-bottom:15px;"></div>
-            
-            <div id="commentSection" style="margin-top:24px;">
-                <h3 id="comCount">Commentaires</h3>
-                <div style="display:flex; gap:12px; margin-bottom:24px;">
-                    <div id="userAvatarCom"></div>
-                    <div style="flex:1;">
-                        <input type="text" id="comInp" placeholder="Ajouter un commentaire..." style="width:100%; background:none; border:none; border-bottom:1px solid #333; color:white; padding:8px 0; outline:none;">
-                        <div style="display:flex; justify-content:flex-end; margin-top:8px;">
-                            <button class="btn-blue" onclick="app.postComment()">Publier</button>
-                        </div>
+            <div id="playerDetails" style="padding:20px 0;">
+                <h2 id="pTitle"></h2>
+                <p id="pMeta" style="color:var(--sec-text);"></p>
+                <div id="pAuthorRow" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; padding-bottom:15px;"></div>
+                <div id="pComments" style="margin-top:30px;">
+                    <h3>Commentaires</h3>
+                    <div style="display:flex; gap:10px; margin-bottom:20px;">
+                        <input type="text" id="comInp" placeholder="Ajouter un commentaire..." style="flex:1; background:none; border:none; border-bottom:1px solid #444; color:white; outline:none;">
+                        <button class="btn-blue" onclick="app.postComment()">Publier</button>
                     </div>
+                    <div id="comList"></div>
                 </div>
-                <div id="comList"></div>
             </div>
         </div>
     </div>
 
     <div id="modalCreate" class="modal">
         <div class="modal-box">
-            <h2>Créer du contenu</h2>
-            <button class="btn-blue" style="width:100%; margin-bottom:12px;" onclick="app.openUpload('video')">🎬 Importer Vidéo / Zapp</button>
-            <button class="btn-red" style="width:100%; margin-bottom:12px;" onclick="app.openStreamSetup()">🔴 Lancer un Stream (Caméra)</button>
-            <button class="action-pill" style="width:100%;" onclick="app.openPostCreate()">📰 Faire une Publication</button>
-            <button class="action-pill" style="width:100%; margin-top:15px; background:none;" onclick="app.closeModals()">Annuler</button>
+            <h2>Que souhaitez-vous créer ?</h2>
+            <button class="btn-blue" style="width:100%; margin-bottom:10px;" onclick="app.prepUpload('video')">🎬 Vidéo Standard</button>
+            <button class="btn-blue" style="width:100%; margin-bottom:10px; background:var(--gold); color:#000;" onclick="app.prepUpload('zapp')">⚡ Zapp (Format Court)</button>
+            <button class="btn-red" style="width:100%; margin-bottom:10px;" onclick="app.prepStream()">🔴 Lancer un Stream</button>
+            <button class="btn-blue" style="width:100%; background:#444;" onclick="app.prepPost()">📰 Publication</button>
+            <button onclick="app.closeModals()" style="width:100%; background:none; border:none; color:var(--sec-text); margin-top:15px; cursor:pointer;">Annuler</button>
         </div>
     </div>
 
     <div id="modalUpload" class="modal">
         <div class="modal-box">
-            <h2>Mettre en ligne</h2>
-            <input type="text" id="upTitle" placeholder="Titre">
-            <label>Vidéo :</label> <input type="file" id="upVidFile" accept="video/*">
-            <label>Miniature :</label> <input type="file" id="upThumbFile" accept="image/*">
-            <div id="upStatus" style="font-size:12px; color:var(--blue);"></div>
-            <button class="btn-blue" id="btnPublish" style="width:100%; margin-top:10px;" onclick="app.processUpload()">PUBLIER</button>
-            <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Annuler</button>
-        </div>
-    </div>
-
-    <div id="modalStream" class="modal">
-        <div class="modal-box">
-            <h2>Lancer un Stream</h2>
-            <input type="text" id="stTitle" placeholder="Titre de votre live">
-            <label>Miniature du Stream :</label> <input type="file" id="stThumb" accept="image/*">
-            <button class="btn-red" style="width:100%; margin-top:10px;" onclick="app.startStreaming()">DÉMARRER</button>
-            <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Annuler</button>
+            <h2 id="upTypeTitle">Mise en ligne</h2>
+            <input type="text" id="upTitle" placeholder="Titre de la vidéo">
+            <label>Fichier vidéo :</label> <input type="file" id="upFileVid" accept="video/*">
+            <label>Miniature (Image) :</label> <input type="file" id="upFileThumb" accept="image/*">
+            <div id="upProgress" style="display:none; color:var(--blue); font-size:12px; margin:10px 0;">Chargement vers le cloud...</div>
+            <button id="btnDoUpload" class="btn-blue" style="width:100%;" onclick="app.startUpload()">PUBLIER MAINTENANT</button>
         </div>
     </div>
 
     <script>
         const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dvbsmh8qq/upload";
-        const CLOUDINARY_PRESET = "mytube_upload";
         const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json";
         const WORKER_URL = "https://mytubeupload.edonis-imbert.workers.dev/";
-        const streamBus = new BroadcastChannel('visiona_v17_stream');
+        const streamBus = new BroadcastChannel('visiona_live_v18');
 
         const app = {
             data: {
@@ -184,288 +163,227 @@
                 videos: [], users: {}, posts: [], credits: [],
                 subs: JSON.parse(localStorage.getItem('mt_subs')) || [],
                 history: JSON.parse(localStorage.getItem('mt_history')) || [],
-                stats: JSON.parse(localStorage.getItem('mt_stats')) || { time: 0, likes: 0, views: 0 },
                 viewLog: JSON.parse(localStorage.getItem('mt_view_log')) || {}
             },
-            currentVid: null,
-            isXmas: false,
+            currentType: 'video',
+            activeVid: null,
 
             init: async function() {
-                this.checkXmas();
-                await this.loadData();
+                this.checkEasterEgg();
+                await this.load();
                 this.updateUI();
                 this.goHome();
-                this.listenStreams();
-                setInterval(() => { this.data.stats.time++; localStorage.setItem('mt_stats', JSON.stringify(this.data.stats)); }, 1000);
+                this.listenToStreams();
             },
 
-            checkXmas: function() {
+            checkEasterEgg: function() {
                 if(Math.random() < 0.001) {
-                    this.isXmas = true;
-                    document.body.classList.add('xmas-active');
                     document.getElementById('logoIcon').innerText = '🎅';
-                    const container = document.getElementById('snow-container');
-                    for(let i=0; i<60; i++) {
-                        const s = document.createElement('div');
-                        s.className = 'snowflake'; s.innerText = '❄';
-                        s.style.left = Math.random()*100+'vw';
-                        s.style.animationDuration = (Math.random()*3+2)+'s';
-                        container.appendChild(s);
-                    }
+                    // Activer Neige ici
                 }
             },
 
-            loadData: async function() {
-                const res = await fetch(GIST_URL + "?t=" + Date.now());
-                const json = await res.json();
-                this.data.videos = json.videos || [];
-                this.data.users = json.users || {};
-                this.data.posts = json.posts || [];
-                this.data.credits = json.credits || ["AlphaGames30 - Lead Dev", "Edonis Imbert - Co-Dev"];
+            load: async function() {
+                try {
+                    const r = await fetch(GIST_URL + "?t=" + Date.now());
+                    const j = await r.json();
+                    this.data.videos = j.videos || [];
+                    this.data.users = j.users || {};
+                    this.data.posts = j.posts || [];
+                    this.data.credits = j.credits || ["AlphaGames30", "Edonis Imbert"];
+                } catch(e) { console.error("Data error", e); }
             },
 
             save: async function() {
-                const body = { videos: this.data.videos, users: this.data.users, posts: this.data.posts, credits: this.data.credits };
-                await fetch(WORKER_URL, { method: 'PATCH', body: JSON.stringify({ files: {"video.json": {content: JSON.stringify(body, null, 2)}}}) });
+                const content = { videos: this.data.videos, users: this.data.users, posts: this.data.posts, credits: this.data.credits };
+                await fetch(WORKER_URL, { method: 'PATCH', body: JSON.stringify({ files: {"video.json": {content: JSON.stringify(content, null, 2)}}}) });
             },
 
-            // --- NAV ---
+            // --- NAVIGATION ---
             hideAll: function() {
-                ['mainGrid', 'shortsGrid', 'communityView', 'statsView', 'profileView', 'creditsView'].forEach(id => document.getElementById(id).style.display = 'none');
+                ['mainGrid', 'zappGrid', 'communityView', 'historyView', 'statsView', 'creditsView'].forEach(id => document.getElementById(id).style.display = 'none');
                 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-active'));
                 document.getElementById('accountMenu').style.display = 'none';
             },
 
             goHome: function() {
                 this.hideAll(); document.getElementById('navHome').classList.add('nav-active');
-                document.getElementById('mainGrid').style.display = 'grid';
-                this.renderVids(this.data.videos.filter(v => !v.isShort && !v.isStream));
+                const g = document.getElementById('mainGrid'); g.style.display = 'grid';
+                this.renderVids(this.data.videos.filter(v => !v.isShort && !v.isStream), g);
             },
 
             goShorts: function() {
                 this.hideAll(); document.getElementById('navShorts').classList.add('nav-active');
-                const g = document.getElementById('shortsGrid'); g.style.display = 'flex';
+                const g = document.getElementById('zappGrid'); g.style.display = 'flex';
                 g.innerHTML = this.data.videos.filter(v => v.isShort).map(v => `
-                    <div class="short-card" onclick="app.openPlayer('${v.id}')">
-                        <img src="${v.thumb}">
-                        <div style="position:absolute; bottom:10px; left:10px; font-weight:bold; text-shadow:0 0 4px #000;">${v.title}</div>
+                    <div class="zapp-card">
+                        <video src="${v.url}" loop autoplay muted onclick="this.paused ? this.play() : this.pause()"></video>
+                        <div style="position:absolute; bottom:20px; left:20px; text-shadow:0 2px 4px #000;">
+                            <h3>${v.title}</h3>
+                            <p>@${v.author}</p>
+                        </div>
                     </div>
                 `).join('');
-            },
-
-            goStreams: function() {
-                this.hideAll(); document.getElementById('navStreams').classList.add('nav-active');
-                document.getElementById('mainGrid').style.display = 'grid';
-                this.renderVids(this.data.videos.filter(v => v.isStream));
             },
 
             goHistory: function() {
                 this.hideAll(); document.getElementById('navHistory').classList.add('nav-active');
-                document.getElementById('mainGrid').style.display = 'grid';
-                const vids = this.data.history.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
-                this.renderVids(vids);
+                const g = document.getElementById('historyView'); g.style.display = 'block';
+                const histVids = this.data.history.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
+                g.innerHTML = `<h2>🕒 Votre historique</h2><div class="video-grid"></div>`;
+                this.renderVids(histVids, g.querySelector('.video-grid'));
             },
 
-            showCredits: function() {
+            goCredits: function() {
                 this.hideAll(); document.getElementById('creditsView').style.display = 'block';
-                document.getElementById('creditsView').innerHTML = `<h2>💳 Crédits & Équipe</h2><ul>` + 
-                this.data.credits.map(c => `<li>${c}</li>`).join('') + `</ul>`;
+                document.getElementById('creditsView').innerHTML = `<h2>💳 Équipe Visiona</h2><div style="background:#1a1a1a; padding:20px; border-radius:15px;">
+                ${this.data.credits.map(c => `<div style="padding:10px; border-bottom:1px solid #333;">✨ ${c}</div>`).join('')}</div>`;
             },
 
-            goStats: function() {
-                this.hideAll(); document.getElementById('navStats').classList.add('nav-active');
-                document.getElementById('statsView').style.display = 'block';
-                const s = this.data.stats;
-                document.getElementById('statsView').innerHTML = `
-                    <h2>📊 Tes Statistiques</h2>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                        <div style="background:#1a1a1a; padding:20px; border-radius:10px;">🕒 Temps Visionnage: ${Math.floor(s.time/3600)}h ${Math.floor((s.time%3600)/60)}m</div>
-                        <div style="background:#1a1a1a; padding:20px; border-radius:10px;">📺 Vidéos vues: ${s.views}</div>
-                        <div style="background:#1a1a1a; padding:20px; border-radius:10px;">👍 Likes donnés: ${s.likes}</div>
-                        <div style="background:#1a1a1a; padding:20px; border-radius:10px;">👥 Abonnés: ${this.data.subs.length}</div>
-                    </div>
-                `;
-            },
-
-            goCommunity: function() {
-                this.hideAll(); document.getElementById('navPosts').classList.add('nav-active');
-                const v = document.getElementById('communityView'); v.style.display = 'block';
-                v.innerHTML = this.data.posts.map(p => `
-                    <div style="background:#1a1a1a; padding:20px; border-radius:12px; margin-bottom:15px;">
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                            ${this.getAvatar(p.author)} <b>${p.author}</b>
-                        </div>
-                        <div>${p.text}</div>
-                    </div>
-                `).join('');
-            },
-
-            // --- PLAYER ---
+            // --- PLAYER & VIEWS ---
             openPlayer: function(id) {
                 const v = this.data.videos.find(x => x.id == id);
-                this.currentVid = v;
+                this.activeVid = v;
                 
-                // Vues (Cooldown 1h)
+                // Cooldown Vues (1h)
                 const now = Date.now();
                 if(!this.data.viewLog[id] || (now - this.data.viewLog[id] > 3600000)) {
                     v.views = (v.views || 0) + 1;
                     this.data.viewLog[id] = now;
                     localStorage.setItem('mt_view_log', JSON.stringify(this.data.viewLog));
-                    this.data.stats.views++;
                     this.save();
                 }
 
-                // Historique
-                this.data.history = [id, ...this.data.history.filter(x => x != id)].slice(0, 40);
+                this.data.history = [id, ...this.data.history.filter(x => x != id)].slice(0, 50);
                 localStorage.setItem('mt_history', JSON.stringify(this.data.history));
 
                 document.getElementById('playerModal').style.display = 'block';
-                document.getElementById('vidTitle').innerText = v.title;
-                document.getElementById('vidMeta').innerText = `${v.views} vues • Mis en ligne le ${v.date || 'Récemment'}`;
+                document.getElementById('pTitle').innerText = v.title;
+                document.getElementById('pMeta').innerText = `${v.views} vues • Mis en ligne le ${v.date || 'récemment'}`;
                 
-                const vid = document.getElementById('vidPlayer');
+                const vid = document.getElementById('mainVid');
                 vid.src = v.url || "";
                 vid.style.display = v.isStream ? 'none' : 'block';
-                document.getElementById('liveCvs').style.display = v.isStream ? 'block' : 'none';
+                document.getElementById('liveCanvas').style.display = v.isStream ? 'block' : 'none';
 
-                const isSub = this.data.subs.includes(v.author);
-                document.getElementById('vidActions').innerHTML = `
-                    <div style="display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="app.viewProfile('${v.author}')">
-                        ${this.getAvatar(v.author)} <b>${v.author}</b>
-                    </div>
-                    <div style="display:flex; gap:10px;">
-                        <button class="action-pill" onclick="app.addLike()">👍 J'aime</button>
-                        <button class="${isSub ? 'action-pill' : 'btn-red'}" onclick="app.toggleSub('${v.author}')">
-                            ${isSub ? 'ABONNÉ' : 'S\'ABONNER'}
-                        </button>
-                    </div>
-                `;
+                this.renderPlayerMeta();
                 this.renderComments();
             },
 
-            // --- STREAMING REEL ---
-            openStreamSetup: function() { this.closeModals(); document.getElementById('modalStream').style.display='flex'; },
-            
-            startStreaming: async function() {
-                const title = document.getElementById('stTitle').value;
-                const thumbFile = document.getElementById('stThumb').files[0];
-                if(!title) return alert("Titre requis");
+            renderPlayerMeta: function() {
+                const isSub = this.data.subs.includes(this.activeVid.author);
+                document.getElementById('pAuthorRow').innerHTML = `
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        ${this.getAvatar(this.activeVid.author)}
+                        <div><b>${this.activeVid.author}</b></div>
+                    </div>
+                    <button class="${isSub ? 'btn-blue' : 'btn-red'}" onclick="app.toggleSub('${this.activeVid.author}')">
+                        ${isSub ? '✅ ABONNÉ' : 'S\'ABONNER'}
+                    </button>
+                `;
+            },
 
-                let thumbUrl = "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500";
-                if(thumbFile) thumbUrl = await this.uploadCloud(thumbFile, "image");
-
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                const id = "live_" + Date.now();
-                
-                this.data.videos.unshift({ id, title, author: this.data.user.name, isStream: true, thumb: thumbUrl, views: 0, date: new Date().toLocaleDateString() });
-                await this.save();
+            // --- UPLOAD LOGIC ---
+            prepUpload: function(type) {
+                this.currentType = type;
                 this.closeModals();
-                this.goStreams();
-
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const vid = document.createElement('video');
-                vid.srcObject = stream; vid.play();
-
-                setInterval(() => {
-                    ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
-                    streamBus.postMessage({ id, frame: canvas.toDataURL('image/webp', 0.5) });
-                }, 100);
+                document.getElementById('upTypeTitle').innerText = type === 'zapp' ? "Publier un Zapp" : "Publier une Vidéo";
+                document.getElementById('modalUpload').style.display = 'flex';
             },
 
-            listenStreams: function() {
-                streamBus.onmessage = (e) => {
-                    if(this.currentVid?.id === e.data.id) {
-                        const cvs = document.getElementById('liveCvs');
-                        const ctx = cvs.getContext('2d');
-                        const img = new Image();
-                        img.onload = () => ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
-                        img.src = e.data.frame;
-                    }
-                };
+            startUpload: async function() {
+                const title = document.getElementById('upTitle').value;
+                const vFile = document.getElementById('upFileVid').files[0];
+                const tFile = document.getElementById('upFileThumb').files[0];
+
+                if(!title || !vFile) return alert("Titre et vidéo requis !");
+                
+                const btn = document.getElementById('btnDoUpload');
+                btn.disabled = true;
+                document.getElementById('upProgress').style.display = 'block';
+
+                try {
+                    const vUrl = await this.uploadToCloud(vFile, 'video');
+                    const tUrl = tFile ? await this.uploadToCloud(tFile, 'image') : "https://via.placeholder.com/480x270/222/fff?text=Visiona";
+                    
+                    const newVid = {
+                        id: Date.now(),
+                        title,
+                        author: this.data.user.name,
+                        url: vUrl,
+                        thumb: tUrl,
+                        isShort: this.currentType === 'zapp',
+                        views: 0,
+                        date: new Date().toLocaleDateString(),
+                        comments: []
+                    };
+
+                    this.data.videos.unshift(newVid);
+                    await this.save();
+                    location.reload();
+                } catch(e) { alert("Erreur d'envoi"); btn.disabled = false; }
             },
 
-            // --- UPLOADS & CREATE ---
-            openUpload: function() { this.closeModals(); document.getElementById('modalUpload').style.display='flex'; },
-            
-            uploadCloud: async function(file, type) {
-                const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', CLOUDINARY_PRESET);
-                const res = await fetch(CLOUDINARY_URL.replace('upload', type+'/upload'), { method: 'POST', body: fd });
-                const json = await res.json();
+            uploadToCloud: async function(file, resourceType) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', 'mytube_upload');
+                const resp = await fetch(`https://api.cloudinary.com/v1_1/dvbsmh8qq/${resourceType}/upload`, { method: 'POST', body: formData });
+                const json = await resp.json();
                 return json.secure_url;
             },
 
-            processUpload: async function() {
-                const title = document.getElementById('upTitle').value;
-                const vF = document.getElementById('upVidFile').files[0];
-                const iF = document.getElementById('upThumbFile').files[0];
-                if(!title || !vF) return alert("Champs manquants");
-
-                const btn = document.getElementById('btnPublish');
-                btn.disabled = true; document.getElementById('upStatus').innerText = "⏳ Envoi en cours...";
-
-                const vUrl = await this.uploadCloud(vF, "video");
-                const iUrl = iF ? await this.uploadCloud(iF, "image") : "https://via.placeholder.com/400x225/222/fff?text=Visiona";
-                
-                const isShort = vF.size < 8000000 && confirm("Est-ce un Zapp (Short) ?");
-
-                this.data.videos.unshift({ id: Date.now(), title, author: this.data.user.name, url: vUrl, thumb: iUrl, isShort, views: 0, date: new Date().toLocaleDateString() });
-                await this.save();
-                location.reload();
+            // --- SOCIAL ---
+            postComment: function() {
+                const txt = document.getElementById('comInp').value;
+                if(!txt || !this.data.user) return;
+                if(!this.activeVid.comments) this.activeVid.comments = [];
+                this.activeVid.comments.push({ id: Date.now(), author: this.data.user.name, text: txt, heart: false });
+                document.getElementById('comInp').value = "";
+                this.renderComments();
+                this.save();
             },
 
-            // --- SOCIAL ---
             renderComments: function() {
-                const list = document.getElementById('comList');
-                const isOwner = this.data.user?.name === this.currentVid.author;
-                list.innerHTML = (this.currentVid.comments || []).map(c => `
+                const isOwner = this.data.user?.name === this.activeVid.author;
+                document.getElementById('comList').innerHTML = (this.activeVid.comments || []).map(c => `
                     <div class="comment-item">
                         ${this.getAvatar(c.author)}
-                        <div class="comment-content">
+                        <div style="flex:1;">
                             <div class="comment-header">${c.author}</div>
-                            <div>${c.text}</div>
-                            ${c.heart ? `<div class="heart-badge">${this.getAvatar(this.currentVid.author)} ❤️</div>` : ''}
-                            ${isOwner ? `<button onclick="app.toggleHeart(${c.id})" style="font-size:10px; background:none; border:none; color:var(--sec-text); cursor:pointer;">Cœur</button>` : ''}
+                            <div style="font-size:14px;">${c.text}</div>
+                            ${c.heart ? `<div class="heart-badge">${this.getAvatar(this.activeVid.author)} ❤️</div>` : ''}
+                            ${isOwner ? `<button onclick="app.giveHeart(${c.id})" style="background:none; border:none; color:var(--sec-text); font-size:10px; cursor:pointer;">Cœur</button>` : ''}
                         </div>
                     </div>
                 `).join('');
             },
 
-            postComment: function() {
-                const t = document.getElementById('comInp').value;
-                if(!t || !this.data.user) return;
-                if(!this.currentVid.comments) this.currentVid.comments = [];
-                this.currentVid.comments.push({ id: Date.now(), author: this.data.user.name, text: t, heart: false });
-                document.getElementById('comInp').value = "";
-                this.renderComments(); this.save();
-            },
-
-            toggleHeart: function(id) {
-                const c = this.currentVid.comments.find(x => x.id === id);
-                c.heart = !c.heart; this.renderComments(); this.save();
+            giveHeart: function(id) {
+                const c = this.activeVid.comments.find(x => x.id === id);
+                c.heart = !c.heart;
+                this.renderComments();
+                this.save();
             },
 
             toggleSub: function(name) {
-                if(this.data.subs.includes(name)) this.data.subs = this.data.subs.filter(n => n !== name);
-                else {
-                    this.data.subs.push(name);
-                    if(Math.random() < 0.01) alert("🎅 Père Noël: Merci pour l'abonnement !");
-                }
+                if(this.data.subs.includes(name)) this.data.subs = this.data.subs.filter(x => x !== name);
+                else this.data.subs.push(name);
                 localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
-                this.updateUI(); this.openPlayer(this.currentVid.id);
+                this.updateUI();
+                this.renderPlayerMeta();
             },
 
-            // --- UI HELPERS ---
-            renderVids: function(list) {
-                const g = document.getElementById('mainGrid');
-                g.innerHTML = list.map(v => `
-                    <div class="video-card" onclick="app.openPlayer('${v.id}')" style="cursor:pointer;">
+            // --- UI TOOLS ---
+            renderVids: function(list, el) {
+                el.innerHTML = list.map(v => `
+                    <div style="cursor:pointer;" onclick="app.openPlayer('${v.id}')">
                         <img src="${v.thumb}" style="width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:12px; background:#222;">
-                        <div style="display:flex; gap:10px; margin-top:10px;">
+                        <div style="display:flex; gap:12px; margin-top:10px;">
                             ${this.getAvatar(v.author)}
                             <div>
-                                <h4 style="margin:0; font-size:14px;">${v.title}</h4>
-                                <p style="font-size:12px; color:var(--sec-text); margin:4px 0;">${v.author} • ${v.views} vues</p>
+                                <h4 style="margin:0; font-size:15px; line-height:1.2;">${v.title}</h4>
+                                <p style="color:var(--sec-text); font-size:12px; margin:5px 0;">${v.author} • ${v.views} vues</p>
                             </div>
                         </div>
                     </div>
@@ -475,33 +393,54 @@
             getAvatar: function(name) {
                 const u = this.data.users[name];
                 if(u && u.avatar) return `<img src="${u.avatar}" class="comment-avatar">`;
-                return `<div class="comment-avatar" style="display:flex; align-items:center; justify-content:center; background:var(--xmas); color:white; font-weight:bold;">${name.charAt(0).toUpperCase()}</div>`;
+                return `<div class="comment-avatar" style="display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; background:var(--red);">${name.charAt(0).toUpperCase()}</div>`;
             },
 
             updateUI: function() {
                 const area = document.getElementById('authArea');
                 if(this.data.user) {
-                    area.innerHTML = `<button onclick="app.openCreate()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer; margin-right:15px;">➕</button>
-                                     <div onclick="app.toggleAccountMenu()" style="cursor:pointer;">${this.getAvatar(this.data.user.name)}</div>`;
-                    document.getElementById('menuName').innerText = this.data.user.name;
-                    if(this.data.user.email === "edonis.imbert@gmail.com") document.getElementById('adminLink').style.display='flex';
+                    area.innerHTML = `
+                        <button onclick="app.openCreate()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">➕</button>
+                        <div onclick="app.toggleMenu()" style="cursor:pointer;">${this.getAvatar(this.data.user.name)}</div>
+                    `;
+                    document.getElementById('menuUser').innerText = this.data.user.name;
+                    if(this.data.user.email === "edonis.imbert@gmail.com") document.getElementById('adminArea').style.display='block';
                 } else {
-                    area.innerHTML = `<button class="btn-blue" onclick="app.doLogin()">Se connecter</button>`;
+                    area.innerHTML = `<button class="btn-blue" onclick="app.doLogin()">Connexion</button>`;
                 }
-                document.getElementById('sidebarSubs').innerHTML = this.data.subs.map(s => `<div class="nav-item" onclick="app.viewProfile('${s}')">${this.getAvatar(s)} <span>${s}</span></div>`).join('');
+
+                document.getElementById('sidebarSubs').innerHTML = this.data.subs.map(s => `
+                    <div class="nav-item" onclick="app.viewProfile('${s}')">
+                        ${this.getAvatar(s)} <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${s}</span>
+                    </div>
+                `).join('');
             },
 
-            goMyProfile: function() { this.viewProfile(this.data.user.name); },
-            viewProfile: function(name) {
-                this.hideAll(); document.getElementById('profileView').style.display = 'block';
-                this.renderVids(this.data.videos.filter(v => v.author === name));
-            },
-            toggleAccountMenu: function() { const m = document.getElementById('accountMenu'); m.style.display = m.style.display === 'none' ? 'block' : 'none'; },
-            openCreate: function() { document.getElementById('modalCreate').style.display='flex'; },
+            openCreate: function() { document.getElementById('modalCreate').style.display = 'flex'; },
+            toggleMenu: function() { const m = document.getElementById('accountMenu'); m.style.display = (m.style.display === 'block' ? 'none' : 'block'); },
             closeModals: function() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); },
-            closePlayer: function() { document.getElementById('playerModal').style.display='none'; document.getElementById('vidPlayer').pause(); },
-            doLogin: function() { const p = prompt("Pseudo ?"); if(p) { this.data.user = {name: p, email: p+"@visiona.com"}; localStorage.setItem('mt_user', JSON.stringify(this.data.user)); location.reload(); }},
-            doLogout: function() { localStorage.removeItem('mt_user'); location.reload(); }
+            closePlayer: function() { document.getElementById('playerModal').style.display='none'; document.getElementById('mainVid').pause(); },
+            doLogin: function() { 
+                const p = prompt("Pseudo ?"); 
+                if(p) { 
+                    this.data.user = {name: p, email: p+"@user.com"}; 
+                    localStorage.setItem('mt_user', JSON.stringify(this.data.user));
+                    location.reload(); 
+                } 
+            },
+            doLogout: function() { localStorage.removeItem('mt_user'); location.reload(); },
+
+            listenToStreams: function() {
+                streamBus.onmessage = (e) => {
+                    if(this.activeVid?.id === e.data.id) {
+                        const cvs = document.getElementById('liveCanvas');
+                        const ctx = cvs.getContext('2d');
+                        const img = new Image();
+                        img.onload = () => ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
+                        img.src = e.data.frame;
+                    }
+                };
+            }
         };
 
         app.init();
