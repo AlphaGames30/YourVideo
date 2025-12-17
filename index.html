@@ -3,531 +3,594 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Visiona V28 - Colossus Ecosystem</title>
+    <title>Visiona V36 - Titan Ultimate</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         /* ==========================================
-           [SECTION 1: SYSTÈME DE DESIGN VISIONA]
+           [SECTION 1: STYLE SYSTEM]
            ========================================== */
         :root {
             --bg: #020202; --side: #060606; --card: #0e0e0e; --accent: #7c4dff;
             --accent-glow: rgba(124, 77, 255, 0.4); --text: #ffffff; --sec: #808080;
             --border: #1a1a1a; --red: #ff3333; --green: #00ff88; --gold: #ffc107;
-            --glass: rgba(255, 255, 255, 0.03); --shadow: 0 15px 50px rgba(0,0,0,0.8);
             --font-main: 'Plus Jakarta Sans', sans-serif;
-            --font-code: 'JetBrains Mono', monospace;
         }
 
         * { box-sizing: border-box; outline: none; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-        body { 
-            margin: 0; background: var(--bg); color: var(--text); 
-            font-family: var(--font-main); overflow: hidden; height: 100vh;
-        }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-main); overflow: hidden; height: 100vh; }
 
-        /* Scrollbar Customization */
+        /* SCROLLBAR */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-        /* Animations */
-        @keyframes pulse-gold { 0% { box-shadow: 0 0 5px var(--gold); } 50% { box-shadow: 0 0 20px var(--gold); } 100% { box-shadow: 0 0 5px var(--gold); } }
-        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* ==========================================
-           [SECTION 2: COMPOSANTS UI RÉUTILISABLES]
-           ========================================== */
-        .v-btn {
-            background: var(--card); border: 1px solid var(--border); color: white;
-            padding: 12px 24px; border-radius: 14px; cursor: pointer; font-weight: 700;
-            display: inline-flex; align-items: center; gap: 10px; font-family: inherit;
-        }
-        .v-btn:hover { background: var(--border); transform: translateY(-2px); }
-        .v-btn-prime { background: var(--accent); border: none; box-shadow: 0 5px 15px var(--accent-glow); }
-        .v-btn-prime:hover { background: #6a3de8; }
-        
-        .v-input {
-            width: 100%; background: #000; border: 1px solid var(--border);
-            padding: 15px 20px; border-radius: 14px; color: white; margin-bottom: 15px;
-            font-size: 15px;
-        }
-        .v-input:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
-
-        .glass-panel { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 25px; }
-
-        /* ==========================================
-           [SECTION 3: LAYOUT GLOBAL]
-           ========================================== */
-        header {
-            height: 80px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; background: rgba(2,2,2,0.9); border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 3000; backdrop-filter: blur(10px);
-        }
-
+        /* LAYOUT */
+        header { height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; background: rgba(2,2,2,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 3000; backdrop-filter: blur(10px); }
         .app-container { display: flex; height: calc(100vh - 80px); }
         
-        .sidebar {
-            width: 280px; background: var(--side); border-right: 1px solid var(--border);
-            padding: 25px; overflow-y: auto; flex-shrink: 0;
-        }
+        /* SIDEBAR QUI DESCEND */
+        .sidebar { width: 280px; background: var(--side); border-right: 1px solid var(--border); padding: 25px; overflow-y: auto; flex-shrink: 0; display:flex; flex-direction:column; }
 
         .viewport { flex: 1; padding: 40px; overflow-y: auto; position: relative; scroll-behavior: smooth; }
 
-        /* Navigation Links */
-        .nav-link {
-            display: flex; align-items: center; gap: 15px; padding: 14px 20px;
-            border-radius: 15px; color: var(--sec); cursor: pointer; font-weight: 600;
-            margin-bottom: 8px; font-size: 15px;
-        }
+        /* NAVIGATION */
+        .nav-link { display: flex; align-items: center; gap: 15px; padding: 14px 20px; border-radius: 15px; color: var(--sec); cursor: pointer; font-weight: 600; margin-bottom: 8px; font-size: 15px; }
         .nav-link:hover, .nav-link.active { background: var(--card); color: white; }
-        .nav-link.active { border-left: 4px solid var(--accent); background: var(--accent-glow); color: var(--accent); }
-        
+        .nav-link.active { border-left: 4px solid var(--accent); background: rgba(124, 77, 255, 0.1); color: var(--accent); }
         .nav-label { font-size: 11px; color: var(--sec); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin: 30px 0 15px 15px; }
 
-        /* ==========================================
-           [SECTION 4: GRILLE VIDÉO & CARTES]
-           ========================================== */
-        /* MODIF: FIXÉ À 4 PAR LIGNE */
+        /* GRILLE 4 VIDEO PAR LIGNE */
         .v-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
-        .v-card { cursor: pointer; animation: slideIn 0.5s ease backwards; }
-        .v-thumb {
-            width: 100%; aspect-ratio: 16/9; border-radius: 22px; overflow: hidden;
-            background: #111; border: 1px solid var(--border); position: relative;
-        }
+        .v-card { cursor: pointer; animation: fadeIn 0.5s ease; position: relative; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+        .v-thumb { width: 100%; aspect-ratio: 16/9; border-radius: 18px; overflow: hidden; background: #111; border: 1px solid var(--border); position: relative; }
         .v-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        /* MODIF: BADGE DURÉE CARRÉ NOIR */
-        .v-badge-time { position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.9); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
+        
+        /* CARRÉ NOIR DURÉE */
+        .v-duration { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.85); color: #fff; padding: 3px 6px; border-radius: 6px; font-size: 11px; font-weight: 800; }
 
-        .v-meta { display: flex; gap: 15px; margin-top: 18px; }
-        .v-avatar { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--border); flex-shrink: 0; object-fit: cover; }
-        .v-info h3 { margin: 0 0 6px 0; font-size: 16px; font-weight: 700; color: #fff; line-height: 1.4; }
-        .v-info p { margin: 0; font-size: 13px; color: var(--sec); }
+        .v-meta { display: flex; gap: 15px; margin-top: 15px; }
+        .v-avatar { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); flex-shrink: 0; object-fit: cover; background: #222; }
 
-        /* ==========================================
-           [SECTION 5: ZAPPS FORMAT]
-           ========================================== */
-        #view-zapps { display: none; height: 100%; flex-direction: column; align-items: center; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .zapp-item {
-            width: 380px; height: calc(100vh - 120px); margin: 20px 0;
-            background: #000; border-radius: 30px; border: 1px solid var(--border);
-            position: relative; overflow: hidden; scroll-snap-align: center;
-        }
+        /* ZAPPS 9:16 TIKTOK STYLE */
+        #view-zapps { display: none; height: 100%; flex-direction: column; align-items: center; overflow-y: scroll; scroll-snap-type: y mandatory; padding-bottom:50px; }
+        .zapp-item { width: 400px; height: 750px; margin-bottom: 40px; background: #000; border-radius: 25px; border: 1px solid var(--border); position: relative; overflow: hidden; scroll-snap-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         .zapp-video { width: 100%; height: 100%; object-fit: cover; }
-
-        /* ==========================================
-           [SECTION 6: NOTIFICATIONS & CRÉDITS]
-           ========================================== */
-        .credit-badge {
-            background: linear-gradient(135deg, var(--gold), #ff8f00);
-            color: black; padding: 4px 12px; border-radius: 10px; font-weight: 800; font-size: 12px;
-            display: flex; align-items: center; gap: 5px;
-        }
+        .zapp-ui { position: absolute; right: 15px; bottom: 100px; display: flex; flex-direction: column; align-items: center; gap: 25px; }
+        .zapp-btn { width: 50px; height: 50px; background: rgba(30,30,30,0.6); backdrop-filter: blur(5px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 22px; color: #fff; }
         
-        #notif-menu {
-            display: none; position: absolute; top: 90px; right: 40px; width: 380px;
-            max-height: 500px; background: var(--card); border: 1px solid var(--border);
-            border-radius: 25px; box-shadow: var(--shadow); z-index: 4000; padding: 25px;
-        }
+        /* UI COMPONENTS */
+        .v-btn { background: var(--card); border: 1px solid var(--border); color: white; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+        .v-btn:hover { background: var(--border); }
+        .v-btn-prime { background: var(--accent); border: none; }
+        .v-input { width: 100%; background: #000; border: 1px solid var(--border); padding: 12px; border-radius: 12px; color: white; margin-bottom: 10px; }
 
-        /* ==========================================
-           [SECTION 7: PLAYER OVERLAY]
-           ========================================== */
-        #player-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; overflow-y: auto; }
-        .player-container { max-width: 1500px; margin: 0 auto; padding: 40px; }
-        .main-video-box { 
-            width: 100%; aspect-ratio: 16/9; border-radius: 35px; overflow: hidden; 
-            background: #000; border: 1px solid var(--border); box-shadow: 0 50px 100px rgba(0,0,0,0.9);
-        }
-        
-        .stat-btn-group { display: flex; gap: 15px; background: var(--card); padding: 10px; border-radius: 18px; border: 1px solid var(--border); }
-        .stat-btn { background: transparent; border: none; color: white; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; padding: 8px 15px; border-radius: 10px; }
-        .stat-btn:hover { background: var(--border); }
-        .stat-btn.active { color: var(--accent); }
+        /* PLAYER & MODALS */
+        #player-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; overflow-y: auto; padding: 40px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 6000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .modal-content { background: var(--side); width: 450px; padding: 40px; border-radius: 30px; border: 1px solid var(--border); }
 
-        /* ==========================================
-           [SECTION 8: MODALS]
-           ========================================== */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
-        .modal-content { background: var(--side); width: 95%; max-width: 600px; padding: 50px; border-radius: 40px; border: 1px solid var(--border); }
+        /* PROFIL TABS */
+        .profile-tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--border); margin-top: 30px; margin-bottom: 20px; }
+        .p-tab { padding: 10px 20px; cursor: pointer; color: var(--sec); font-weight: 700; border-bottom: 3px solid transparent; }
+        .p-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-        /* ==========================================
-           [SECTION 9: PANEL ADMIN & REMERCIEMENTS]
-           ========================================== */
-        .admin-box { background: #0c0c0c; border: 1px solid var(--gold); border-radius: 20px; padding: 25px; margin-bottom: 25px; }
-        .contrib-card {
-            background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
-            border: 1px solid var(--border); padding: 25px; border-radius: 25px;
-            text-align: center; position: relative; overflow: hidden;
-        }
-        .contrib-card.gold { border-color: var(--gold); animation: pulse-gold 3s infinite; }
-        .contrib-card img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold); margin-bottom: 15px; }
+        /* NOTIFS & CLOCHE */
+        #notif-menu { display: none; position: absolute; top: 70px; right: 50px; width: 300px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 15px; z-index: 4000; }
+
+        /* CŒUR CRÉATEUR */
+        .creator-heart { position: relative; display: inline-block; }
+        .creator-heart-img { position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--bg); }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="display:flex; align-items:center; gap:40px;">
-            <div style="display:flex; align-items:center; gap:15px; cursor:pointer;" onclick="V_CORE.nav('home')">
-                <div style="width:45px; height:45px; background:var(--accent); border-radius:14px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:26px; transform:rotate(-5deg);">V</div>
-                <span style="font-size:26px; font-weight:900; letter-spacing:-1px;">VISIONA</span>
-            </div>
+        <div style="display:flex; align-items:center; gap:15px; cursor:pointer;" onclick="V.nav('home')">
+            <div style="width:40px; height:40px; background:var(--accent); border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:24px;">V</div>
+            <span style="font-size:24px; font-weight:900;">VISIONA</span>
         </div>
 
-        <div style="flex:1; max-width:600px; display:flex; background:#000; border:1px solid var(--border); border-radius:40px; padding:6px;">
-            <input type="text" id="search-input" placeholder="Rechercher sur l'écosystème..." style="flex:1; background:transparent; border:none; color:white; padding:0 25px; font-size:15px;">
-            <button class="v-btn-prime" style="border-radius:40px; padding:10px 25px;" onclick="V_CORE.search()">Trouver</button>
+        <div style="flex:1; max-width:500px; display:flex; background:#000; border:1px solid var(--border); border-radius:30px; padding:5px;">
+            <input type="text" id="search-in" placeholder="Rechercher..." style="flex:1; background:transparent; border:none; color:white; padding:0 20px;">
+            <button class="v-btn-prime" style="border-radius:30px;" onclick="V.search()">Go</button>
         </div>
 
-        <div style="display:flex; align-items:center; gap:25px;">
-            <div id="user-credits-display"></div>
+        <div style="display:flex; align-items:center; gap:20px;">
+            <div id="credits-ui" style="color:var(--gold); font-weight:800;">0 CR</div>
             <div style="position:relative;">
-                <button onclick="V_CORE.toggleNotifs()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">🔔 <span id="notif-badge" style="position:absolute; top:-5px; right:-5px; background:var(--red); font-size:10px; padding:3px 6px; border-radius:10px;">0</span></button>
-                <div id="notif-menu">
-                    <h3 style="margin:0 0 20px 0;">Notifications</h3>
-                    <div id="notif-list"></div>
-                </div>
+                <button onclick="V.toggleNotif()" style="background:none; border:none; color:white; font-size:22px; cursor:pointer;">🔔</button>
+                <div id="notif-menu"><h3>Notifications</h3><div id="notif-list"></div></div>
             </div>
-            <div id="header-auth-zone"></div>
+            <div id="auth-ui"></div>
         </div>
     </header>
 
     <div class="app-container">
         <aside class="sidebar">
-            <div class="nav-label">Explorer</div>
-            <div class="nav-link active" id="n-home" onclick="V_CORE.nav('home')">🏠 Accueil</div>
-            <div class="nav-link" id="n-zapps" onclick="V_CORE.nav('zapps')">⚡ Visiona Zapps</div>
-            <div class="nav-link" id="n-history" onclick="V_CORE.nav('history')">🕒 Historique</div>
-            <div class="nav-link" onclick="V_CORE.nav('subs-feed')">📺 Abonnements</div>
+            <div class="nav-link active" id="n-home" onclick="V.nav('home')">🏠 Accueil</div>
+            <div class="nav-link" id="n-zapps" onclick="V.nav('zapps')">⚡ Zapps</div>
+            <div class="nav-link" id="n-stream" onclick="V.nav('stream')">🔴 Direct</div>
+            <div class="nav-link" id="n-hist" onclick="V.nav('history')">🕒 Historique</div>
+            <div class="nav-link" onclick="V.nav('subs')">📺 Abonnements</div>
             
-            <div class="nav-label">Moi</div>
-            <div class="nav-link" onclick="V_CORE.nav('my-channel')">👤 Ma Chaîne</div>
-            <div class="nav-link" onclick="V_CORE.nav('stats')">📊 Statistiques</div>
-            <div class="nav-link" onclick="V_CORE.nav('thanks')">💎 Remerciements</div>
+            <div class="nav-label">MOI</div>
+            <div class="nav-link" onclick="V.nav('profile', V.state.user?.name)">👤 Ma Chaîne</div>
+            <div class="nav-link" onclick="V.nav('stats')">📊 Statistiques</div>
+            <div class="nav-link" onclick="V.nav('thanks')">💎 Remerciements</div>
 
-            <div class="nav-label">Communauté</div>
-            <div id="sidebar-subs-list"></div>
+            <div class="nav-label">ABONNEMENTS</div>
+            <div id="sub-list-sidebar"></div>
 
-            <div id="admin-section" style="display:none;">
-                <div class="nav-label" style="color:var(--gold);">Gouvernance</div>
-                <div class="nav-link" onclick="V_CORE.nav('admin')" style="color:var(--gold);">🔑 Panel Maître</div>
+            <div id="admin-btn" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:20px;">
+                <div class="nav-link" onclick="V.nav('admin')" style="color:var(--gold);">🔑 Admin Panel</div>
             </div>
         </aside>
 
-        <main class="viewport" id="viewport">
+        <main class="viewport">
             <div id="view-home">
-                <h2 style="font-size:32px; font-weight:900; margin-bottom:35px;">Recommandations</h2>
+                <h2 style="margin-bottom:20px;">Recommandations</h2>
                 <div id="grid-home" class="v-grid"></div>
             </div>
 
             <div id="view-zapps"></div>
 
+            <div id="view-stream" style="display:none;">
+                <h2>🔴 Directs en cours</h2>
+                <div id="grid-stream" class="v-grid" style="margin-top:20px;">
+                    <div style="text-align:center; grid-column:1/-1; padding:50px; color:var(--sec);">Aucun stream en cours.</div>
+                </div>
+            </div>
+
             <div id="view-history" style="display:none;">
-                <h2 style="font-size:32px; font-weight:900; margin-bottom:35px;">🕒 Votre Historique</h2>
-                <div id="grid-history" class="v-grid"></div>
+                <h2>🕒 Historique</h2>
+                <div id="grid-history" class="v-grid" style="margin-top:20px;"></div>
+            </div>
+
+            <div id="view-subs" style="display:none;">
+                <h2>📺 Vos Abonnements</h2>
+                <div id="grid-subs" class="v-grid" style="margin-top:20px;"></div>
             </div>
 
             <div id="view-stats" style="display:none;">
-                <h2 style="font-size:32px; font-weight:900; margin-bottom:35px;">Votre Impact</h2>
-                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:25px;">
-                    <div class="glass-panel" style="padding:30px; text-align:center;">
-                        <span style="display:block; font-size:40px; font-weight:900; color:var(--accent);" id="st-v">0</span>
-                        <small style="color:var(--sec); font-weight:800; text-transform:uppercase;">Vues</small>
-                    </div>
-                    <div class="glass-panel" style="padding:30px; text-align:center;">
-                        <span style="display:block; font-size:40px; font-weight:900; color:var(--green);" id="st-t">0h 00m</span>
-                        <small style="color:var(--sec); font-weight:800; text-transform:uppercase;">Temps Passé</small>
-                    </div>
-                    <div class="glass-panel" style="padding:30px; text-align:center;">
-                        <span style="display:block; font-size:40px; font-weight:900; color:var(--gold);" id="st-c">0</span>
-                        <small style="color:var(--sec); font-weight:800; text-transform:uppercase;">Crédits</small>
-                    </div>
-                    <div class="glass-panel" style="padding:30px; text-align:center;">
-                        <span style="display:block; font-size:40px; font-weight:900; color:white;" id="st-s">0</span>
-                        <small style="color:var(--sec); font-weight:800; text-transform:uppercase;">Abonnements</small>
-                    </div>
+                <h2>📊 Statistiques Temps Réel</h2>
+                <div class="glass-panel" style="padding:40px; margin-top:20px; text-align:center;">
+                    <h1 id="stat-timer" style="font-size:60px; color:var(--green);">00:00:00</h1>
+                    <p>Temps passé sur cette session</p>
                 </div>
-                <h3 style="margin-top:50px;">🔥 Vos 3 créateurs favoris</h3>
-                <div id="top-creators" class="v-grid"></div>
-            </div>
-
-            <div id="view-thanks" style="display:none;">
-                <h2 style="font-size:32px; font-weight:900; margin-bottom:20px; text-align:center;">💎 Le Hall of Fame</h2>
-                <p style="text-align:center; color:var(--sec); margin-bottom:50px;">Ceux qui font battre le cœur de Visiona.</p>
-                <div id="thanks-grid" class="v-grid"></div>
             </div>
 
             <div id="view-admin" style="display:none;">
-                <h2 style="color:var(--gold); font-weight:900;">🔑 Panel Alpha - Visiona Engine</h2>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px; margin-top:40px;">
-                    <div class="admin-box">
-                        <h3>💰 Distribution de Crédits</h3>
-                        <input type="text" id="adm-user-credit" class="v-input" placeholder="Pseudo de l'utilisateur">
-                        <input type="number" id="adm-amount-credit" class="v-input" placeholder="Montant">
-                        <button class="v-btn v-btn-prime" style="width:100%;" onclick="V_CORE.adminAddCredits()">Ajouter les Crédits</button>
+                <h2 style="color:var(--gold);">Panel Admin</h2>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:20px;">
+                    <div class="glass-panel" style="padding:20px;">
+                        <h3>Gestion Vidéos</h3>
+                        <div id="adm-vid-list" style="max-height:300px; overflow-y:auto; margin-top:10px;"></div>
                     </div>
-                    <div class="admin-box">
-                        <h3>🏆 Ajouter aux Remerciements</h3>
-                        <input type="text" id="adm-user-thanks" class="v-input" placeholder="Pseudo">
-                        <input type="text" id="adm-msg-thanks" class="v-input" placeholder="Rôle (ex: Donateur, Dev)">
-                        <button class="v-btn" style="width:100%; border-color:var(--gold); color:var(--gold);" onclick="V_CORE.adminAddThanks()">Inscrire au Hall of Fame</button>
+                    <div class="glass-panel" style="padding:20px;">
+                        <h3>Gestion Staff & Remerciements</h3>
+                        <input type="text" id="adm-pseudo" class="v-input" placeholder="Pseudo">
+                        <div style="display:flex; gap:10px;">
+                            <button class="v-btn" onclick="V.admPromote()">Admin</button>
+                            <button class="v-btn" onclick="V.admThanks()">Hall of Fame</button>
+                        </div>
                     </div>
-                </div>
-                <div class="admin-box" style="margin-top:30px;">
-                    <h3>🚩 Modération des Vidéos</h3>
-                    <div id="admin-video-list" style="max-height:300px; overflow-y:auto;"></div>
                 </div>
             </div>
 
-            <div id="view-my-channel" style="display:none;">
-                <div id="p-hero" style="height:300px; border-radius:35px; background:#111; background-size:cover; position:relative;">
-                    <img id="my-pdp-display" src="" style="width:150px; height:150px; border-radius:50%; border:8px solid var(--bg); position:absolute; bottom:-60px; left:40px;">
+            <div id="view-thanks" style="display:none;">
+                <h2>💎 Hall of Fame</h2>
+                <div id="grid-thanks" class="v-grid" style="margin-top:20px;"></div>
+            </div>
+
+            <div id="view-profile" style="display:none;">
+                <div id="p-banner" style="height:250px; border-radius:25px; background:#111; background-size:cover; position:relative;">
+                    <img id="p-avatar" src="" style="width:130px; height:130px; border-radius:50%; border:6px solid var(--bg); position:absolute; bottom:-40px; left:40px;">
                 </div>
-                <div style="margin: 80px 0 40px 40px;">
-                    <h1 id="my-name-display" style="font-size:42px;">Nom de Chaîne</h1>
-                    <div class="glass-panel" style="margin-top:30px; padding:25px; display:inline-block;">
-                        <p style="margin-bottom:15px; font-weight:bold;">Personnalisation Alpha :</p>
-                        <label class="v-btn" style="margin-right:10px;">📸 Photo Profil <input type="file" id="inp-pdp" hidden onchange="V_CORE.uploadLocal('pdp')"></label>
-                        <label class="v-btn">🖼️ Bannière <input type="file" id="inp-banner" hidden onchange="V_CORE.uploadLocal('banner')"></label>
+                <div style="margin: 60px 0 0 40px; display:flex; justify-content:space-between; align-items:center; padding-right:40px;">
+                    <div>
+                        <h1 id="p-name">Nom</h1>
+                        <p id="p-sub-count" style="color:var(--sec);">0 abonnés</p>
                     </div>
+                    <div id="p-actions"></div>
                 </div>
-                <div id="my-videos-grid" class="v-grid"></div>
+                
+                <div class="profile-tabs">
+                    <div class="p-tab active" onclick="V.tab('video')">VIDÉOS</div>
+                    <div class="p-tab" onclick="V.tab('zap')">ZAPPS</div>
+                    <div class="p-tab" onclick="V.tab('direct')">DIRECT</div>
+                    <div class="p-tab" onclick="V.tab('pub')">PUBLICATIONS</div>
+                    <div class="p-tab" onclick="V.tab('about')">À PROPOS</div>
+                </div>
+                <div id="p-content" class="v-grid"></div>
             </div>
         </main>
     </div>
 
     <div id="player-overlay">
-        <div class="player-container">
-            <button onclick="V_CORE.closePlayer()" class="v-btn" style="margin-bottom:30px;">← QUITTER LE MODE LECTURE</button>
-            <div class="main-video-box">
-                <video id="main-video" controls autoplay style="width:100%; height:100%;"></video>
-            </div>
-            
-            <div style="margin-top:40px; display:grid; grid-template-columns: 1fr 380px; gap:60px;">
+        <div style="max-width:1400px; margin:0 auto;">
+            <button onclick="V.closePlayer()" class="v-btn" style="margin-bottom:20px;">← RETOUR</button>
+            <div style="display:grid; grid-template-columns: 1fr 350px; gap:40px;">
                 <div>
-                    <h1 id="p-title" style="font-size:32px; font-weight:900; margin:0;">Titre</h1>
-                    <div style="display:flex; align-items:center; justify-content:space-between; margin-top:15px;">
-                        <span id="p-meta" style="color:var(--sec);">0 vues • Il y a 0m</span>
-                        <div class="stat-btn-group">
-                            <button id="p-like" class="stat-btn" onclick="V_CORE.interact('like')">👍 <span id="p-like-count">0</span></button>
-                            <button id="p-dislike" class="stat-btn" onclick="V_CORE.interact('dislike')">👎</button>
-                            <button class="stat-btn">🔗 Partager</button>
+                    <video id="vid-main" controls autoplay style="width:100%; border-radius:25px; background:#000;"></video>
+                    <h1 id="vid-title" style="margin-top:20px;">Titre</h1>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:15px; border-bottom:1px solid var(--border);">
+                        <span id="vid-meta" style="color:var(--sec);">Info</span>
+                        <div style="display:flex; gap:10px;">
+                            <button class="v-btn" onclick="V.interact('like')">👍 <span id="vid-likes">0</span></button>
+                            <button class="v-btn" onclick="V.interact('dislike')">👎</button>
+                            <button class="v-btn" onclick="V.share()">🔗 Partager</button>
                         </div>
                     </div>
-
-                    <div class="glass-panel" style="margin-top:35px; padding:30px; display:flex; justify-content:space-between; align-items:center;">
-                        <div id="p-chan-meta" style="display:flex; align-items:center; gap:20px; cursor:pointer;"></div>
-                        <div style="display:flex; align-items:center; gap:15px;">
-                            <button id="p-sub-btn" class="v-btn v-btn-prime" style="padding:15px 40px;"></button>
-                        </div>
+                    <div style="margin-top:20px; display:flex; align-items:center; justify-content:space-between;">
+                        <div id="vid-author" style="display:flex; gap:15px; align-items:center; cursor:pointer;"></div>
+                        <div id="vid-sub-btn"></div>
                     </div>
-
-                    <div style="margin-top:60px;">
-                        <h3 style="font-size:24px;">Discussions (<span id="p-com-count">0</span>)</h3>
-                        <div style="display:flex; gap:20px; margin-bottom:40px;">
-                            <img id="my-pdp-com" src="" style="width:45px; height:45px; border-radius:50%;">
-                            <input type="text" id="com-input" class="v-input" placeholder="Ajouter un commentaire..." style="margin:0;">
-                            <button class="v-btn v-btn-prime" onclick="V_CORE.postComment()">Publier</button>
+                    
+                    <div style="margin-top:40px;">
+                        <h3>Commentaires</h3>
+                        <div style="display:flex; gap:15px; margin:20px 0;">
+                            <input type="text" id="com-in" class="v-input" placeholder="Commenter..." style="margin:0;">
+                            <button class="v-btn v-btn-prime" onclick="V.postCom()">Envoyer</button>
                         </div>
-                        <div id="p-com-list"></div>
+                        <div id="com-list"></div>
                     </div>
                 </div>
-                
-                <div>
-                    <h3 style="margin:0 0 20px 0;">Vidéos suggérées</h3>
-                    <div id="p-side-list"></div>
-                </div>
+                <div id="vid-suggest"></div>
             </div>
+        </div>
+    </div>
+
+    <div id="modal-edit" class="modal">
+        <div class="modal-content">
+            <h3>Personnaliser</h3>
+            <p>Photo de profil :</p>
+            <input type="file" id="f-pdp" class="v-input" onchange="V.upload('pdp')">
+            <p>Bannière :</p>
+            <input type="file" id="f-banner" class="v-input" onchange="V.upload('banner')">
+            <p>Description :</p>
+            <input type="text" id="f-desc" class="v-input" placeholder="Bio...">
+            <button class="v-btn v-btn-prime" onclick="V.saveProfileEdit()">Enregistrer</button>
         </div>
     </div>
 
     <div id="modal-auth" class="modal">
         <div class="modal-content">
-            <h2 style="margin:0 0 10px 0;">Connexion Visiona</h2>
-            <input type="text" id="auth-pseudo" class="v-input" placeholder="Votre Pseudo Unique">
-            <button class="v-btn v-btn-prime" style="width:100%;" onclick="V_CORE.login()">REJOINDRE</button>
+            <h2>Connexion</h2>
+            <input type="text" id="auth-name" class="v-input" placeholder="Pseudo">
+            <input type="email" id="auth-mail" class="v-input" placeholder="Email">
+            <button class="v-btn v-btn-prime" onclick="V.login()">Entrer</button>
         </div>
     </div>
 
     <script>
-        const DB_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json";
-        const WORKER = "https://mytubeupload.edonis-imbert.workers.dev/";
-
-        const V_CORE = {
-            state: {
-                user: JSON.parse(localStorage.getItem('v28_user')) || null,
-                data: { videos: [], users: {}, thanks: [] },
-                // MODIF: HISTORIQUE & LIKES RÉELS
-                history: JSON.parse(localStorage.getItem('v28_history')) || [],
-                likedVideos: JSON.parse(localStorage.getItem('v28_liked')) || [],
-                activeVid: null
+        const DB = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json";
+        
+        const V = {
+            s: {
+                u: JSON.parse(localStorage.getItem('v36_u')) || null,
+                d: { videos:[], users:{}, thanks:[], admins:["Admin"] },
+                subs: JSON.parse(localStorage.getItem('v36_s')) || [],
+                hist: JSON.parse(localStorage.getItem('v36_h')) || [],
+                liked: JSON.parse(localStorage.getItem('v36_l')) || [],
+                time: 0,
+                curr: null
             },
 
-            init: async function() {
-                await this.fetch();
+            async init() {
+                await this.sync();
+                this.shuffleHome();
                 this.renderUI();
                 this.nav('home');
+                setInterval(() => { this.s.time++; this.updTime(); }, 1000);
+                this.easter();
             },
 
-            fetch: async function() {
+            async sync() {
                 try {
-                    const r = await fetch(DB_URL + "?nocache=" + Date.now());
-                    this.state.data = await r.json();
-                } catch(e) { console.error("Fetch failed"); }
+                    let r = await fetch(DB + "?t=" + Date.now());
+                    this.s.d = await r.json();
+                } catch(e){}
             },
 
-            save: async function() {
-                await fetch(WORKER, {
-                    method: 'PATCH',
-                    body: JSON.stringify({ files: {"video.json": {content: JSON.stringify(this.state.data, null, 2)}}})
-                });
+            shuffleHome() {
+                this.s.d.videos.sort(() => Math.random() - 0.5);
             },
 
-            saveLocal: function() {
-                localStorage.setItem('v28_user', JSON.stringify(this.state.user));
-                localStorage.setItem('v28_history', JSON.stringify(this.state.history));
-                localStorage.setItem('v28_liked', JSON.stringify(this.state.likedVideos));
+            updTime() {
+                let h = Math.floor(this.s.time / 3600), m = Math.floor((this.s.time % 3600) / 60), s = this.s.time % 60;
+                if(document.getElementById('stat-timer')) 
+                    document.getElementById('stat-timer').innerText = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
             },
 
-            nav: function(page) {
-                const views = ['view-home', 'view-zapps', 'view-stats', 'view-thanks', 'view-admin', 'view-my-channel', 'view-history'];
-                views.forEach(v => document.getElementById(v).style.display = 'none');
+            nav(p, param) {
+                document.querySelectorAll('.viewport > div').forEach(d => d.style.display='none');
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                 
-                const target = document.getElementById('view-' + page);
-                if(target) target.style.display = (page === 'zapps' ? 'flex' : 'block');
+                let t = document.getElementById('view-'+p);
+                if(t) t.style.display = (p === 'zapps' ? 'flex' : 'block');
+                
+                if(document.getElementById('n-'+p)) document.getElementById('n-'+p).classList.add('active');
 
-                if(page === 'home') this.renderGrid('grid-home', this.state.data.videos.filter(v => !v.isShort));
-                if(page === 'history') this.renderGrid('grid-history', this.state.history);
-                if(page === 'zapps') this.renderZapps();
-                if(page === 'thanks') this.renderThanks();
-                if(page === 'admin') this.renderAdmin();
-                if(page === 'my-channel') this.renderMyChannel();
+                if(p === 'home') this.renderGrid('grid-home', this.s.d.videos.filter(v => !v.isShort));
+                if(p === 'zapps') this.renderZapps();
+                if(p === 'history') this.renderGrid('grid-history', this.s.hist);
+                if(p === 'subs') this.renderGrid('grid-subs', this.s.d.videos.filter(v => this.s.subs.includes(v.author)));
+                if(p === 'thanks') this.renderThanks();
+                if(p === 'admin') this.renderAdmin();
+                if(p === 'profile') this.renderProfile(param || this.s.u?.name);
             },
 
-            renderGrid: function(containerId, vids) {
-                const grid = document.getElementById(containerId);
-                grid.innerHTML = vids.map(v => `
-                    <div class="v-card" onclick="V_CORE.openPlayer('${v.id}')">
+            renderGrid(id, list) {
+                document.getElementById(id).innerHTML = list.map(v => `
+                    <div class="v-card" onclick="V.play('${v.id}')">
                         <div class="v-thumb">
                             <img src="${v.thumb}">
-                            <div class="v-badge-time">${v.duration || '0:00'}</div>
+                            <div class="v-duration">${v.duration || '00:00'}</div>
                         </div>
                         <div class="v-meta">
-                            <img src="${this.getPDP(v.author)}" class="v-avatar">
+                            <img src="${this.av(v.author)}" class="v-avatar">
                             <div class="v-info">
                                 <h3>${v.title}</h3>
-                                <p>${v.author} • ${this.timeAgo(v.timestamp)}</p>
+                                <p>${v.author} • ${this.ago(v.timestamp)}</p>
                             </div>
                         </div>
                     </div>
                 `).join('');
             },
 
-            renderZapps: function() {
-                const container = document.getElementById('view-zapps');
-                const shorts = this.state.data.videos.filter(v => v.isShort);
-                container.innerHTML = shorts.map(s => `
+            renderZapps() {
+                document.getElementById('view-zapps').innerHTML = this.s.d.videos.filter(v => v.isShort).map(v => `
                     <div class="zapp-item">
-                        <video src="${s.url}" class="zapp-video" loop autoplay muted></video>
-                        <div style="position:absolute; right:20px; bottom:120px; display:flex; flex-direction:column; align-items:center; gap:25px;">
-                            <div style="position:relative; cursor:pointer;" onclick="V_CORE.interact('like', '${s.id}')">
-                                <span style="font-size:35px;">❤️</span>
-                                <img src="${this.getPDP(s.author)}" style="position:absolute; bottom:-5px; right:-5px; width:22px; height:22px; border-radius:50%; border:2px solid #000;">
-                            </div>
-                            <b style="font-size:14px;">${s.likes || 0}</b>
+                        <video src="${v.url}" class="zapp-video" loop autoplay muted></video>
+                        <div class="zapp-ui">
+                            <div class="zapp-btn" onclick="V.interact('like','${v.id}')">❤️</div>
+                            <span>${v.likes||0}</span>
+                            <div class="zapp-btn" onclick="V.play('${v.id}')">💬</div>
+                        </div>
+                        <div style="position:absolute; bottom:20px; left:20px;">
+                            <b onclick="V.nav('profile','${v.author}')" style="cursor:pointer;">@${v.author}</b>
+                            <p>${v.title}</p>
                         </div>
                     </div>
                 `).join('');
             },
 
-            openPlayer: function(id) {
-                const v = this.state.data.videos.find(x => x.id == id);
-                if(!v) return;
-                this.state.activeVid = v;
-                v.views = (v.views || 0) + 1;
+            play(id) {
+                let v = this.s.d.videos.find(x => x.id == id);
+                this.s.curr = v;
+                this.s.hist = [v, ...this.s.hist.filter(x=>x.id!==id)].slice(0,50);
+                localStorage.setItem('v36_h', JSON.stringify(this.s.hist));
 
-                // MODIF: HISTORIQUE RÉEL
-                this.state.history = [v, ...this.state.history.filter(h => h.id !== v.id)].slice(0, 30);
+                document.getElementById('player-overlay').style.display='block';
+                document.getElementById('vid-main').src = v.url;
+                document.getElementById('vid-title').innerText = v.title;
+                document.getElementById('vid-meta').innerText = `${v.views||0} vues • ${this.ago(v.timestamp)}`;
+                document.getElementById('vid-likes').innerText = v.likes||0;
                 
-                document.getElementById('player-overlay').style.display = 'block';
-                document.getElementById('main-video').src = v.url;
-                document.getElementById('p-title').innerText = v.title;
-                document.getElementById('p-like-count').innerText = v.likes || 0;
-                
-                this.saveLocal();
-                this.save();
-                this.renderComments();
-                this.renderPlayerMeta();
+                this.renderAuthor(v.author);
+                this.renderComs();
             },
 
-            // MODIF: LIKE UNIQUE
-            interact: function(type, id = null) {
-                const v = id ? this.state.data.videos.find(x => x.id == id) : this.state.activeVid;
-                if(this.state.likedVideos.includes(v.id)) return alert("Déjà liké !");
+            renderAuthor(u) {
+                let sub = this.s.subs.includes(u);
+                document.getElementById('vid-author').innerHTML = `<img src="${this.av(u)}" class="v-avatar"> <b>${u}</b>`;
+                document.getElementById('vid-author').onclick = () => V.nav('profile', u);
+                
+                document.getElementById('vid-sub-btn').innerHTML = `
+                    <button class="v-btn ${sub?'':'v-btn-prime'}" onclick="V.sub('${u}')">${sub?'Abonné 🔔':'S\'abonner'}</button>
+                `;
+            },
+
+            sub(u) {
+                if(!this.s.u) return this.modal('auth');
+                if(this.s.subs.includes(u)) this.s.subs = this.s.subs.filter(x=>x!==u);
+                else { 
+                    this.s.subs.push(u); 
+                    // Logique cloche: clic simple = "toutes" par defaut
+                    alert("Abonné ! (Cloche activée)");
+                }
+                localStorage.setItem('v36_s', JSON.stringify(this.s.subs));
+                this.renderAuthor(u);
+                this.renderSubsSide();
+            },
+
+            renderSubsSide() {
+                document.getElementById('sub-list-sidebar').innerHTML = this.s.subs.map(u => `
+                    <div class="nav-link" onclick="V.nav('profile','${u}')">
+                        <img src="${this.av(u)}" style="width:24px; height:24px; border-radius:50%;"> ${u}
+                    </div>
+                `).join('');
+            },
+
+            interact(type, id) {
+                if(!this.s.u) return this.modal('auth');
+                let v = id ? this.s.d.videos.find(x=>x.id==id) : this.s.curr;
                 
                 if(type === 'like') {
-                    v.likes = (v.likes || 0) + 1;
-                    this.state.likedVideos.push(v.id);
-                    if(id) this.renderZapps(); else document.getElementById('p-like-count').innerText = v.likes;
+                    if(this.s.liked.includes(v.id)) return; // 1 like max
+                    v.likes = (v.likes||0)+1;
+                    this.s.liked.push(v.id);
+                    localStorage.setItem('v36_l', JSON.stringify(this.s.liked));
+                    if(!id) document.getElementById('vid-likes').innerText = v.likes;
                 }
-                this.saveLocal();
-                this.save();
+                if(type === 'dislike') alert("Dislike pris en compte (masqué)");
             },
 
-            // MODIF: UPLOAD LOCAL
-            uploadLocal: function(type) {
-                const file = document.getElementById(type === 'pdp' ? 'inp-pdp' : 'inp-banner').files[0];
-                if(!file) return;
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    const u = this.state.user.name;
-                    if(!this.state.data.users[u]) this.state.data.users[u] = {};
-                    if(type === 'pdp') this.state.data.users[u].avatar = reader.result;
-                    else this.state.data.users[u].banner = reader.result;
-                    this.save();
-                    this.renderMyChannel();
-                };
-                reader.readAsDataURL(file);
+            share() {
+                navigator.clipboard.writeText(window.location.href);
+                alert("Lien copié !");
             },
 
-            // FONCTIONS DE BASE PRÉSERVÉES
-            timeAgo: function(ts) {
-                if(!ts) return "il y a 1h";
-                const diff = Math.floor((Date.now() - ts) / 1000);
-                if(diff < 60) return "à l'instant";
-                return `il y a ${Math.floor(diff/60)}m`;
+            postCom() {
+                let txt = document.getElementById('com-in').value;
+                if(!txt) return;
+                if(!this.s.curr.comments) this.s.curr.comments = [];
+                this.s.curr.comments.unshift({u:this.s.u.name, t:txt, d:Date.now(), h:false});
+                document.getElementById('com-in').value='';
+                this.renderComs();
             },
-            getPDP: function(name) {
-                return this.state.data.users[name]?.avatar || `https://ui-avatars.com/api/?name=${name}&background=7c4dff&color=fff`;
+
+            heartCom(i) {
+                if(this.s.curr.author !== this.s.u?.name) return;
+                this.s.curr.comments[i].h = !this.s.curr.comments[i].h;
+                this.renderComs();
             },
-            renderUI: function() {
-                const zone = document.getElementById('header-auth-zone');
-                if(this.state.user) {
-                    zone.innerHTML = `<img src="${this.getPDP(this.state.user.name)}" style="width:40px; height:40px; border-radius:50%; cursor:pointer;" onclick="V_CORE.nav('my-channel')">`;
-                    if(this.state.user.name === "Admin") document.getElementById('admin-section').style.display = 'block';
+
+            renderComs() {
+                document.getElementById('com-list').innerHTML = (this.s.curr.comments||[]).map((c,i) => `
+                    <div style="display:flex; gap:15px; margin-bottom:15px;">
+                        <img src="${this.av(c.u)}" class="v-avatar">
+                        <div>
+                            <b>${c.u}</b>
+                            <p>${c.t}</p>
+                            <div style="font-size:12px; color:gray; display:flex; align-items:center; gap:10px;">
+                                ${this.ago(c.d)} 
+                                ${this.s.curr.author === this.s.u?.name ? `<span style="cursor:pointer;" onclick="V.heartCom(${i})">Mettre un ❤️</span>` : ''}
+                                ${c.h ? `<span class="creator-heart">❤️<img src="${this.av(this.s.curr.author)}" class="creator-heart-img"></span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            renderProfile(u) {
+                let d = this.s.d.users[u] || {};
+                let isMe = this.s.u?.name === u;
+                document.getElementById('p-name').innerText = u;
+                document.getElementById('p-avatar').src = d.avatar || this.av(u);
+                document.getElementById('p-banner').style.backgroundImage = d.banner ? `url(${d.banner})` : 'none';
+                
+                let acts = document.getElementById('p-actions');
+                if(isMe) {
+                    acts.innerHTML = `<button class="v-btn" onclick="V.modal('modal-edit')">Personnaliser</button>`;
                 } else {
-                    zone.innerHTML = `<button class="v-btn v-btn-prime" onclick="V_CORE.openModal('modal-auth')">Connexion</button>`;
+                    let sub = this.s.subs.includes(u);
+                    acts.innerHTML = `<button class="v-btn v-btn-prime" onclick="V.sub('${u}')">${sub?'Abonné 🔔':'S\'abonner'}</button>`;
+                }
+                
+                this.s.profUser = u;
+                this.tab('video');
+            },
+
+            tab(t) {
+                document.querySelectorAll('.p-tab').forEach(x=>x.classList.remove('active'));
+                event?.target?.classList?.add('active');
+                let list = [];
+                let u = this.s.profUser;
+                if(t==='video') list = this.s.d.videos.filter(v => v.author === u && !v.isShort);
+                if(t==='zap') list = this.s.d.videos.filter(v => v.author === u && v.isShort);
+                
+                if(t==='about') {
+                    document.getElementById('p-content').innerHTML = `<div style="padding:20px;">${this.s.d.users[u]?.desc || "Aucune description."}</div>`;
+                } else if(t==='direct' || t==='pub') {
+                    document.getElementById('p-content').innerHTML = `<div style="padding:20px;">Aucun contenu.</div>`;
+                } else {
+                    this.renderGrid('p-content', list);
                 }
             },
-            login: function() {
-                const p = document.getElementById('auth-pseudo').value;
-                if(p) { this.state.user = { name: p }; this.saveLocal(); location.reload(); }
+
+            upload(type) {
+                let f = document.getElementById(type==='pdp'?'f-pdp':'f-banner').files[0];
+                if(f) {
+                    let r = new FileReader();
+                    r.onload = e => {
+                        let u = this.s.u.name;
+                        if(!this.s.d.users[u]) this.s.d.users[u]={};
+                        if(type==='pdp') this.s.d.users[u].avatar = e.target.result;
+                        else this.s.d.users[u].banner = e.target.result;
+                        this.renderProfile(u);
+                        this.saveProfileEdit(); // Sauvegarde locale simulée
+                    };
+                    r.readAsDataURL(f);
+                }
             },
-            closePlayer: function() { document.getElementById('player-overlay').style.display = 'none'; document.getElementById('main-video').pause(); },
-            openModal: function(id) { document.getElementById(id).style.display = 'flex'; },
             
-            // RENDER MY CHANNEL
-            renderMyChannel: function() {
-                const u = this.state.user.name;
-                const data = this.state.data.users[u] || {};
-                document.getElementById('my-name-display').innerText = u;
-                document.getElementById('my-pdp-display').src = this.getPDP(u);
-                if(data.banner) document.getElementById('p-hero').style.backgroundImage = `url(${data.banner})`;
-                const vids = this.state.data.videos.filter(v => v.author === u);
-                this.renderGrid('my-videos-grid', vids);
+            saveProfileEdit() {
+                // Simulation sauvegarde desc
+                let desc = document.getElementById('f-desc').value;
+                if(desc) {
+                    if(!this.s.d.users[this.s.u.name]) this.s.d.users[this.s.u.name]={};
+                    this.s.d.users[this.s.u.name].desc = desc;
+                }
+                this.modal('modal-edit', false);
+                this.renderProfile(this.s.u.name);
+            },
+
+            // ADMIN
+            renderAdmin() {
+                if(!this.s.d.admins.includes(this.s.u?.name)) return document.getElementById('view-admin').innerHTML = "Accès refusé";
+                document.getElementById('adm-vid-list').innerHTML = this.s.d.videos.map(v => `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span>${v.title}</span> <button onclick="V.admDel('${v.id}')" style="color:red;border:none;background:none;cursor:pointer;">X</button>
+                    </div>
+                `).join('');
+            },
+            admDel(id) { this.s.d.videos = this.s.d.videos.filter(v=>v.id!==id); this.renderAdmin(); },
+            admPromote() { 
+                let p = document.getElementById('adm-pseudo').value;
+                if(p) { this.s.d.admins.push(p); alert(p+" est admin"); }
+            },
+            admThanks() {
+                let p = document.getElementById('adm-pseudo').value;
+                if(p) { this.s.d.thanks.push({pseudo:p, role:'Membre'}); alert("Ajouté !"); }
+            },
+            renderThanks() {
+                document.getElementById('grid-thanks').innerHTML = this.s.d.thanks.map(t => `
+                    <div class="contrib-card gold">
+                        <img src="${this.av(t.pseudo)}">
+                        <h3>${t.pseudo}</h3>
+                        <p>${t.role}</p>
+                    </div>
+                `).join('');
+            },
+
+            // UTILS
+            av(n) { return this.s.d.users[n]?.avatar || `https://ui-avatars.com/api/?name=${n}&background=7c4dff&color=fff`; },
+            ago(ts) {
+                let s = Math.floor((Date.now()-ts)/1000);
+                if(s<60) return "à l'instant";
+                if(s<3600) return Math.floor(s/60)+" min";
+                if(s<86400) return Math.floor(s/3600)+" h";
+                return Math.floor(s/86400)+" j";
+            },
+            renderUI() {
+                if(this.s.u) {
+                    document.getElementById('auth-ui').innerHTML = `<img src="${this.av(this.s.u.name)}" style="width:40px;height:40px;border-radius:50%;cursor:pointer;" onclick="V.nav('profile','${this.s.u.name}')">`;
+                    if(this.s.d.admins.includes(this.s.u.name)) document.getElementById('admin-btn').style.display='block';
+                } else {
+                    document.getElementById('auth-ui').innerHTML = `<button class="v-btn" onclick="V.modal('modal-auth')">Connexion</button>`;
+                }
+                this.renderSubsSide();
+            },
+            login() {
+                let n = document.getElementById('auth-name').value;
+                if(n) {
+                    this.s.u = {name:n};
+                    localStorage.setItem('v36_u', JSON.stringify(this.s.u));
+                    location.reload();
+                }
+            },
+            modal(id, show=true) { document.getElementById(id).style.display = show?'flex':'none'; },
+            closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); },
+            closePlayer() { document.getElementById('player-overlay').style.display='none'; document.getElementById('vid-main').pause(); },
+            toggleNotif() { 
+                let n = document.getElementById('notif-menu');
+                n.style.display = n.style.display==='block'?'none':'block';
+            },
+            easter() {
+                let k=[]; 
+                window.onkeydown=e=>{
+                    k.push(e.key);
+                    if(k.slice(-5).join('')==='alpha') alert("EASTER EGG ACTIVÉ !");
+                };
             }
         };
 
-        V_CORE.init();
+        window.onload = () => V.init();
     </script>
 </body>
 </html>
