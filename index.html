@@ -3,60 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Visiona Noël - AlphaGames30</title>
+    <title>Visiona V14 - AlphaGames30 & Edonis</title>
     <style>
-        :root { --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa; --hover: #272727; --blue: #3ea6ff; --red: #ff0000; --green: #00a854; --xmas: #d42426; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, Arial, sans-serif; overflow-x: hidden; padding-bottom: 60px; }
-        
-        /* Easter Egg Neige */
+        :root { 
+            --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa; 
+            --hover: #272727; --blue: #3ea6ff; --red: #ff0000; --green: #00a854; 
+            --gold: #ffd700; --xmas: #d42426;
+        }
+
+        /* --- EFFETS NOEL --- */
         #snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
-        .snowflake { position: fixed; top: -10px; color: white; font-size: 1em; user-select: none; z-index: 9999; animation: fall linear infinite; }
+        .snowflake { position: fixed; top: -10px; color: white; font-size: 1.2em; user-select: none; z-index: 9999; animation: fall linear infinite; }
         @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
 
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: Roboto, Arial, sans-serif; overflow-x: hidden; padding-bottom: 60px; transition: filter 0.5s; }
+        
+        /* --- HEADER --- */
         header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; height: 56px; background: var(--header); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
-        .logo { font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; position: relative; }
-        .logo::before { content: '🎅'; font-size: 24px; margin-right: 5px; } /* Logo Noël */
+        .logo { font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; }
+        .logo::before { content: '🎅'; font-size: 24px; margin-right: 8px; transition: transform 0.3s; }
+        .logo:hover::before { transform: scale(1.2) rotate(10deg); }
         
-        .search-box { display: flex; flex: 1; max-width: 500px; margin: 0 10px; }
-        .search-box input { width: 100%; background: #121212; border: 1px solid #333; color: white; padding: 8px 15px; border-radius: 40px 0 0 40px; }
-        .search-box button { background: #222; border: 1px solid #333; border-left: none; padding: 0 20px; border-radius: 0 40px 40px 0; color: white; cursor: pointer; }
+        .search-box { display: flex; flex: 1; max-width: 600px; margin: 0 20px; }
+        .search-box input { width: 100%; background: #121212; border: 1px solid #333; color: white; padding: 10px 15px; border-radius: 40px 0 0 40px; outline: none; }
+        .search-box input:focus { border-color: var(--blue); }
+        .search-box button { background: #222; border: 1px solid #333; border-left: none; padding: 0 20px; border-radius: 0 40px 40px 0; cursor: pointer; color: white; }
 
+        /* --- LAYOUT --- */
         .container { display: flex; height: calc(100vh - 56px); }
-        .sidebar { width: 220px; background: var(--bg); padding: 10px; overflow-y: auto; flex-shrink: 0; border-right: 1px solid #222; }
-        .nav-item { padding: 10px; border-radius: 10px; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .sidebar { width: 240px; background: var(--bg); padding: 12px; overflow-y: auto; flex-shrink: 0; border-right: 1px solid #222; }
+        .nav-item { padding: 12px; border-radius: 10px; cursor: pointer; margin-bottom: 4px; display: flex; align-items: center; gap: 15px; transition: background 0.2s; font-size: 14px; }
         .nav-item:hover { background: var(--hover); }
-        .nav-active { background: var(--hover); font-weight: bold; border-left: 3px solid var(--red); }
+        .nav-active { background: var(--hover); font-weight: bold; border-left: 4px solid var(--red); }
+        .sidebar hr { border: none; border-top: 1px solid #333; margin: 12px 0; }
 
-        .content { flex: 1; padding: 20px; overflow-y: auto; }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .video-card { cursor: pointer; transition: 0.2s; }
-        .thumb-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #333; }
-        .thumb { width: 100%; height: 100%; object-fit: cover; }
-        .badge-live { position: absolute; bottom: 5px; right: 5px; background: var(--red); color: white; padding: 2px 6px; font-size: 10px; border-radius: 4px; font-weight: bold; }
-
-        /* Shorts / Zapp */
-        .shorts-grid { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; }
-        .short-card { flex-shrink: 0; width: 160px; height: 300px; cursor: pointer; border-radius: 12px; overflow: hidden; background: #333; position: relative; }
-
-        /* Profil & PDP Lettre */
-        .avatar-letter { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; background: var(--xmas); }
-        .avatar-big { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; background: var(--xmas); display: flex; align-items: center; justify-content: center; font-size: 50px; color: white; border: 4px solid var(--bg); }
-        .banner { width: 100%; height: 200px; background: #333; object-fit: cover; border-radius: 15px; }
-
-        /* Modals */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 600; justify-content: center; align-items: center; }
-        .modal-box { background: #212121; padding: 25px; border-radius: 15px; width: 90%; max-width: 450px; }
-        .btn-blue { width: 100%; padding: 12px; background: var(--blue); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .action-pill { background: #272727; color: white; border: none; padding: 6px 12px; border-radius: 18px; cursor: pointer; }
+        .content { flex: 1; padding: 24px; overflow-y: auto; scroll-behavior: smooth; }
         
-        /* Player */
-        .player-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 500; overflow-y: auto; padding-bottom: 50px; }
-        .video-wrapper { width: 100%; max-width: 1000px; margin: 20px auto; aspect-ratio: 16/9; background: #000; }
-        video { width: 100%; height: 100%; }
+        /* --- VIDEOS & SHORTS --- */
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .video-card { cursor: pointer; position: relative; }
+        .thumb-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #222; transition: border-radius 0.2s; }
+        .video-card:hover .thumb-container { border-radius: 0; }
+        .thumb { width: 100%; height: 100%; object-fit: cover; }
+        .badge-live { position: absolute; bottom: 8px; right: 8px; background: var(--red); color: white; padding: 3px 6px; font-size: 11px; border-radius: 4px; font-weight: bold; }
+        
+        .shorts-container { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; scroll-snap-type: x mandatory; }
+        .short-card { flex: 0 0 180px; height: 320px; border-radius: 15px; overflow: hidden; position: relative; cursor: pointer; scroll-snap-align: start; }
+        .short-card img { width: 100%; height: 100%; object-fit: cover; }
 
-        footer { text-align: center; padding: 20px; color: var(--sec-text); font-size: 12px; border-top: 1px solid #222; margin-top: 40px; }
+        /* --- PDP & PROFIL --- */
+        .avatar-letter { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; background: var(--xmas); flex-shrink: 0; }
+        .avatar-big { width: 128px; height: 128px; border-radius: 50%; border: 4px solid var(--bg); background: var(--xmas); display: flex; align-items: center; justify-content: center; font-size: 60px; color: white; }
+        .banner { width: 100%; height: 200px; background: linear-gradient(45deg, #1a1a1a, #333); border-radius: 15px; object-fit: cover; }
 
-        @media(max-width: 768px) { .sidebar { display: none; } }
+        /* --- PLAYER --- */
+        .player-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; overflow-y: auto; }
+        .player-content { width: 95%; max-width: 1280px; margin: 0 auto; padding-top: 20px; }
+        .video-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .video-info { padding: 20px 0; border-bottom: 1px solid #333; }
+        
+        /* --- BUTTONS --- */
+        .btn-blue { background: var(--blue); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .btn-red { background: var(--red); color: #fff; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .action-pill { background: #272727; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .action-pill:hover { background: #3f3f3f; }
+
+        /* --- MODALS --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-box { background: #212121; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; border: 1px solid #333; }
+        .modal-box input, .modal-box textarea { width: 100%; padding: 12px; margin: 10px 0; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; }
+
+        footer { text-align: center; padding: 40px; color: var(--sec-text); border-top: 1px solid #222; margin-top: 50px; font-size: 13px; }
+
+        @media(max-width: 900px) { .sidebar { display: none; } }
     </style>
 </head>
 <body>
@@ -64,117 +83,169 @@
     <div id="snow-container"></div>
 
     <header>
-        <div class="logo" onclick="app.goHome()" id="mainLogo"><span>Visiona</span></div>
-        <div class="search-box"><input type="text" id="searchInput" placeholder="Rechercher..."><button onclick="app.search()">🔍</button></div>
-        <div class="header-btns">
-            <button onclick="app.openCreateChoice()">➕</button>
-            <button id="loginBtn" class="action-pill" onclick="app.toggleAccountMenu()">👤 Connexion</button>
+        <div class="logo" onclick="app.goHome()" id="logoNoel"><span>Visiona</span></div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Rechercher une vidéo, un créateur...">
+            <button onclick="app.search()">🔍</button>
+        </div>
+        <div class="header-btns" style="display:flex; align-items:center;">
+            <button onclick="app.openCreateChoice()" style="background:none; border:none; color:white; font-size:22px; cursor:pointer; margin-right:15px;">➕</button>
+            <div id="loginSection">
+                <button class="btn-blue" onclick="app.openLogin()">Se connecter</button>
+            </div>
         </div>
     </header>
 
-    <div id="accountMenu" style="display:none; position:absolute; right:10px; top:60px; background:#282828; padding:15px; border-radius:10px; z-index:1000; min-width: 150px; border: 1px solid #444;">
-        <div id="menuUserName" style="font-weight:bold; margin-bottom:10px; color: var(--blue);"></div>
+    <div id="accountMenu" style="display:none; position:fixed; right:20px; top:60px; background:#282828; border:1px solid #444; border-radius:12px; z-index:1500; min-width: 200px; overflow:hidden;">
+        <div id="menuHeader" style="padding:15px; border-bottom:1px solid #444; font-weight:bold;"></div>
         <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
-        <div class="nav-item" onclick="app.doLogout()">🚪 Déconnexion</div>
+        <div class="nav-item" onclick="app.goStats()">📊 Mes Statistiques</div>
+        <div class="nav-item" onclick="app.doLogout()" style="color:var(--red);">🚪 Déconnexion</div>
     </div>
 
     <div class="container">
         <nav class="sidebar">
-            <div class="nav-item" id="navHome" onclick="app.goHome()">🏠 Accueil</div>
+            <div class="nav-item nav-active" id="navHome" onclick="app.goHome()">🏠 Accueil</div>
             <div class="nav-item" id="navShorts" onclick="app.goShorts()">⚡ Zapp</div>
             <div class="nav-item" id="navLives" onclick="app.goLives()">🔴 Directs</div>
             <div class="nav-item" id="navSubs" onclick="app.goSubs()">📺 Abonnements</div>
-            <hr style="border-color: #333;">
+            <hr>
             <div class="nav-item" id="navHistory" onclick="app.goHistory()">🕒 Historique</div>
-            <div class="nav-item" id="navStats" onclick="app.goStats()">📊 Statistiques</div>
             <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
-            <div id="adminLink" class="nav-item" style="display:none; color: var(--red);" onclick="app.goAdminPanel()">🔑 Admin Panel</div>
+            <hr>
+            <div id="adminLink" class="nav-item" style="display:none; color: var(--red);" onclick="app.goAdminPanel()">🔑 Panneau Admin</div>
+            <div style="padding:15px; font-size:12px; color:var(--sec-text);">
+                A propos • Presse • Droits d'auteur<br><br>
+                © 2025 Visiona LLC<br>AlphaGames30 & Edonis Imbert
+            </div>
         </nav>
 
         <main class="content">
             <div id="mainTitle"></div>
+            
             <div id="videoGrid" class="video-grid"></div>
-            <div id="shortsGrid" class="shorts-grid" style="display:none;"></div>
+            <div id="shortsGrid" class="shorts-container" style="display:none;"></div>
 
             <div id="profileView" style="display:none;">
                 <img class="banner" id="pBanner" src="">
-                <div style="display:flex; align-items:flex-end; gap:20px; padding:20px; margin-top:-60px;">
+                <div style="display:flex; align-items:flex-end; gap:25px; padding:0 30px; margin-top:-64px;">
                     <div id="pAvatarContainer"></div>
-                    <div>
-                        <h1 id="pName" style="margin:0; text-shadow: 0 0 10px rgba(0,0,0,0.5);"></h1>
-                        <p id="pStats" style="color:var(--sec-text);"></p>
-                        <div id="profileActions"></div>
+                    <div style="padding-bottom:10px; flex:1;">
+                        <h1 id="pName" style="margin:0; font-size:32px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8);"></h1>
+                        <p id="pStats" style="color:var(--sec-text); margin:5px 0;"></p>
+                        <div id="profileActions" style="margin-top:10px;"></div>
                     </div>
                 </div>
-                <div id="pVideos" class="video-grid" style="padding:20px; border-top:1px solid #333; margin-top:20px;"></div>
-            </div>
-
-            <div id="statsView" style="display:none;">
-                <h2>📊 Statistiques Globales</h2>
-                <div id="statsContent" style="background:#1a1a1a; padding:20px; border-radius:10px;"></div>
+                <div id="pVideos" class="video-grid" style="margin-top:40px; padding:20px; border-top:1px solid #333;"></div>
             </div>
 
             <div id="adminPanel" style="display:none;">
-                <h2>🔑 Panel Administration</h2>
-                <button class="action-pill" onclick="app.openBroadcastModal()">📢 Faire une annonce</button>
-                <div id="adminVideoList" style="margin-top:20px;"></div>
+                <h2>Administration Système</h2>
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <button class="btn-blue" onclick="app.openBroadcastModal()">📢 Message Global</button>
+                    <button class="action-pill" onclick="app.loadData()">🔄 Actualiser Données</button>
+                </div>
+                <div id="adminVideoList"></div>
             </div>
 
             <footer>
-                <p>© 2024 Visiona - AlphaGames30 & Edonis Imbert</p>
-                <p>Version Spéciale Noël 🎄 - HLMT 13.5 Fusion</p>
+                <p>Développé par <b>AlphaGames30</b> & <b>Edonis Imbert</b></p>
+                <p>Propulsé par Cloudinary & GitHub Gist API • Version 14.0.2 Stable</p>
             </footer>
         </main>
     </div>
 
+    <div id="playerModal" class="player-overlay">
+        <div style="padding:15px;"><button class="action-pill" onclick="app.closePlayer()">✕ FERMER</button></div>
+        <div class="player-content">
+            <div class="video-wrapper">
+                <video id="mainVideoPlayer" controls autoplay></video>
+            </div>
+            <div class="video-info">
+                <h2 id="playerTitle" style="margin:10px 0;"></h2>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div id="playerAuthorArea" style="display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="app.closePlayer(); app.viewProfile(currentVideoAuthor)">
+                        </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="action-pill" id="likeBtn">👍 J'aime</button>
+                        <button class="action-pill">🎁 Partager</button>
+                    </div>
+                </div>
+                <div id="commentSection" style="margin-top:30px; background:#161616; padding:20px; border-radius:12px;">
+                    <h3>Commentaires</h3>
+                    <div style="display:flex; gap:10px; margin-bottom:20px;">
+                        <input type="text" id="comInput" placeholder="Ajouter un commentaire..." style="flex:1; background:#000; border:1px solid #333; color:white; padding:10px; border-radius:5px;">
+                        <button class="btn-blue" onclick="app.addComment()">Publier</button>
+                    </div>
+                    <div id="commentList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="modalCreateChoice" class="modal">
         <div class="modal-box">
-            <h2>Créer</h2>
-            <button class="btn-blue" onclick="app.openUpload()">🎬 Vidéo / Zapp</button>
-            <button class="btn-blue" style="background:var(--red); color:white;" onclick="app.startLiveStreaming()">🔴 Lancer un Direct</button>
-            <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Annuler</button>
+            <h2 style="margin-top:0;">Créer du contenu</h2>
+            <div style="display:grid; gap:15px;">
+                <button class="btn-blue" onclick="app.openUpload('video')">🎬 Importer une Vidéo / Zapp</button>
+                <button class="btn-red" onclick="app.startLiveStreaming()">🔴 Diffuser en Direct (Caméra)</button>
+            </div>
+            <button class="action-pill" style="width:100%; margin-top:20px;" onclick="app.closeModals()">Annuler</button>
+        </div>
+    </div>
+
+    <div id="modalLiveStream" class="modal">
+        <div class="modal-box" style="max-width: 600px;">
+            <h2>🔴 Studio Direct</h2>
+            <video id="livePreview" autoplay muted style="width:100%; border-radius:10px; background:#000; transform: scaleX(-1);"></video>
+            <input type="text" id="liveTitle" placeholder="Titre de votre direct...">
+            <button class="btn-red" style="width:100%;" onclick="app.confirmStartLive()">COMMENCER LE LIVE</button>
+            <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.stopLiveStreaming()">Annuler</button>
         </div>
     </div>
 
     <div id="modalUpload" class="modal">
         <div class="modal-box">
-            <h2>Publier</h2>
-            <input type="text" id="upTitle" placeholder="Titre" style="width:100%; padding:10px; margin:10px 0; background:#111; color:white; border:1px solid #444;">
+            <h2 id="upTypeTitle">Importer</h2>
+            <input type="text" id="upTitle" placeholder="Titre de la vidéo">
+            <label>Fichier Vidéo :</label>
             <input type="file" id="upVideoFile" accept="video/*">
-            <label>Miniature</label>
+            <label>Miniature (Image) :</label>
             <input type="file" id="upThumbFile" accept="image/*">
-            <button class="btn-blue" id="publishBtn" onclick="app.publish()">PUBLIER</button>
+            <div id="uploadStatus" style="font-size:12px; color:var(--blue); margin:10px 0;"></div>
+            <button class="btn-blue" id="publishBtn" onclick="app.publish()">PUBLIER SUR VISIONA</button>
+            <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Annuler</button>
+        </div>
+    </div>
+
+    <div id="modalLogin" class="modal">
+        <div class="modal-box">
+            <h2>Connexion / Inscription</h2>
+            <input type="email" id="logEmail" placeholder="Adresse Email">
+            <input type="text" id="logName" placeholder="Nom d'utilisateur (pour inscription)">
+            <input type="password" id="logPass" placeholder="Mot de passe">
+            <button class="btn-blue" style="width:100%;" onclick="app.doAuth()">Continuer</button>
             <button class="action-pill" style="width:100%; margin-top:10px;" onclick="app.closeModals()">Fermer</button>
         </div>
     </div>
 
-    <div id="playerModal" class="player-overlay">
-        <div style="padding: 15px;"><button class="action-pill" onclick="app.closePlayer()">✕ Fermer</button></div>
-        <div class="video-wrapper">
-            <video id="mainVideoPlayer" controls autoplay></video>
-        </div>
-        <div style="padding:0 20px;">
-            <h2 id="playerTitle"></h2>
-            <div id="playerActions" style="display:flex; gap:15px; align-items:center; border-bottom:1px solid #333; padding-bottom:15px;"></div>
-            <div id="commentSection" style="margin-top:20px;">
-                <h3>Commentaires</h3>
-                <div id="commentList"></div>
-            </div>
-        </div>
-    </div>
-
     <script>
+        const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dvbsmh8qq/upload";
+        const CLOUDINARY_PRESET = "mytube_upload";
         const WORKER_URL = "https://mytubeupload.edonis-imbert.workers.dev/";
         const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json";
         const ADMIN_EMAIL = "edonis.imbert@gmail.com";
+
+        let currentVideoAuthor = "";
+        let liveStream = null;
 
         const app = {
             data: {
                 user: JSON.parse(localStorage.getItem('mt_user')),
                 videos: [], users: {}, 
-                stats: JSON.parse(localStorage.getItem('mt_stats')) || { time: 0 },
                 history: JSON.parse(localStorage.getItem('mt_history')) || [],
-                subs: JSON.parse(localStorage.getItem('mt_subs')) || {} 
+                subs: JSON.parse(localStorage.getItem('mt_subs')) || {},
+                stats: JSON.parse(localStorage.getItem('mt_stats')) || { time: 0 }
             },
 
             init: async function() {
@@ -183,104 +254,115 @@
                 this.updateUI();
                 this.goHome();
                 this.setupEasterEggs();
+                // Temps passé
                 setInterval(() => { this.data.stats.time += 60; localStorage.setItem('mt_stats', JSON.stringify(this.data.stats)); }, 60000);
             },
 
+            // --- NOEL & EASTER EGGS ---
             startSnow: function() {
                 const container = document.getElementById('snow-container');
-                for(let i=0; i<50; i++) {
+                for(let i=0; i<60; i++) {
                     const flake = document.createElement('div');
                     flake.className = 'snowflake';
-                    flake.innerHTML = '❄';
+                    flake.innerHTML = ['❄','❅','❆'][Math.floor(Math.random()*3)];
                     flake.style.left = Math.random() * 100 + 'vw';
-                    flake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    flake.style.animationDuration = (Math.random() * 3 + 3) + 's';
                     flake.style.opacity = Math.random();
+                    flake.style.fontSize = (Math.random() * 10 + 10) + 'px';
                     container.appendChild(flake);
                 }
             },
 
             setupEasterEggs: function() {
-                let clickCount = 0;
-                document.getElementById('mainLogo').onclick = () => {
-                    clickCount++;
-                    if(clickCount === 10) {
-                        alert("🎄 JOYEUX NOËL ! Mode Arc-en-ciel activé !");
-                        document.body.style.filter = "hue-rotate(90deg)";
-                        clickCount = 0;
+                let logoClicks = 0;
+                document.getElementById('logoNoel').onclick = () => {
+                    logoClicks++;
+                    if(logoClicks === 10) {
+                        document.body.style.filter = "hue-rotate(180deg)";
+                        alert("🌈 Mode PSYCHÉDÉLIQUE activé ! Joyeuses fêtes !");
+                        logoClicks = 0;
                     }
                 };
             },
 
+            // --- DATA ---
             loadData: async function() {
                 try {
                     const res = await fetch(GIST_URL + "?t=" + Date.now());
                     const json = await res.json();
                     this.data.videos = json.videos || [];
                     this.data.users = json.users || {};
-                } catch(e) { console.error("Erreur Gist", e); }
+                } catch(e) { console.error("Erreur Gist load", e); }
             },
 
-            getAvatar: function(name, size="small") {
-                const user = this.data.users[name];
-                const char = name ? name.charAt(0).toUpperCase() : '?';
-                if(user && user.avatar) {
-                    return `<img src="${user.avatar}" class="${size === 'big' ? 'avatar-big' : 'avatar-letter'}">`;
-                }
-                return `<div class="${size === 'big' ? 'avatar-big' : 'avatar-letter'}">${char}</div>`;
+            saveGist: async function() {
+                const content = { videos: this.data.videos, users: this.data.users };
+                await fetch(WORKER_URL, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ files: { "video.json": { content: JSON.stringify(content, null, 2) } } })
+                });
             },
 
+            // --- NAVIGATION ---
             hideAll: function() {
-                ['videoGrid', 'shortsGrid', 'profileView', 'statsView', 'adminPanel'].forEach(id => document.getElementById(id).style.display = 'none');
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
+                ['videoGrid', 'shortsGrid', 'profileView', 'adminPanel'].forEach(id => {
+                    document.getElementById(id).style.display = 'none';
+                });
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-active'));
             },
 
             goHome: function() {
                 this.hideAll();
-                document.getElementById('videoGrid').style.display = 'grid';
                 document.getElementById('navHome').classList.add('nav-active');
-                document.getElementById('mainTitle').innerHTML = "<h2>Accueil 🎄</h2>";
+                document.getElementById('videoGrid').style.display = 'grid';
+                document.getElementById('mainTitle').innerHTML = "<h2>Contenu à la une 🎄</h2>";
                 this.render(this.data.videos.filter(v => !v.isShort && !v.isStream));
             },
 
             goShorts: function() {
                 this.hideAll();
-                document.getElementById('shortsGrid').style.display = 'flex';
                 document.getElementById('navShorts').classList.add('nav-active');
-                document.getElementById('mainTitle').innerHTML = "<h2>⚡ Zapp</h2>";
+                document.getElementById('shortsGrid').style.display = 'flex';
+                document.getElementById('mainTitle').innerHTML = "<h2>⚡ Zapp (Shorts)</h2>";
                 const shorts = this.data.videos.filter(v => v.isShort);
                 document.getElementById('shortsGrid').innerHTML = shorts.map(v => `
                     <div class="short-card" onclick="app.openVideoOverlay(${v.id})">
-                        <img src="${v.thumb}" style="width:100%; height:100%; object-fit:cover;">
-                        <div style="position:absolute; bottom:10px; left:10px; font-weight:bold;">${v.title}</div>
+                        <img src="${v.thumb}">
+                        <div style="position:absolute; bottom:15px; left:15px; font-weight:bold; text-shadow:1px 1px 5px black;">${v.title}</div>
                     </div>
                 `).join('');
             },
 
             goLives: function() {
                 this.hideAll();
-                document.getElementById('videoGrid').style.display = 'grid';
                 document.getElementById('navLives').classList.add('nav-active');
+                document.getElementById('videoGrid').style.display = 'grid';
                 document.getElementById('mainTitle').innerHTML = "<h2>🔴 Directs en cours</h2>";
                 this.render(this.data.videos.filter(v => v.isStream));
             },
 
             goHistory: function() {
                 this.hideAll();
-                document.getElementById('videoGrid').style.display = 'grid';
                 document.getElementById('navHistory').classList.add('nav-active');
-                document.getElementById('mainTitle').innerHTML = "<h2>🕒 Historique</h2>";
-                const hist = this.data.history.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
-                this.render(hist);
+                document.getElementById('videoGrid').style.display = 'grid';
+                document.getElementById('mainTitle').innerHTML = "<h2>🕒 Mon Historique</h2>";
+                const h = this.data.history.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
+                this.render(h);
             },
 
             goSubs: function() {
-                if(!this.data.user) return alert("Connectez-vous pour voir vos abonnements");
+                if(!this.data.user) return this.openLogin();
                 this.hideAll();
-                document.getElementById('videoGrid').style.display = 'grid';
                 document.getElementById('navSubs').classList.add('nav-active');
+                document.getElementById('videoGrid').style.display = 'grid';
                 document.getElementById('mainTitle').innerHTML = "<h2>📺 Mes Abonnements</h2>";
-                const authors = Object.keys(this.data.subs);
-                this.render(this.data.videos.filter(v => authors.includes(v.author)));
+                const subNames = Object.keys(this.data.subs);
+                this.render(this.data.videos.filter(v => subNames.includes(v.author)));
+            },
+
+            goMyProfile: function() {
+                if(!this.data.user) return this.openLogin();
+                this.viewProfile(this.data.user.name);
             },
 
             viewProfile: function(name) {
@@ -290,20 +372,157 @@
                 const profile = this.data.users[name] || { name: name };
                 
                 document.getElementById('pName').innerText = profile.name;
+                document.getElementById('pBanner').src = profile.banner || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1000';
                 document.getElementById('pAvatarContainer').innerHTML = this.getAvatar(name, "big");
-                document.getElementById('pBanner').src = profile.banner || 'https://via.placeholder.com/1000x200/333/fff?text=Visiona';
                 
-                const videos = this.data.videos.filter(vid => vid.author === name);
-                document.getElementById('pStats').innerText = `${videos.length} vidéos • 0 abonnés`;
+                const myVids = this.data.videos.filter(vid => vid.author === name);
+                document.getElementById('pStats').innerText = `${myVids.length} vidéos • Créateur Visiona`;
 
-                let subBtn = "";
+                let btns = "";
                 if(this.data.user && this.data.user.name !== name) {
                     const isSub = this.data.subs[name];
-                    subBtn = `<button class="action-pill" style="background:${isSub ? '#444' : 'var(--red)'}" onclick="app.toggleSub('${name}')">${isSub ? '✅ Abonné' : 'S\'abonner'}</button>`;
+                    btns = `<button class="btn-red" onclick="app.toggleSub('${name}')">${isSub ? '✅ ABONNÉ' : 'S\'ABONNER'}</button>`;
                 }
-                document.getElementById('profileActions').innerHTML = subBtn;
+                document.getElementById('profileActions').innerHTML = btns;
+                this.render(myVids, 'pVideos');
+            },
 
-                this.render(videos, 'pVideos');
+            // --- DIRECT (NOUVEAUTÉ) ---
+            startLiveStreaming: async function() {
+                if(!this.data.user) return this.openLogin();
+                try {
+                    liveStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    this.closeModals();
+                    document.getElementById('modalLiveStream').style.display = 'flex';
+                    document.getElementById('livePreview').srcObject = liveStream;
+                } catch(e) { alert("Impossible d'accéder à la caméra."); }
+            },
+
+            stopLiveStreaming: function() {
+                if(liveStream) {
+                    liveStream.getTracks().forEach(t => t.stop());
+                    liveStream = null;
+                }
+                document.getElementById('modalLiveStream').style.display = 'none';
+            },
+
+            confirmStartLive: async function() {
+                const title = document.getElementById('liveTitle').value || "Live de " + this.data.user.name;
+                const newLive = {
+                    id: Date.now(), title: title, author: this.data.user.name, isStream: true,
+                    url: "", thumb: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500", views: 0
+                };
+                this.data.videos.unshift(newLive);
+                await this.saveGist();
+                this.stopLiveStreaming();
+                this.goLives();
+                alert("Votre live est lancé ! (Simulation locale)");
+            },
+
+            // --- UPLOAD (CLOUDINARY) ---
+            publish: async function() {
+                const title = document.getElementById('upTitle').value;
+                const vidFile = document.getElementById('upVideoFile').files[0];
+                const thumbFile = document.getElementById('upThumbFile').files[0];
+                if(!title || !vidFile) return alert("Titre et vidéo requis !");
+
+                const btn = document.getElementById('publishBtn');
+                const status = document.getElementById('uploadStatus');
+                btn.disabled = true;
+                status.innerText = "⏳ Upload vers Cloudinary en cours... ne fermez pas.";
+
+                try {
+                    // Upload Video
+                    const fdV = new FormData();
+                    fdV.append('file', vidFile);
+                    fdV.append('upload_preset', CLOUDINARY_PRESET);
+                    const resV = await fetch(CLOUDINARY_URL.replace('upload', 'video/upload'), { method: 'POST', body: fdV });
+                    const jsonV = await resV.json();
+
+                    // Upload Thumb
+                    let thumbUrl = "https://via.placeholder.com/600x340/222/fff?text=Visiona";
+                    if(thumbFile) {
+                        const fdT = new FormData();
+                        fdT.append('file', thumbFile);
+                        fdT.append('upload_preset', CLOUDINARY_PRESET);
+                        const resT = await fetch(CLOUDINARY_URL, { method: 'POST', body: fdT });
+                        const jsonT = await resT.json();
+                        thumbUrl = jsonT.secure_url;
+                    }
+
+                    const isShort = vidFile.size < 5000000 && confirm("Est-ce un Zapp (vidéo courte) ?");
+
+                    const newVideo = {
+                        id: Date.now(), title: title, url: jsonV.secure_url, thumb: thumbUrl,
+                        author: this.data.user.name, views: 0, isShort: isShort, date: new Date().toLocaleDateString()
+                    };
+
+                    this.data.videos.unshift(newVideo);
+                    await this.saveGist();
+                    this.closeModals();
+                    isShort ? this.goShorts() : this.goHome();
+                } catch(e) {
+                    alert("Erreur lors de l'upload. Vérifiez votre connexion.");
+                } finally {
+                    btn.disabled = false;
+                    status.innerText = "";
+                }
+            },
+
+            // --- LOGIQUE CORE ---
+            render: function(list, target = 'videoGrid') {
+                const el = document.getElementById(target);
+                if(list.length === 0) { el.innerHTML = "<p style='grid-column: 1/-1; text-align:center; padding:50px; color:#555;'>Aucun contenu trouvé.</p>"; return; }
+                el.innerHTML = list.map(v => `
+                    <div class="video-card" onclick="app.openVideoOverlay(${v.id})">
+                        <div class="thumb-container">
+                            <img src="${v.thumb}" class="thumb">
+                            ${v.isStream ? '<span class="badge-live">LIVE</span>' : ''}
+                        </div>
+                        <div style="display:flex; gap:12px; margin-top:12px;">
+                            ${this.getAvatar(v.author)}
+                            <div style="overflow:hidden;">
+                                <h4 style="margin:0; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${v.title}</h4>
+                                <p style="margin:4px 0; font-size:13px; color:var(--sec-text);">${v.author}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            getAvatar: function(name, size="small") {
+                const u = this.data.users[name];
+                const char = name ? name.charAt(0).toUpperCase() : '?';
+                const className = size === 'big' ? 'avatar-big' : 'avatar-letter';
+                if(u && u.avatar) return `<img src="${u.avatar}" class="${className}">`;
+                return `<div class="${className}">${char}</div>`;
+            },
+
+            openVideoOverlay: function(id) {
+                const v = this.data.videos.find(x => x.id == id);
+                if(!v) return;
+                currentVideoAuthor = v.author;
+                
+                // Historique
+                this.data.history = [id, ...this.data.history.filter(x => x !== id)].slice(0, 30);
+                localStorage.setItem('mt_history', JSON.stringify(this.data.history));
+
+                const player = document.getElementById('playerModal');
+                player.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+                const vid = document.getElementById('mainVideoPlayer');
+                vid.src = v.url;
+                document.getElementById('playerTitle').innerText = v.title;
+                
+                document.getElementById('playerAuthorArea').innerHTML = `
+                    ${this.getAvatar(v.author)}
+                    <div>
+                        <b style="font-size:16px;">${v.author}</b><br>
+                        <span style="font-size:12px; color:var(--sec-text);">Certifié Visiona</span>
+                    </div>
+                `;
+                this.renderComments(v);
             },
 
             toggleSub: function(name) {
@@ -313,63 +532,65 @@
                 this.viewProfile(name);
             },
 
-            openVideoOverlay: function(id) {
-                const v = this.data.videos.find(x => x.id == id);
-                if(!v) return;
+            // --- AUTH ---
+            doAuth: function() {
+                const email = document.getElementById('logEmail').value;
+                const name = document.getElementById('logName').value || email.split('@')[0];
+                if(!email) return alert("Email requis");
                 
-                // Historique
-                this.data.history = [id, ...this.data.history.filter(x => x !== id)].slice(0, 20);
-                localStorage.setItem('mt_history', JSON.stringify(this.data.history));
-
-                document.getElementById('playerModal').style.display = 'block';
-                document.getElementById('mainVideoPlayer').src = v.url;
-                document.getElementById('playerTitle').innerText = v.title;
+                this.data.user = { email, name };
+                localStorage.setItem('mt_user', JSON.stringify(this.data.user));
                 
-                document.getElementById('playerActions').innerHTML = `
-                    <div onclick="app.closePlayer(); app.viewProfile('${v.author}')" style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-                        ${this.getAvatar(v.author)}
-                        <b>${v.author}</b>
-                    </div>
-                    <button class="action-pill">👍 ${v.likes || 0}</button>
-                `;
+                if(!this.data.users[name]) {
+                    this.data.users[name] = { name, email, avatar: null };
+                    this.saveGist();
+                }
+                location.reload();
             },
 
-            render: function(list, target = 'videoGrid') {
-                const el = document.getElementById(target);
-                if(list.length === 0) { el.innerHTML = "<p>Rien à afficher ici.</p>"; return; }
-                el.innerHTML = list.map(v => `
-                    <div class="video-card" onclick="app.openVideoOverlay(${v.id})">
-                        <div class="thumb-container">
-                            <img src="${v.thumb}" class="thumb">
-                            ${v.isStream ? '<span class="badge-live">LIVE</span>' : ''}
-                        </div>
-                        <div style="display:flex; gap:10px; margin-top:10px;">
-                            ${this.getAvatar(v.author)}
-                            <div>
-                                <h4 style="margin:0;">${v.title}</h4>
-                                <p style="margin:5px 0; font-size:12px; color:var(--sec-text);">${v.author}</p>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            },
-
-            // --- AUTH & UI ---
             updateUI: function() {
+                const sec = document.getElementById('loginSection');
                 if(this.data.user) {
-                    document.getElementById('loginBtn').innerText = this.data.user.name;
-                    document.getElementById('menuUserName').innerText = this.data.user.name;
+                    sec.innerHTML = `<div onclick="app.toggleAccountMenu()" style="cursor:pointer;">${this.getAvatar(this.data.user.name)}</div>`;
+                    document.getElementById('menuHeader').innerText = this.data.user.name;
                     if(this.data.user.email === ADMIN_EMAIL) document.getElementById('adminLink').style.display = 'block';
                 }
             },
 
-            closePlayer: function() { document.getElementById('playerModal').style.display = 'none'; document.getElementById('mainVideoPlayer').pause(); },
+            // --- UTILS ---
+            openLogin: function() { document.getElementById('modalLogin').style.display = 'flex'; },
             openCreateChoice: function() { document.getElementById('modalCreateChoice').style.display = 'flex'; },
             openUpload: function() { this.closeModals(); document.getElementById('modalUpload').style.display = 'flex'; },
-            closeModals: function() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); },
-            toggleAccountMenu: function() { 
-                const m = document.getElementById('accountMenu'); 
-                m.style.display = m.style.display === 'none' ? 'block' : 'none'; 
+            closeModals: function() { 
+                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
+                this.stopLiveStreaming();
+            },
+            closePlayer: function() { 
+                document.getElementById('playerModal').style.display = 'none'; 
+                document.getElementById('mainVideoPlayer').pause();
+                document.body.style.overflow = 'auto';
+            },
+            toggleAccountMenu: function() {
+                const m = document.getElementById('accountMenu');
+                m.style.display = m.style.display === 'none' ? 'block' : 'none';
+            },
+            goAdminPanel: function() {
+                this.hideAll();
+                document.getElementById('adminPanel').style.display = 'block';
+                const list = document.getElementById('adminVideoList');
+                list.innerHTML = this.data.videos.map(v => `
+                    <div style="display:flex; justify-content:space-between; padding:10px; background:#222; margin-bottom:5px; border-radius:8px;">
+                        <span>${v.title} (${v.author})</span>
+                        <button onclick="app.deleteVideo(${v.id})" style="color:red; background:none; border:none; cursor:pointer;">Supprimer</button>
+                    </div>
+                `).join('');
+            },
+            deleteVideo: async function(id) {
+                if(confirm("Supprimer définitivement ?")) {
+                    this.data.videos = this.data.videos.filter(v => v.id !== id);
+                    await this.saveGist();
+                    this.goAdminPanel();
+                }
             }
         };
 
