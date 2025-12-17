@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Visiona V36 - Titan Ultimate</title>
+    <title>Visiona V37 - Ultimate Titan</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* ==========================================
-           [SECTION 1: STYLE SYSTEM]
-           ========================================== */
+        /* [STYLE SYSTEM INCHANGÉ] */
         :root {
             --bg: #020202; --side: #060606; --card: #0e0e0e; --accent: #7c4dff;
             --accent-glow: rgba(124, 77, 255, 0.4); --text: #ffffff; --sec: #808080;
@@ -17,81 +15,67 @@
             --font-main: 'Plus Jakarta Sans', sans-serif;
         }
 
-        * { box-sizing: border-box; outline: none; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        * { box-sizing: border-box; outline: none; transition: all 0.2s ease; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-main); overflow: hidden; height: 100vh; }
 
-        /* SCROLLBAR */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-        /* LAYOUT */
-        header { height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; background: rgba(2,2,2,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 3000; backdrop-filter: blur(10px); }
+        header { height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(2,2,2,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 3000; backdrop-filter: blur(10px); }
         .app-container { display: flex; height: calc(100vh - 80px); }
         
-        /* SIDEBAR QUI DESCEND */
-        .sidebar { width: 280px; background: var(--side); border-right: 1px solid var(--border); padding: 25px; overflow-y: auto; flex-shrink: 0; display:flex; flex-direction:column; }
+        .sidebar { width: 280px; background: var(--side); border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; flex-shrink: 0; display:flex; flex-direction:column; }
+        .viewport { flex: 1; padding: 30px; overflow-y: auto; position: relative; scroll-behavior: smooth; }
 
-        .viewport { flex: 1; padding: 40px; overflow-y: auto; position: relative; scroll-behavior: smooth; }
-
-        /* NAVIGATION */
-        .nav-link { display: flex; align-items: center; gap: 15px; padding: 14px 20px; border-radius: 15px; color: var(--sec); cursor: pointer; font-weight: 600; margin-bottom: 8px; font-size: 15px; }
+        .nav-link { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 12px; color: var(--sec); cursor: pointer; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
         .nav-link:hover, .nav-link.active { background: var(--card); color: white; }
         .nav-link.active { border-left: 4px solid var(--accent); background: rgba(124, 77, 255, 0.1); color: var(--accent); }
-        .nav-label { font-size: 11px; color: var(--sec); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin: 30px 0 15px 15px; }
+        .nav-label { font-size: 11px; color: var(--sec); font-weight: 800; text-transform: uppercase; margin: 25px 0 10px 10px; }
 
-        /* GRILLE 4 VIDEO PAR LIGNE */
-        .v-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
-        .v-card { cursor: pointer; animation: fadeIn 0.5s ease; position: relative; }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-
+        .v-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .v-card { cursor: pointer; position: relative; }
         .v-thumb { width: 100%; aspect-ratio: 16/9; border-radius: 18px; overflow: hidden; background: #111; border: 1px solid var(--border); position: relative; }
         .v-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* CARRÉ NOIR DURÉE */
         .v-duration { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.85); color: #fff; padding: 3px 6px; border-radius: 6px; font-size: 11px; font-weight: 800; }
 
-        .v-meta { display: flex; gap: 15px; margin-top: 15px; }
-        .v-avatar { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); flex-shrink: 0; object-fit: cover; background: #222; }
+        .v-meta { display: flex; gap: 12px; margin-top: 12px; }
+        .v-avatar { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); flex-shrink: 0; object-fit: cover; background: #222; }
 
-        /* ZAPPS 9:16 TIKTOK STYLE */
+        /* ZAPPS 9:16 FIXE */
         #view-zapps { display: none; height: 100%; flex-direction: column; align-items: center; overflow-y: scroll; scroll-snap-type: y mandatory; padding-bottom:50px; }
-        .zapp-item { width: 400px; height: 750px; margin-bottom: 40px; background: #000; border-radius: 25px; border: 1px solid var(--border); position: relative; overflow: hidden; scroll-snap-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .zapp-item { width: 400px; height: 711px; /* Ratio 9:16 exact */ margin-bottom: 40px; background: #000; border-radius: 25px; border: 1px solid var(--border); position: relative; overflow: hidden; scroll-snap-align: start; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         .zapp-video { width: 100%; height: 100%; object-fit: cover; }
-        .zapp-ui { position: absolute; right: 15px; bottom: 100px; display: flex; flex-direction: column; align-items: center; gap: 25px; }
-        .zapp-btn { width: 50px; height: 50px; background: rgba(30,30,30,0.6); backdrop-filter: blur(5px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 22px; color: #fff; }
+        .zapp-ui { position: absolute; right: 15px; bottom: 100px; display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 10; }
+        .zapp-btn { width: 50px; height: 50px; background: rgba(30,30,30,0.6); backdrop-filter: blur(5px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 22px; color: #fff; flex-direction: column; gap: 5px; }
         
-        /* UI COMPONENTS */
         .v-btn { background: var(--card); border: 1px solid var(--border); color: white; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
-        .v-btn:hover { background: var(--border); }
         .v-btn-prime { background: var(--accent); border: none; }
         .v-input { width: 100%; background: #000; border: 1px solid var(--border); padding: 12px; border-radius: 12px; color: white; margin-bottom: 10px; }
 
-        /* PLAYER & MODALS */
         #player-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; overflow-y: auto; padding: 40px; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 6000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
         .modal-content { background: var(--side); width: 450px; padding: 40px; border-radius: 30px; border: 1px solid var(--border); }
 
-        /* PROFIL TABS */
         .profile-tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--border); margin-top: 30px; margin-bottom: 20px; }
         .p-tab { padding: 10px 20px; cursor: pointer; color: var(--sec); font-weight: 700; border-bottom: 3px solid transparent; }
         .p-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-        /* NOTIFS & CLOCHE */
         #notif-menu { display: none; position: absolute; top: 70px; right: 50px; width: 300px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 15px; z-index: 4000; }
-
-        /* CŒUR CRÉATEUR */
+        
+        /* CŒUR CRÉATEUR & SUB SIDEBAR */
         .creator-heart { position: relative; display: inline-block; }
         .creator-heart-img { position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--bg); }
+        .sub-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; cursor: pointer; border-radius: 10px; }
+        .sub-row:hover { background: var(--card); }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="display:flex; align-items:center; gap:15px; cursor:pointer;" onclick="V.nav('home')">
+        <div style="display:flex; align-items:center; gap:20px; cursor:pointer;" onclick="V.nav('home')">
             <div style="width:40px; height:40px; background:var(--accent); border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:24px;">V</div>
-            <span style="font-size:24px; font-weight:900;">VISIONA</span>
+            <span style="font-size:22px; font-weight:900;">VISIONA</span>
         </div>
 
         <div style="flex:1; max-width:500px; display:flex; background:#000; border:1px solid var(--border); border-radius:30px; padding:5px;">
@@ -99,10 +83,11 @@
             <button class="v-btn-prime" style="border-radius:30px;" onclick="V.search()">Go</button>
         </div>
 
-        <div style="display:flex; align-items:center; gap:20px;">
-            <div id="credits-ui" style="color:var(--gold); font-weight:800;">0 CR</div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <button class="v-btn" onclick="V.modal('create')" style="padding:10px 15px;">➕ Créer</button>
+            
             <div style="position:relative;">
-                <button onclick="V.toggleNotif()" style="background:none; border:none; color:white; font-size:22px; cursor:pointer;">🔔</button>
+                <button onclick="V.toggleNotif()" style="background:none; border:none; color:white; font-size:22px; cursor:pointer;">🔔 <span id="notif-badge" style="background:red; font-size:10px; padding:2px 5px; border-radius:10px; position:absolute; top:0; right:0;">0</span></button>
                 <div id="notif-menu"><h3>Notifications</h3><div id="notif-list"></div></div>
             </div>
             <div id="auth-ui"></div>
@@ -115,15 +100,14 @@
             <div class="nav-link" id="n-zapps" onclick="V.nav('zapps')">⚡ Zapps</div>
             <div class="nav-link" id="n-stream" onclick="V.nav('stream')">🔴 Direct</div>
             <div class="nav-link" id="n-hist" onclick="V.nav('history')">🕒 Historique</div>
-            <div class="nav-link" onclick="V.nav('subs')">📺 Abonnements</div>
-            
-            <div class="nav-label">MOI</div>
-            <div class="nav-link" onclick="V.nav('profile', V.state.user?.name)">👤 Ma Chaîne</div>
             <div class="nav-link" onclick="V.nav('stats')">📊 Statistiques</div>
-            <div class="nav-link" onclick="V.nav('thanks')">💎 Remerciements</div>
-
+            
             <div class="nav-label">ABONNEMENTS</div>
-            <div id="sub-list-sidebar"></div>
+            <div id="sub-list-sidebar" style="display:flex; flex-direction:column; gap:5px;"></div>
+
+            <div class="nav-label">MOI</div>
+            <div class="nav-link" onclick="V.nav('profile', V.s.u?.name)">👤 Ma Chaîne</div>
+            <div class="nav-link" onclick="V.nav('thanks')">💎 Remerciements</div>
 
             <div id="admin-btn" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:20px;">
                 <div class="nav-link" onclick="V.nav('admin')" style="color:var(--gold);">🔑 Admin Panel</div>
@@ -131,13 +115,8 @@
         </aside>
 
         <main class="viewport">
-            <div id="view-home">
-                <h2 style="margin-bottom:20px;">Recommandations</h2>
-                <div id="grid-home" class="v-grid"></div>
-            </div>
-
-            <div id="view-zapps"></div>
-
+            <div id="view-home"><div id="grid-home" class="v-grid"></div></div>
+            
             <div id="view-stream" style="display:none;">
                 <h2>🔴 Directs en cours</h2>
                 <div id="grid-stream" class="v-grid" style="margin-top:20px;">
@@ -145,67 +124,73 @@
                 </div>
             </div>
 
+            <div id="view-zapps"></div>
+
             <div id="view-history" style="display:none;">
                 <h2>🕒 Historique</h2>
                 <div id="grid-history" class="v-grid" style="margin-top:20px;"></div>
             </div>
 
-            <div id="view-subs" style="display:none;">
-                <h2>📺 Vos Abonnements</h2>
-                <div id="grid-subs" class="v-grid" style="margin-top:20px;"></div>
-            </div>
-
             <div id="view-stats" style="display:none;">
-                <h2>📊 Statistiques Temps Réel</h2>
-                <div class="glass-panel" style="padding:40px; margin-top:20px; text-align:center;">
-                    <h1 id="stat-timer" style="font-size:60px; color:var(--green);">00:00:00</h1>
-                    <p>Temps passé sur cette session</p>
+                <h2>📊 Vos Statistiques</h2>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; margin-top:20px;">
+                    <div class="glass-panel" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center;">
+                        <h1 id="stat-timer" style="font-size:40px; color:var(--green);">00:00:00</h1>
+                        <p style="color:var(--sec);">Temps passé (Session)</p>
+                    </div>
+                    <div class="glass-panel" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center;">
+                        <h1 id="stat-vid-count" style="font-size:40px; color:var(--accent);">0</h1>
+                        <p style="color:var(--sec);">Vidéos regardées</p>
+                    </div>
+                    <div class="glass-panel" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center;">
+                        <h1 id="stat-sub-count" style="font-size:40px; color:var(--gold);">0</h1>
+                        <p style="color:var(--sec);">Abonnements</p>
+                    </div>
                 </div>
+                <h3 style="margin-top:40px;">🏆 Top 3 Créateurs regardés</h3>
+                <div id="top-creators-list" class="v-grid"></div>
             </div>
 
             <div id="view-admin" style="display:none;">
-                <h2 style="color:var(--gold);">Panel Admin</h2>
+                <h2 style="color:var(--gold);">🔑 Contrôle de l'Écosystème</h2>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:20px;">
-                    <div class="glass-panel" style="padding:20px;">
+                    <div style="background:var(--card); padding:20px; border-radius:15px; border:1px solid var(--gold);">
                         <h3>Gestion Vidéos</h3>
-                        <div id="adm-vid-list" style="max-height:300px; overflow-y:auto; margin-top:10px;"></div>
+                        <div id="adm-vid-list" style="max-height:300px; overflow-y:auto;"></div>
                     </div>
-                    <div class="glass-panel" style="padding:20px;">
-                        <h3>Gestion Staff & Remerciements</h3>
-                        <input type="text" id="adm-pseudo" class="v-input" placeholder="Pseudo">
-                        <div style="display:flex; gap:10px;">
-                            <button class="v-btn" onclick="V.admPromote()">Admin</button>
-                            <button class="v-btn" onclick="V.admThanks()">Hall of Fame</button>
-                        </div>
+                    <div style="background:var(--card); padding:20px; border-radius:15px; border:1px solid var(--gold);">
+                        <h3>Promouvoir Admin</h3>
+                        <input type="text" id="adm-new-admin" class="v-input" placeholder="Email ou Pseudo">
+                        <button class="v-btn v-btn-prime" onclick="V.adminPromote()">Valider</button>
                     </div>
                 </div>
-            </div>
-
-            <div id="view-thanks" style="display:none;">
-                <h2>💎 Hall of Fame</h2>
-                <div id="grid-thanks" class="v-grid" style="margin-top:20px;"></div>
             </div>
 
             <div id="view-profile" style="display:none;">
                 <div id="p-banner" style="height:250px; border-radius:25px; background:#111; background-size:cover; position:relative;">
-                    <img id="p-avatar" src="" style="width:130px; height:130px; border-radius:50%; border:6px solid var(--bg); position:absolute; bottom:-40px; left:40px;">
+                    <img id="p-avatar" src="" style="width:130px; height:130px; border-radius:50%; border:6px solid var(--bg); position:absolute; bottom:-40px; left:40px; background:#000;">
                 </div>
                 <div style="margin: 60px 0 0 40px; display:flex; justify-content:space-between; align-items:center; padding-right:40px;">
                     <div>
-                        <h1 id="p-name">Nom</h1>
-                        <p id="p-sub-count" style="color:var(--sec);">0 abonnés</p>
+                        <h1 id="p-name">Pseudo</h1>
+                        <p id="p-desc" style="color:var(--sec);">Description...</p>
+                        <p id="p-sub-count-txt" style="font-weight:800; font-size:14px; margin-top:5px;">0 abonnés</p>
                     </div>
                     <div id="p-actions"></div>
                 </div>
-                
                 <div class="profile-tabs">
                     <div class="p-tab active" onclick="V.tab('video')">VIDÉOS</div>
                     <div class="p-tab" onclick="V.tab('zap')">ZAPPS</div>
                     <div class="p-tab" onclick="V.tab('direct')">DIRECT</div>
-                    <div class="p-tab" onclick="V.tab('pub')">PUBLICATIONS</div>
+                    <div class="p-tab" onclick="V.tab('pub')">POSTS</div>
                     <div class="p-tab" onclick="V.tab('about')">À PROPOS</div>
                 </div>
-                <div id="p-content" class="v-grid"></div>
+                <div id="p-content" class="v-grid" style="margin-top:30px;"></div>
+            </div>
+            
+            <div id="view-thanks" style="display:none;">
+                <h2>💎 Hall of Fame</h2>
+                <div id="grid-thanks" class="v-grid" style="margin-top:20px;"></div>
             </div>
         </main>
     </div>
@@ -221,7 +206,7 @@
                         <span id="vid-meta" style="color:var(--sec);">Info</span>
                         <div style="display:flex; gap:10px;">
                             <button class="v-btn" onclick="V.interact('like')">👍 <span id="vid-likes">0</span></button>
-                            <button class="v-btn" onclick="V.interact('dislike')">👎</button>
+                            <button class="v-btn" onclick="V.interact('dislike')">👎 <span id="vid-dislikes">0</span></button>
                             <button class="v-btn" onclick="V.share()">🔗 Partager</button>
                         </div>
                     </div>
@@ -233,8 +218,8 @@
                     <div style="margin-top:40px;">
                         <h3>Commentaires</h3>
                         <div style="display:flex; gap:15px; margin:20px 0;">
-                            <input type="text" id="com-in" class="v-input" placeholder="Commenter..." style="margin:0;">
-                            <button class="v-btn v-btn-prime" onclick="V.postCom()">Envoyer</button>
+                            <input type="text" id="com-in" class="v-input" style="margin:0;" placeholder="Ajouter un commentaire...">
+                            <button class="v-btn v-btn-prime" onclick="V.postCom()">Publier</button>
                         </div>
                         <div id="com-list"></div>
                     </div>
@@ -247,13 +232,23 @@
     <div id="modal-edit" class="modal">
         <div class="modal-content">
             <h3>Personnaliser</h3>
-            <p>Photo de profil :</p>
-            <input type="file" id="f-pdp" class="v-input" onchange="V.upload('pdp')">
-            <p>Bannière :</p>
-            <input type="file" id="f-banner" class="v-input" onchange="V.upload('banner')">
-            <p>Description :</p>
             <input type="text" id="f-desc" class="v-input" placeholder="Bio...">
-            <button class="v-btn v-btn-prime" onclick="V.saveProfileEdit()">Enregistrer</button>
+            <label class="v-btn" style="display:block; margin-bottom:10px;">📸 Photo Profil <input type="file" id="f-pdp" hidden onchange="V.upload('pdp')"></label>
+            <label class="v-btn" style="display:block;">🖼️ Bannière <input type="file" id="f-banner" hidden onchange="V.upload('banner')"></label>
+            <button class="v-btn v-btn-prime" style="margin-top:20px;" onclick="V.saveProfileEdit()">Sauvegarder</button>
+        </div>
+    </div>
+
+    <div id="modal-create" class="modal">
+        <div class="modal-content">
+            <h3>Créer du contenu</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px;">
+                <button class="v-btn" onclick="alert('Module Upload Vidéo')">📹 Vidéo</button>
+                <button class="v-btn" onclick="alert('Module Zapp')">⚡ Zapp</button>
+                <button class="v-btn" onclick="alert('Module Post')">📝 Post</button>
+                <button class="v-btn" onclick="alert('Module Live')">🔴 Live</button>
+            </div>
+            <button class="v-btn" style="margin-top:20px; width:100%;" onclick="V.modal('create', false)">Annuler</button>
         </div>
     </div>
 
@@ -261,7 +256,7 @@
         <div class="modal-content">
             <h2>Connexion</h2>
             <input type="text" id="auth-name" class="v-input" placeholder="Pseudo">
-            <input type="email" id="auth-mail" class="v-input" placeholder="Email">
+            <input type="email" id="auth-email" class="v-input" placeholder="Email (pour admin)">
             <button class="v-btn v-btn-prime" onclick="V.login()">Entrer</button>
         </div>
     </div>
@@ -271,12 +266,13 @@
         
         const V = {
             s: {
-                u: JSON.parse(localStorage.getItem('v36_u')) || null,
+                u: JSON.parse(localStorage.getItem('v37_u')) || null,
                 d: { videos:[], users:{}, thanks:[], admins:["Admin"] },
-                subs: JSON.parse(localStorage.getItem('v36_s')) || [],
-                hist: JSON.parse(localStorage.getItem('v36_h')) || [],
-                liked: JSON.parse(localStorage.getItem('v36_l')) || [],
-                time: 0,
+                subs: JSON.parse(localStorage.getItem('v37_s')) || [],
+                hist: JSON.parse(localStorage.getItem('v37_h')) || [],
+                liked: JSON.parse(localStorage.getItem('v37_l')) || [],
+                disliked: JSON.parse(localStorage.getItem('v37_d')) || [],
+                stats: JSON.parse(localStorage.getItem('v37_st')) || { time: 0, watched: 0, top: {} },
                 curr: null
             },
 
@@ -285,7 +281,11 @@
                 this.shuffleHome();
                 this.renderUI();
                 this.nav('home');
-                setInterval(() => { this.s.time++; this.updTime(); }, 1000);
+                setInterval(() => { 
+                    this.s.stats.time++; 
+                    this.updTime(); 
+                    localStorage.setItem('v37_st', JSON.stringify(this.s.stats));
+                }, 1000);
                 this.easter();
             },
 
@@ -301,9 +301,14 @@
             },
 
             updTime() {
-                let h = Math.floor(this.s.time / 3600), m = Math.floor((this.s.time % 3600) / 60), s = this.s.time % 60;
+                let t = this.s.stats.time;
+                let h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
                 if(document.getElementById('stat-timer')) 
                     document.getElementById('stat-timer').innerText = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+                if(document.getElementById('stat-vid-count'))
+                    document.getElementById('stat-vid-count').innerText = this.s.stats.watched;
+                if(document.getElementById('stat-sub-count'))
+                    document.getElementById('stat-sub-count').innerText = this.s.subs.length;
             },
 
             nav(p, param) {
@@ -318,10 +323,23 @@
                 if(p === 'home') this.renderGrid('grid-home', this.s.d.videos.filter(v => !v.isShort));
                 if(p === 'zapps') this.renderZapps();
                 if(p === 'history') this.renderGrid('grid-history', this.s.hist);
-                if(p === 'subs') this.renderGrid('grid-subs', this.s.d.videos.filter(v => this.s.subs.includes(v.author)));
                 if(p === 'thanks') this.renderThanks();
                 if(p === 'admin') this.renderAdmin();
                 if(p === 'profile') this.renderProfile(param || this.s.u?.name);
+                if(p === 'stats') this.renderStats();
+            },
+
+            renderStats() {
+                this.updTime();
+                // TOP 3
+                let sorted = Object.entries(this.s.stats.top).sort((a,b) => b[1]-a[1]).slice(0,3);
+                document.getElementById('top-creators-list').innerHTML = sorted.map(([name, count]) => `
+                    <div class="v-card">
+                        <img src="${this.av(name)}" style="width:100%; border-radius:15px;">
+                        <h3 style="text-align:center; margin-top:10px;">${name}</h3>
+                        <p style="text-align:center; color:var(--sec);">${count} visionnages</p>
+                    </div>
+                `).join('');
             },
 
             renderGrid(id, list) {
@@ -329,7 +347,7 @@
                     <div class="v-card" onclick="V.play('${v.id}')">
                         <div class="v-thumb">
                             <img src="${v.thumb}">
-                            <div class="v-duration">${v.duration || '00:00'}</div>
+                            <div class="v-duration">${v.duration || '04:20'}</div>
                         </div>
                         <div class="v-meta">
                             <img src="${this.av(v.author)}" class="v-avatar">
@@ -347,9 +365,12 @@
                     <div class="zapp-item">
                         <video src="${v.url}" class="zapp-video" loop autoplay muted></video>
                         <div class="zapp-ui">
-                            <div class="zapp-btn" onclick="V.interact('like','${v.id}')">❤️</div>
-                            <span>${v.likes||0}</span>
+                            <div class="zapp-btn" onclick="V.interact('like','${v.id}')">
+                                <span>❤️</span>
+                                <span style="font-size:12px;">${v.likes||0}</span>
+                            </div>
                             <div class="zapp-btn" onclick="V.play('${v.id}')">💬</div>
+                            <div class="zapp-btn" onclick="V.share()">🔗</div>
                         </div>
                         <div style="position:absolute; bottom:20px; left:20px;">
                             <b onclick="V.nav('profile','${v.author}')" style="cursor:pointer;">@${v.author}</b>
@@ -362,14 +383,21 @@
             play(id) {
                 let v = this.s.d.videos.find(x => x.id == id);
                 this.s.curr = v;
+                // Update History
                 this.s.hist = [v, ...this.s.hist.filter(x=>x.id!==id)].slice(0,50);
-                localStorage.setItem('v36_h', JSON.stringify(this.s.hist));
+                localStorage.setItem('v37_h', JSON.stringify(this.s.hist));
+                // Update Stats
+                this.s.stats.watched++;
+                this.s.stats.top[v.author] = (this.s.stats.top[v.author] || 0) + 1;
+                localStorage.setItem('v37_st', JSON.stringify(this.s.stats));
 
                 document.getElementById('player-overlay').style.display='block';
                 document.getElementById('vid-main').src = v.url;
                 document.getElementById('vid-title').innerText = v.title;
+                // TEMPS REEL
                 document.getElementById('vid-meta').innerText = `${v.views||0} vues • ${this.ago(v.timestamp)}`;
                 document.getElementById('vid-likes').innerText = v.likes||0;
+                document.getElementById('vid-dislikes').innerText = v.dislikes||0;
                 
                 this.renderAuthor(v.author);
                 this.renderComs();
@@ -390,18 +418,19 @@
                 if(this.s.subs.includes(u)) this.s.subs = this.s.subs.filter(x=>x!==u);
                 else { 
                     this.s.subs.push(u); 
-                    // Logique cloche: clic simple = "toutes" par defaut
-                    alert("Abonné ! (Cloche activée)");
+                    alert("Abonné !");
                 }
-                localStorage.setItem('v36_s', JSON.stringify(this.s.subs));
+                localStorage.setItem('v37_s', JSON.stringify(this.s.subs));
                 this.renderAuthor(u);
                 this.renderSubsSide();
             },
 
             renderSubsSide() {
+                // ABONNEMENT EN COLONNE COMME YOUTUBE
                 document.getElementById('sub-list-sidebar').innerHTML = this.s.subs.map(u => `
-                    <div class="nav-link" onclick="V.nav('profile','${u}')">
-                        <img src="${this.av(u)}" style="width:24px; height:24px; border-radius:50%;"> ${u}
+                    <div class="sub-row" onclick="V.nav('profile','${u}')">
+                        <img src="${this.av(u)}" style="width:24px; height:24px; border-radius:50%;"> 
+                        <span style="font-size:14px;">${u}</span>
                     </div>
                 `).join('');
             },
@@ -410,19 +439,34 @@
                 if(!this.s.u) return this.modal('auth');
                 let v = id ? this.s.d.videos.find(x=>x.id==id) : this.s.curr;
                 
+                // DISLIKE VISIBLE & TOGGLE
                 if(type === 'like') {
-                    if(this.s.liked.includes(v.id)) return; // 1 like max
-                    v.likes = (v.likes||0)+1;
-                    this.s.liked.push(v.id);
-                    localStorage.setItem('v36_l', JSON.stringify(this.s.liked));
+                    if(this.s.liked.includes(v.id)) {
+                        v.likes--; 
+                        this.s.liked = this.s.liked.filter(x=>x!==v.id);
+                    } else {
+                        v.likes = (v.likes||0)+1;
+                        this.s.liked.push(v.id);
+                    }
+                    localStorage.setItem('v37_l', JSON.stringify(this.s.liked));
                     if(!id) document.getElementById('vid-likes').innerText = v.likes;
                 }
-                if(type === 'dislike') alert("Dislike pris en compte (masqué)");
+                if(type === 'dislike') {
+                    if(this.s.disliked.includes(v.id)) {
+                        v.dislikes--;
+                        this.s.disliked = this.s.disliked.filter(x=>x!==v.id);
+                    } else {
+                        v.dislikes = (v.dislikes||0)+1;
+                        this.s.disliked.push(v.id);
+                    }
+                    localStorage.setItem('v37_d', JSON.stringify(this.s.disliked));
+                    if(!id) document.getElementById('vid-dislikes').innerText = v.dislikes;
+                }
             },
 
             share() {
                 navigator.clipboard.writeText(window.location.href);
-                alert("Lien copié !");
+                alert("Lien copié dans le presse-papier !");
             },
 
             postCom() {
@@ -449,7 +493,7 @@
                             <p>${c.t}</p>
                             <div style="font-size:12px; color:gray; display:flex; align-items:center; gap:10px;">
                                 ${this.ago(c.d)} 
-                                ${this.s.curr.author === this.s.u?.name ? `<span style="cursor:pointer;" onclick="V.heartCom(${i})">Mettre un ❤️</span>` : ''}
+                                ${this.s.curr.author === this.s.u?.name ? `<span style="cursor:pointer;" onclick="V.heartCom(${i})">❤️</span>` : ''}
                                 ${c.h ? `<span class="creator-heart">❤️<img src="${this.av(this.s.curr.author)}" class="creator-heart-img"></span>` : ''}
                             </div>
                         </div>
@@ -464,6 +508,7 @@
                 document.getElementById('p-avatar').src = d.avatar || this.av(u);
                 document.getElementById('p-banner').style.backgroundImage = d.banner ? `url(${d.banner})` : 'none';
                 
+                // BOUTON PERSONNALISER OU S'ABONNER
                 let acts = document.getElementById('p-actions');
                 if(isMe) {
                     acts.innerHTML = `<button class="v-btn" onclick="V.modal('modal-edit')">Personnaliser</button>`;
@@ -503,14 +548,12 @@
                         if(type==='pdp') this.s.d.users[u].avatar = e.target.result;
                         else this.s.d.users[u].banner = e.target.result;
                         this.renderProfile(u);
-                        this.saveProfileEdit(); // Sauvegarde locale simulée
                     };
                     r.readAsDataURL(f);
                 }
             },
             
             saveProfileEdit() {
-                // Simulation sauvegarde desc
                 let desc = document.getElementById('f-desc').value;
                 if(desc) {
                     if(!this.s.d.users[this.s.u.name]) this.s.d.users[this.s.u.name]={};
@@ -520,9 +563,11 @@
                 this.renderProfile(this.s.u.name);
             },
 
-            // ADMIN
             renderAdmin() {
-                if(!this.s.d.admins.includes(this.s.u?.name)) return document.getElementById('view-admin').innerHTML = "Accès refusé";
+                // ACCES ADMIN EDONIS
+                const isEdonis = this.s.u?.email === 'edonis.imbert@gmail.com';
+                if(!this.s.d.admins.includes(this.s.u?.name) && !isEdonis) return document.getElementById('view-admin').innerHTML = "Accès refusé";
+                
                 document.getElementById('adm-vid-list').innerHTML = this.s.d.videos.map(v => `
                     <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                         <span>${v.title}</span> <button onclick="V.admDel('${v.id}')" style="color:red;border:none;background:none;cursor:pointer;">X</button>
@@ -530,8 +575,8 @@
                 `).join('');
             },
             admDel(id) { this.s.d.videos = this.s.d.videos.filter(v=>v.id!==id); this.renderAdmin(); },
-            admPromote() { 
-                let p = document.getElementById('adm-pseudo').value;
+            adminPromote() { 
+                let p = document.getElementById('adm-new-admin').value;
                 if(p) { this.s.d.admins.push(p); alert(p+" est admin"); }
             },
             admThanks() {
@@ -541,26 +586,32 @@
             renderThanks() {
                 document.getElementById('grid-thanks').innerHTML = this.s.d.thanks.map(t => `
                     <div class="contrib-card gold">
-                        <img src="${this.av(t.pseudo)}">
+                        <img src="${this.av(t.pseudo)}" class="v-avatar">
                         <h3>${t.pseudo}</h3>
                         <p>${t.role}</p>
                     </div>
                 `).join('');
             },
 
-            // UTILS
             av(n) { return this.s.d.users[n]?.avatar || `https://ui-avatars.com/api/?name=${n}&background=7c4dff&color=fff`; },
+            
+            // TEMPS REEL CORRIGÉ (PAS NaN)
             ago(ts) {
+                if(!ts) return "récemment";
                 let s = Math.floor((Date.now()-ts)/1000);
                 if(s<60) return "à l'instant";
                 if(s<3600) return Math.floor(s/60)+" min";
                 if(s<86400) return Math.floor(s/3600)+" h";
                 return Math.floor(s/86400)+" j";
             },
+
             renderUI() {
+                // VERIF ADMIN EDONIS EMAIL
+                const isEdonis = this.s.u?.email === 'edonis.imbert@gmail.com';
+                
                 if(this.s.u) {
                     document.getElementById('auth-ui').innerHTML = `<img src="${this.av(this.s.u.name)}" style="width:40px;height:40px;border-radius:50%;cursor:pointer;" onclick="V.nav('profile','${this.s.u.name}')">`;
-                    if(this.s.d.admins.includes(this.s.u.name)) document.getElementById('admin-btn').style.display='block';
+                    if(this.s.d.admins.includes(this.s.u.name) || isEdonis) document.getElementById('admin-btn').style.display='block';
                 } else {
                     document.getElementById('auth-ui').innerHTML = `<button class="v-btn" onclick="V.modal('modal-auth')">Connexion</button>`;
                 }
@@ -568,9 +619,10 @@
             },
             login() {
                 let n = document.getElementById('auth-name').value;
+                let e = document.getElementById('auth-email').value;
                 if(n) {
-                    this.s.u = {name:n};
-                    localStorage.setItem('v36_u', JSON.stringify(this.s.u));
+                    this.s.u = {name:n, email:e};
+                    localStorage.setItem('v37_u', JSON.stringify(this.s.u));
                     location.reload();
                 }
             },
@@ -585,7 +637,7 @@
                 let k=[]; 
                 window.onkeydown=e=>{
                     k.push(e.key);
-                    if(k.slice(-5).join('')==='alpha') alert("EASTER EGG ACTIVÉ !");
+                    if(k.slice(-7).join('')==='visiona') alert("EASTER EGG TITAN ACTIVÉ !");
                 };
             }
         };
