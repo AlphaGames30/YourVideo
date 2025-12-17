@@ -3,418 +3,358 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Visiona V19 - L'Expérience Ultime</title>
+    <title>Visiona V21 - Original & Power</title>
     <style>
         :root { 
-            --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa; 
-            --hover: #272727; --blue: #3ea6ff; --red: #ff0000; --gold: #ffd700;
+            --bg: #050505; --header: #0a0a0a; --text: #ffffff; --sec-text: #b1b1b1; 
+            --accent: #6e45e2; --accent-2: #88d3ce; --red: #ff3e3e; --border: #1a1a1a;
         }
 
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Roboto', sans-serif; overflow-x: hidden; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        /* --- HEADER PREMIUM --- */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; height: 60px; background: var(--header); position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid #222; }
-        .logo { display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 22px; font-weight: bold; letter-spacing: -1px; }
-        .logo-play { background: var(--red); color: white; padding: 6px 12px; border-radius: 8px; font-size: 14px; }
-        
-        .search-box { display: flex; flex: 1; max-width: 700px; margin: 0 40px; }
-        .search-box input { width: 100%; background: #121212; border: 1px solid #333; color: white; padding: 12px 20px; border-radius: 40px 0 0 40px; outline: none; font-size: 16px; }
-        .search-box button { background: #222; border: 1px solid #333; padding: 0 25px; border-radius: 0 40px 40px 0; cursor: pointer; color: white; border-left: none; }
+        /* --- NOUVEAU LOGO VISIONA --- */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 0 25px; height: 70px; background: var(--header); position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid var(--border); }
+        .v-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 24px; font-weight: 900; background: linear-gradient(45deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .v-icon { width: 35px; height: 35px; background: linear-gradient(45deg, var(--accent), var(--accent-2)); border-radius: 10px; transform: rotate(-10deg); display: flex; align-items: center; justify-content: center; color: white; -webkit-text-fill-color: white; font-size: 20px; }
 
-        /* --- SIDEBAR CLASSIQUE --- */
-        .container { display: flex; height: calc(100vh - 60px); }
-        .sidebar { width: 260px; background: var(--bg); padding: 15px; overflow-y: auto; flex-shrink: 0; border-right: 1px solid #222; }
-        .nav-item { padding: 12px 15px; border-radius: 12px; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 20px; transition: 0.3s; font-size: 15px; }
-        .nav-item:hover { background: var(--hover); }
-        .nav-active { background: var(--hover); font-weight: bold; }
-        .sidebar hr { border: none; border-top: 1px solid #333; margin: 15px 0; }
-
-        /* --- GRILLES DE CONTENU --- */
+        /* --- LAYOUT 4 COLONNES --- */
+        .container { display: flex; height: calc(100vh - 70px); }
+        .sidebar { width: 260px; background: var(--header); padding: 20px; overflow-y: auto; flex-shrink: 0; border-right: 1px solid var(--border); }
         .content { flex: 1; padding: 30px; overflow-y: auto; }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
-        .video-card { cursor: pointer; transition: transform 0.2s; }
-        .video-card:hover { transform: scale(1.02); }
-        .thumb-wrap { width: 100%; aspect-ratio: 16/9; position: relative; border-radius: 15px; overflow: hidden; background: #222; }
-        .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; } /* Fixé à 4 colonnes */
 
-        /* --- ZAPP (FORMAT VERTICAL) --- */
-        .zapp-view { display: flex; flex-direction: column; align-items: center; gap: 30px; overflow-y: auto; height: 100%; scroll-snap-type: y mandatory; }
-        .zapp-item { width: 360px; height: 640px; background: #000; border-radius: 20px; scroll-snap-align: center; position: relative; flex-shrink: 0; }
-        .zapp-item video { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
+        /* --- ABONNEMENTS --- */
+        .sub-tier { font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 5px; font-weight: bold; }
+        .tier-standard { background: #555; }
+        .tier-premium { background: var(--accent); }
+        .tier-vip { background: gold; color: black; }
 
-        /* --- LECTEUR CINÉMA --- */
-        #playerOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 5000; overflow-y: auto; padding: 20px; box-sizing: border-box; }
-        .player-container { max-width: 1280px; margin: 0 auto; }
-        .main-video-area { width: 100%; aspect-ratio: 16/9; background: #111; border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .video-info-box { margin-top: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+        /* --- PROFIL ONGLET --- */
+        .profile-header { background: #111; padding: 40px; border-radius: 20px; margin-bottom: 20px; }
+        .tabs { display: flex; gap: 30px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .tab { padding: 15px 0; cursor: pointer; color: var(--sec-text); font-weight: 600; position: relative; }
+        .tab.active { color: white; border-bottom: 3px solid var(--accent); }
+
+        /* --- UI ELEMENTS --- */
+        .nav-item { padding: 12px 15px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
+        .nav-item:hover { background: #1a1a1a; }
+        .nav-active { background: #1a1a1a; border-left: 4px solid var(--accent); }
         
-        /* --- COMMENTAIRES --- */
-        .comment-item { display: flex; gap: 15px; margin-top: 25px; }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #444; flex-shrink: 0; }
-        .com-body { flex: 1; }
-        .com-author { font-weight: bold; font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
-        .creator-heart { display: flex; align-items: center; gap: 5px; background: #222; padding: 4px 10px; border-radius: 15px; font-size: 12px; margin-top: 8px; width: fit-content; border: 1px solid #333; }
-        .creator-heart img { width: 18px; height: 18px; border-radius: 50%; }
+        .thumb { width: 100%; aspect-ratio: 16/9; border-radius: 12px; object-fit: cover; background: #222; transition: 0.3s; }
+        .video-card:hover .thumb { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
 
-        /* --- BOUTONS & MODALS --- */
-        .btn-blue { background: var(--blue); color: #000; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-red { background: var(--red); color: white; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9000; justify-content: center; align-items: center; }
-        .modal-card { background: #1a1a1a; padding: 35px; border-radius: 25px; width: 90%; max-width: 550px; border: 1px solid #333; }
-        .modal-card input, .modal-card textarea { width: 100%; padding: 15px; margin: 12px 0; background: #000; border: 1px solid #444; color: white; border-radius: 10px; box-sizing: border-box; }
+        /* --- PLAYER & LIVE --- */
+        #playerOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; padding: 20px; overflow-y: auto; }
+        .live-indicator { background: var(--red); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; position: absolute; top: 10px; left: 10px; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        #userMenu { display: none; position: fixed; right: 25px; top: 70px; background: #1a1a1a; border: 1px solid #333; border-radius: 15px; width: 250px; z-index: 3000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* --- MODALS --- */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 6000; align-items: center; justify-content: center; }
+        .modal-box { background: #111; padding: 30px; border-radius: 25px; width: 90%; max-width: 500px; border: 1px solid var(--border); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; }
+
+        .btn-v { background: linear-gradient(45deg, var(--accent), var(--accent-2)); color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo" onclick="app.goHome()">
-            <div id="logoBadge" class="logo-play">▶</div>
-            <span>VISIONA</span>
+        <div class="v-logo" onclick="app.goHome()">
+            <div class="v-icon">V</div> VISIONA
         </div>
-        <div class="search-box">
-            <input type="text" id="searchInp" placeholder="Rechercher sur Visiona...">
-            <button onclick="app.search()">🔍</button>
+        <div style="flex:1; max-width: 500px; display:flex;">
+            <input type="text" id="search" placeholder="Rechercher sur Visiona..." style="margin:0; border-radius: 20px 0 0 20px;">
+            <button class="btn-v" style="border-radius: 0 20px 20px 0;">🔍</button>
         </div>
-        <div id="headerAuth" style="display:flex; align-items:center; gap:20px;"></div>
+        <div id="authHeader" style="display:flex; align-items:center; gap:20px;"></div>
     </header>
-
-    <div id="userMenu">
-        <div id="menuUserName" style="padding:20px; border-bottom:1px solid #333; font-weight:bold; color:var(--blue);"></div>
-        <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
-        <div class="nav-item" onclick="app.doLogout()" style="color:var(--red);">🚪 Déconnexion</div>
-    </div>
 
     <div class="container">
         <nav class="sidebar">
-            <div class="nav-item nav-active" id="navHome" onclick="app.goHome()">🏠 Accueil</div>
-            <div class="nav-item" id="navZapp" onclick="app.goZapp()">⚡ Zapp</div>
-            <div class="nav-item" id="navLive" onclick="app.goLive()">🔴 En Direct</div>
-            <div class="nav-item" id="navPost" onclick="app.goCommunity()">📰 Communauté</div>
-            <hr>
-            <div class="nav-item" id="navHistory" onclick="app.goHistory()">🕒 Historique</div>
-            <div class="nav-item" id="navStats" onclick="app.goStats()">📊 Statistiques</div>
-            <div class="nav-item" id="navCredits" onclick="app.goCredits()">💳 Crédits</div>
-            <hr>
-            <div style="font-size:12px; color:var(--sec-text); padding:0 15px 10px;">MES ABONNEMENTS</div>
-            <div id="sidebarSubs"></div>
-            <div id="adminZone" style="display:none;">
-                <hr>
-                <div class="nav-item" style="color:var(--gold);" onclick="app.goAdmin()">🔑 Administration</div>
-            </div>
+            <div class="nav-item nav-active" id="nHome" onclick="app.goHome()">💠 Accueil</div>
+            <div class="nav-item" onclick="app.goShorts()">⚡ Zapp</div>
+            <div class="nav-item" onclick="app.goLiveTab()">🔴 Directs</div>
+            <div class="nav-item" onclick="app.goCommunity()">📰 Communauté</div>
+            <hr style="border-color:var(--border)">
+            <div class="nav-item" onclick="app.goMyProfile()">👤 Ma Chaîne</div>
+            <div class="nav-item" onclick="app.goHistory()">🕒 Historique</div>
+            <div class="nav-item" onclick="app.goStats()">📊 Statistiques</div>
+            <hr style="border-color:var(--border)">
+            <div style="font-size:12px; color:var(--sec-text); padding:10px;">MES ABONNEMENTS</div>
+            <div id="sideSubs"></div>
+            <div id="adminLink" style="display:none;"><hr><div class="nav-item" onclick="app.goAdmin()" style="color:var(--accent-2)">🔑 Admin Panel</div></div>
         </nav>
 
         <main class="content">
-            <div id="mainGrid" class="video-grid"></div>
-            <div id="zappGrid" class="zapp-view" style="display:none;"></div>
-            <div id="commView" style="display:none;"></div>
-            <div id="statsView" style="display:none;"></div>
-            <div id="historyView" style="display:none;"></div>
-            <div id="creditsView" style="display:none;"></div>
-            <div id="profileView" style="display:none;"></div>
+            <div id="viewMain" class="video-grid"></div>
+            <div id="viewProfile" style="display:none;"></div>
+            <div id="viewZapp" style="display:none; justify-content:center; gap:20px; overflow-y:auto; height:100%;"></div>
+            <div id="viewOther"></div>
         </main>
     </div>
 
     <div id="playerOverlay">
-        <div class="player-container">
-            <button class="btn-blue" onclick="app.closePlayer()" style="margin-bottom:20px;">✕ QUITTER LE LECTEUR</button>
-            <div class="main-video-area">
-                <video id="pVid" controls autoplay style="width:100%; height:100%;"></video>
-                <canvas id="liveCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; display:none;"></canvas>
+        <div style="max-width:1200px; margin:0 auto;">
+            <button class="btn-v" onclick="app.closePlayer()">✕ QUITTER</button>
+            <div style="width:100%; aspect-ratio:16/9; background:#000; border-radius:20px; margin-top:20px; position:relative; overflow:hidden;">
+                <video id="vPlayer" controls autoplay style="width:100%; height:100%;"></video>
+                <canvas id="liveCanvas" style="display:none; width:100%; height:100%;"></canvas>
             </div>
-            <div class="video-info-box">
-                <h1 id="pTitle" style="margin:10px 0;"></h1>
-                <div id="pMeta" style="color:var(--sec-text); font-size:14px; margin-bottom:20px;"></div>
-                <div id="pChannelRow" style="display:flex; justify-content:space-between; align-items:center;"></div>
-            </div>
-            <div id="pCommentSection" style="margin-top:40px;">
-                <h3>Commentaires</h3>
-                <div style="display:flex; gap:15px; margin-bottom:30px;">
-                    <div id="myAvatar"></div>
-                    <div style="flex:1;">
-                        <input type="text" id="comInput" placeholder="Ajouter un commentaire..." style="width:100%; background:none; border:none; border-bottom:1px solid #333; color:white; padding:10px 0; outline:none;">
-                        <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-                            <button class="btn-blue" onclick="app.addComment()">Publier</button>
-                        </div>
-                    </div>
-                </div>
-                <div id="comList"></div>
+            <div id="vDetails" style="margin-top:20px;">
+                <h1 id="vT"></h1>
+                <div id="vM" style="color:var(--sec-text);"></div>
+                <div id="vAuthor" style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; background:#111; padding:20px; border-radius:15px;"></div>
             </div>
         </div>
     </div>
 
-    <div id="modalCreate" class="modal">
-        <div class="modal-card">
-            <h2>Mettre en ligne</h2>
-            <select id="createType" onchange="app.uiToggleType()">
-                <option value="video">Vidéo Standard</option>
-                <option value="zapp">⚡ Zapp (Format Court)</option>
-                <option value="post">📰 Publication</option>
-                <option value="live">🔴 Lancer un Stream</option>
-            </select>
-            <div id="createFields">
-                <input type="text" id="creaTitle" placeholder="Titre">
-                <div id="fileGroup">
-                    <label>Vidéo :</label><input type="file" id="creaFileVid" accept="video/*">
-                    <label>Miniature :</label><input type="file" id="creaFileThumb" accept="image/*">
-                </div>
-            </div>
-            <div id="upStatus" style="color:var(--blue); margin-top:10px;"></div>
-            <button id="btnPublish" class="btn-red" style="width:100%; margin-top:15px;" onclick="app.handlePublish()">PUBLIER SUR VISIONA</button>
-            <button onclick="app.closeModals()" style="width:100%; background:none; border:none; color:var(--sec-text); margin-top:15px; cursor:pointer;">Annuler</button>
+    <div id="modalSub" class="modal">
+        <div class="modal-box">
+            <h2>Choisir un niveau d'abonnement</h2>
+            <button class="btn-v" style="width:100%; margin-bottom:10px; background:#444;" onclick="app.confirmSub('Standard')">Standard (Gratuit)</button>
+            <button class="btn-v" style="width:100%; margin-bottom:10px;" onclick="app.confirmSub('Premium')">Premium (Soutien)</button>
+            <button class="btn-v" style="width:100%; background:gold; color:black;" onclick="app.confirmSub('VIP')">VIP (Légende)</button>
+        </div>
+    </div>
+
+    <div id="modalStream" class="modal">
+        <div class="modal-box">
+            <h2>Lancer un direct</h2>
+            <video id="streamPreview" autoplay muted style="width:100%; border-radius:10px; background:#000;"></video>
+            <input type="text" id="streamTitle" placeholder="Titre du live...">
+            <button class="btn-v" style="width:100%;" onclick="app.startStreaming()">PASSER AU DIRECT</button>
         </div>
     </div>
 
     <script>
-        const CLOUD_URL = "https://api.cloudinary.com/v1_1/dvbsmh8qq/upload";
-        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json";
+        const CLOUD = "https://api.cloudinary.com/v1_1/dvbsmh8qq/upload";
+        const GIST = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json";
         const WORKER = "https://mytubeupload.edonis-imbert.workers.dev/";
-        const streamBus = new BroadcastChannel('visiona_stream_v19');
+        const bus = new BroadcastChannel('visiona_v21_live');
 
         const app = {
             data: {
-                user: JSON.parse(localStorage.getItem('mt_user')),
-                videos: [], users: {}, posts: [], credits: [],
-                subs: JSON.parse(localStorage.getItem('mt_subs')) || [],
-                history: JSON.parse(localStorage.getItem('mt_history')) || [],
-                viewLog: JSON.parse(localStorage.getItem('mt_view_log')) || {}
+                user: JSON.parse(localStorage.getItem('vt_user')),
+                videos: [], users: {}, posts: [],
+                subs: JSON.parse(localStorage.getItem('vt_subs')) || [], // Format: {name, tier}
+                history: JSON.parse(localStorage.getItem('vt_history')) || [],
+                viewLog: JSON.parse(localStorage.getItem('vt_view_log')) || {}
             },
-            activeVid: null,
+            activeV: null, streamStream: null,
 
             init: async function() {
                 await this.load();
                 this.updateUI();
                 this.goHome();
-                this.listenStreams();
-                if(Math.random() < 0.001) document.getElementById('logoBadge').innerText = '🎅';
             },
 
             load: async function() {
-                const r = await fetch(GIST_URL + "?t=" + Date.now());
-                const j = await r.json();
-                this.data.videos = j.videos || [];
-                this.data.users = j.users || {};
-                this.data.posts = j.posts || [];
-                this.data.credits = j.credits || ["AlphaGames30", "Edonis Imbert"];
+                try {
+                    const r = await fetch(GIST + "?t=" + Date.now());
+                    const j = await r.json();
+                    this.data.videos = j.videos || [];
+                    this.data.users = j.users || {};
+                    this.data.posts = j.posts || [];
+                } catch(e) { console.error("Load Error"); }
             },
 
             save: async function() {
-                const body = { videos: this.data.videos, users: this.data.users, posts: this.data.posts, credits: this.data.credits };
-                await fetch(WORKER, { method: 'PATCH', body: JSON.stringify({ files: {"video.json": {content: JSON.stringify(body, null, 2)}}}) });
+                const b = { videos: this.data.videos, users: this.data.users, posts: this.data.posts };
+                await fetch(WORKER, { method: 'PATCH', body: JSON.stringify({ files: {"video.json": {content: JSON.stringify(b, null, 2)}}}) });
             },
 
-            // --- NAV ---
-            hideAll: function() {
-                ['mainGrid', 'zappGrid', 'commView', 'statsView', 'historyView', 'creditsView', 'profileView'].forEach(id => document.getElementById(id).style.display = 'none');
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-active'));
-                document.getElementById('userMenu').style.display = 'none';
+            // --- NAVIGATION ---
+            hide: function() {
+                ['viewMain', 'viewProfile', 'viewZapp', 'viewOther'].forEach(id => document.getElementById(id).style.display='none');
             },
 
             goHome: function() {
-                this.hideAll(); document.getElementById('navHome').classList.add('nav-active');
-                const g = document.getElementById('mainGrid'); g.style.display = 'grid';
-                this.renderVids(this.data.videos.filter(v => !v.isShort && !v.isStream), g);
+                this.hide(); document.getElementById('viewMain').style.display='grid';
+                // ALGO ALEATOIRE
+                let shuffled = [...this.data.videos.filter(v => !v.isShort && !v.isStream)];
+                shuffled.sort(() => Math.random() - 0.5);
+                this.renderVids(shuffled, document.getElementById('viewMain'));
             },
 
-            goZapp: function() {
-                this.hideAll(); document.getElementById('navZapp').classList.add('nav-active');
-                const g = document.getElementById('zappGrid'); g.style.display = 'flex';
-                g.innerHTML = this.data.videos.filter(v => v.isShort).map(v => `
-                    <div class="zapp-item">
-                        <video src="${v.url}" loop autoplay muted onclick="this.paused?this.play():this.pause()"></video>
-                        <div style="position:absolute; bottom:30px; left:20px; text-shadow:0 0 10px #000;">
-                            <h2>${v.title}</h2><p>@${v.author}</p>
+            // --- SYSTEME DE PROFIL ---
+            viewProfile: function(name) {
+                this.hide(); const v = document.getElementById('viewProfile'); v.style.display='block';
+                const uVids = this.data.videos.filter(x => x.author === name);
+                const uPosts = this.data.posts.filter(x => x.author === name);
+                
+                v.innerHTML = `
+                    <div class="profile-header">
+                        <div style="display:flex; align-items:center; gap:25px;">
+                            ${this.getAv(name, 80)}
+                            <div>
+                                <h1 style="margin:0;">${name}</h1>
+                                <p style="color:var(--sec-text);">${uVids.length} Vidéos • ${this.data.subs.filter(s=>s.name===name).length} Abonnés</p>
+                            </div>
                         </div>
                     </div>
-                `).join('');
+                    <div class="tabs">
+                        <div class="tab active" onclick="app.setTab(this, 'v')">VIDÉOS</div>
+                        <div class="tab" onclick="app.setTab(this, 'z')">ZAPPS</div>
+                        <div class="tab" onclick="app.setTab(this, 's')">STREAMS</div>
+                        <div class="tab" onclick="app.setTab(this, 'p')">PUBLICATIONS</div>
+                        <div class="tab" onclick="app.setTab(this, 'a')">À PROPOS</div>
+                    </div>
+                    <div id="tabContent" class="video-grid"></div>
+                `;
+                this.setTab(v.querySelector('.tab'), 'v', name);
             },
 
-            goHistory: function() {
-                this.hideAll(); document.getElementById('navHistory').classList.add('nav-active');
-                const g = document.getElementById('historyView'); g.style.display = 'block';
-                const vids = this.data.history.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
-                g.innerHTML = `<h2 style="margin-bottom:20px;">🕒 Historique de lecture</h2><div class="video-grid"></div>`;
-                this.renderVids(vids, g.querySelector('.video-grid'));
+            setTab: function(el, type, name) {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                el.classList.add('active');
+                const target = document.getElementById('tabContent');
+                const vids = this.data.videos.filter(v => v.author === (name || this.activeV.author));
+
+                if(type === 'v') this.renderVids(vids.filter(v=>!v.isShort && !v.isStream), target);
+                if(type === 'z') this.renderVids(vids.filter(v=>v.isShort), target);
+                if(type === 's') this.renderVids(vids.filter(v=>v.isStream), target);
+                if(type === 'p') target.innerHTML = this.data.posts.filter(p=>p.author===(name || this.activeV.author)).map(p=>`<div style="background:#111; padding:20px; border-radius:15px; grid-column: span 4;">${p.text}</div>`).join('');
+                if(type === 'a') target.innerHTML = `<div style="grid-column: span 4;">Canal créé pour le partage de contenu Visiona.</div>`;
             },
 
-            // --- PLAYER ---
+            // --- VUES & STATS (FIXÉ) ---
             openPlayer: function(id) {
                 const v = this.data.videos.find(x => x.id == id);
-                this.activeVid = v;
+                this.activeV = v;
                 
-                // Vues (Cooldown 1h)
+                // Cooldown 1h strict par ID de vidéo
                 const now = Date.now();
                 if(!this.data.viewLog[id] || (now - this.data.viewLog[id] > 3600000)) {
                     v.views = (v.views || 0) + 1;
                     this.data.viewLog[id] = now;
-                    localStorage.setItem('mt_view_log', JSON.stringify(this.data.viewLog));
+                    localStorage.setItem('vt_view_log', JSON.stringify(this.data.viewLog));
                     this.save();
                 }
 
-                this.data.history = [id, ...this.data.history.filter(x => x != id)].slice(0, 50);
-                localStorage.setItem('mt_history', JSON.stringify(this.data.history));
-
-                document.getElementById('playerOverlay').style.display = 'block';
-                document.getElementById('pTitle').innerText = v.title;
-                document.getElementById('pMeta').innerText = `${v.views} vues • ${v.date || 'Récemment'}`;
+                document.getElementById('playerOverlay').style.display='block';
+                document.getElementById('vT').innerText = v.title;
+                document.getElementById('vM').innerText = `${v.views} vues • ${v.date}`;
                 
-                const vid = document.getElementById('pVid');
-                vid.src = v.url || "";
-                vid.style.display = v.isStream ? 'none' : 'block';
-                document.getElementById('liveCanvas').style.display = v.isStream ? 'block' : 'none';
-
-                this.renderPlayerMeta();
-                this.renderComments();
-            },
-
-            renderPlayerMeta: function() {
-                const isSub = this.data.subs.includes(this.activeVid.author);
-                document.getElementById('pChannelRow').innerHTML = `
-                    <div style="display:flex; align-items:center; gap:15px; cursor:pointer;" onclick="app.closePlayer(); app.viewProfile('${this.activeVid.author}')">
-                        ${this.getAvatar(this.activeVid.author)}
-                        <div><b>${this.activeVid.author}</b></div>
+                const vid = document.getElementById('vPlayer');
+                if(v.isStream) {
+                    vid.style.display='none'; document.getElementById('liveCanvas').style.display='block';
+                    this.listenLive(v.id);
+                } else {
+                    vid.style.display='block'; document.getElementById('liveCanvas').style.display='none';
+                    vid.src = v.url;
+                }
+                
+                const sub = this.data.subs.find(s => s.name === v.author);
+                document.getElementById('vAuthor').innerHTML = `
+                    <div style="display:flex; align-items:center; gap:15px; cursor:pointer;" onclick="app.viewProfile('${v.author}')">
+                        ${this.getAv(v.author)}
+                        <div><b>${v.author}</b> ${sub ? `<span class="sub-tier tier-${sub.tier.toLowerCase()}">${sub.tier}</span>` : ''}</div>
                     </div>
-                    <button class="${isSub ? 'btn-blue' : 'btn-red'}" onclick="app.toggleSub('${this.activeVid.author}')">
-                        ${isSub ? '✅ ABONNÉ' : 'S\'ABONNER'}
-                    </button>
+                    <button class="btn-v" onclick="app.openSubModal('${v.author}')">${sub ? 'ABONNÉ' : 'S\'ABONNER'}</button>
                 `;
             },
 
-            // --- PUBLICATION / UPLOAD ---
-            uiToggleType: function() {
-                const t = document.getElementById('createType').value;
-                document.getElementById('fileGroup').style.display = (t === 'post' || t === 'live') ? 'none' : 'block';
+            // --- STREAMING REEL ---
+            prepStream: async function() {
+                document.getElementById('modalStream').style.display='flex';
+                this.streamStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+                document.getElementById('streamPreview').srcObject = this.streamStream;
             },
 
-            handlePublish: async function() {
-                const type = document.getElementById('createType').value;
-                const title = document.getElementById('creaTitle').value;
-                if(!title) return alert("Titre manquant");
+            startStreaming: async function() {
+                const title = document.getElementById('streamTitle').value;
+                const streamId = "live_" + Date.now();
+                this.data.videos.unshift({ id: streamId, title, author: this.data.user.name, isStream: true, views: 0, date: "EN DIRECT" });
+                await this.save();
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 640; canvas.height = 360;
 
-                const btn = document.getElementById('btnPublish');
-                const status = document.getElementById('upStatus');
-                btn.disabled = true; status.innerText = "⏳ Connexion au serveur Visiona...";
+                setInterval(() => {
+                    ctx.drawImage(document.getElementById('streamPreview'), 0, 0, 640, 360);
+                    bus.postMessage({ id: streamId, frame: canvas.toDataURL('image/jpeg', 0.5) });
+                }, 100);
 
-                try {
-                    let url = "", thumb = "https://via.placeholder.com/480x270/222/fff?text=Visiona";
-                    
-                    if(type === 'video' || type === 'zapp') {
-                        const vF = document.getElementById('creaFileVid').files[0];
-                        const tF = document.getElementById('creaFileThumb').files[0];
-                        if(!vF) throw "Vidéo requise";
-                        url = await this.upCloud(vF, 'video');
-                        if(tF) thumb = await this.upCloud(tF, 'image');
+                location.reload();
+            },
+
+            listenLive: function(id) {
+                bus.onmessage = (e) => {
+                    if(e.data.id === id) {
+                        const img = new Image();
+                        img.onload = () => document.getElementById('liveCanvas').getContext('2d').drawImage(img, 0, 0, 1280, 720);
+                        img.src = e.data.frame;
                     }
-
-                    const newItem = {
-                        id: Date.now(), title, author: this.data.user.name,
-                        url, thumb, views: 0, date: new Date().toLocaleDateString(),
-                        isShort: type === 'zapp', isStream: type === 'live', comments: []
-                    };
-
-                    if(type === 'post') this.data.posts.unshift({ author: this.data.user.name, text: title });
-                    else this.data.videos.unshift(newItem);
-
-                    await this.save();
-                    location.reload();
-                } catch(e) { alert(e); btn.disabled = false; status.innerText = ""; }
+                };
             },
 
-            upCloud: async function(file, rType) {
-                const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', 'mytube_upload');
-                const res = await fetch(CLOUD_URL.replace('upload', rType+'/upload'), { method: 'POST', body: fd });
-                const j = await res.json(); return j.secure_url;
+            // --- ABONNEMENT 3 NIVEAUX ---
+            openSubModal: function(name) {
+                this.subPending = name;
+                document.getElementById('modalSub').style.display='flex';
             },
 
-            // --- SOCIAL ---
-            renderComments: function() {
-                const isOwner = this.data.user?.name === this.activeVid.author;
-                document.getElementById('comList').innerHTML = (this.activeVid.comments || []).map(c => `
-                    <div class="comment-item">
-                        ${this.getAvatar(c.author)}
-                        <div class="com-body">
-                            <div class="com-author">${c.author}</div>
-                            <div>${c.text}</div>
-                            ${c.heart ? `<div class="creator-heart">${this.getAvatar(this.activeVid.author)} ❤️</div>` : ''}
-                            ${isOwner ? `<button onclick="app.toggleHeart(${c.id})" style="background:none; border:none; color:var(--sec-text); font-size:10px; cursor:pointer; margin-top:5px;">Cœur</button>` : ''}
-                        </div>
-                    </div>
-                `).join('');
+            confirmSub: function(tier) {
+                this.data.subs = this.data.subs.filter(s => s.name !== this.subPending);
+                this.data.subs.push({name: this.subPending, tier: tier});
+                localStorage.setItem('vt_subs', JSON.stringify(this.data.subs));
+                location.reload();
             },
 
-            addComment: function() {
-                const txt = document.getElementById('comInput').value;
-                if(!txt || !this.data.user) return;
-                if(!this.activeVid.comments) this.activeVid.comments = [];
-                this.activeVid.comments.push({ id: Date.now(), author: this.data.user.name, text: txt, heart: false });
-                document.getElementById('comInput').value = "";
-                this.renderComments(); this.save();
-            },
-
-            toggleHeart: function(id) {
-                const c = this.activeVid.comments.find(x => x.id === id);
-                c.heart = !c.heart; this.renderComments(); this.save();
-            },
-
-            toggleSub: function(name) {
-                if(this.data.subs.includes(name)) this.data.subs = this.data.subs.filter(x => x !== name);
-                else this.data.subs.push(name);
-                localStorage.setItem('mt_subs', JSON.stringify(this.data.subs));
-                this.updateUI(); this.renderPlayerMeta();
-            },
-
-            // --- UI HELPERS ---
+            // --- HELPERS ---
             renderVids: function(list, el) {
                 el.innerHTML = list.map(v => `
-                    <div class="video-card" onclick="app.openPlayer('${v.id}')">
-                        <div class="thumb-wrap"><img src="${v.thumb}"></div>
-                        <div style="display:flex; gap:15px; margin-top:15px;">
-                            ${this.getAvatar(v.author)}
+                    <div class="video-card" onclick="app.openPlayer('${v.id}')" style="cursor:pointer; position:relative;">
+                        ${v.isStream ? '<div class="live-indicator">LIVE</div>' : ''}
+                        <img src="${v.thumb || 'https://via.placeholder.com/300x170/111/fff?text=Visiona'}" class="thumb">
+                        <div style="display:flex; gap:12px; margin-top:12px;">
+                            ${this.getAv(v.author, 35)}
                             <div>
-                                <h4 style="margin:0; font-size:16px;">${v.title}</h4>
-                                <p style="color:var(--sec-text); font-size:13px; margin:5px 0;">${v.author} • ${v.views} vues</p>
+                                <div style="font-weight:bold; font-size:14px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${v.title}</div>
+                                <div style="color:var(--sec-text); font-size:12px; margin-top:4px;">${v.author} • ${v.views} vues</div>
                             </div>
                         </div>
                     </div>
                 `).join('');
             },
 
-            getAvatar: function(name) {
+            getAv: function(name, size=40) {
                 const u = this.data.users[name];
-                if(u && u.avatar) return `<img src="${u.avatar}" class="avatar">`;
-                return `<div class="avatar" style="display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; background:var(--red);">${name.charAt(0).toUpperCase()}</div>`;
+                const src = u?.avatar ? u.avatar : `https://ui-avatars.com/api/?name=${name}&background=6e45e2&color=fff`;
+                return `<img src="${src}" style="width:${size}px; height:${size}px; border-radius:50%; object-fit:cover; background:#333;">`;
             },
 
             updateUI: function() {
-                const area = document.getElementById('headerAuth');
+                const h = document.getElementById('authHeader');
                 if(this.data.user) {
-                    area.innerHTML = `<button onclick="app.openCreate()" style="background:none; border:none; color:#fff; font-size:26px; cursor:pointer;">⊕</button>
-                                     <div onclick="app.toggleUserMenu()" style="cursor:pointer;">${this.getAvatar(this.data.user.name)}</div>`;
-                    document.getElementById('menuUserName').innerText = this.data.user.name;
-                    if(this.data.user.email === "edonis.imbert@gmail.com") document.getElementById('adminZone').style.display='block';
+                    h.innerHTML = `
+                        <button onclick="app.prepStream()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;">🎥</button>
+                        ${this.getAv(this.data.user.name)}
+                    `;
+                    if(this.data.user.email === "edonis.imbert@gmail.com") document.getElementById('adminLink').style.display='block';
                 } else {
-                    area.innerHTML = `<button class="btn-blue" onclick="app.doLogin()">Se connecter</button>`;
+                    h.innerHTML = `<button class="btn-v" onclick="app.login()">Connexion</button>`;
                 }
-                document.getElementById('sidebarSubs').innerHTML = this.data.subs.map(s => `<div class="nav-item" onclick="app.viewProfile('${s}')">${this.getAvatar(s)} <span>${s}</span></div>`).join('');
+                
+                document.getElementById('sideSubs').innerHTML = this.data.subs.map(s => `
+                    <div class="nav-item" onclick="app.viewProfile('${s.name}')">
+                        ${this.getAv(s.name, 25)} <span>${s.name}</span> <span class="sub-tier tier-${s.tier.toLowerCase()}">${s.tier[0]}</span>
+                    </div>
+                `).join('');
             },
 
-            // --- MISC ---
-            openCreate: function() { document.getElementById('modalCreate').style.display='flex'; },
-            closeModals: function() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); },
-            closePlayer: function() { document.getElementById('playerOverlay').style.display='none'; document.getElementById('pVid').pause(); },
-            toggleUserMenu: function() { const m = document.getElementById('userMenu'); m.style.display = (m.style.display === 'block' ? 'none' : 'block'); },
-            doLogin: function() { const p = prompt("Pseudo ?"); if(p) { this.data.user = {name: p, email: p+"@user.com"}; localStorage.setItem('mt_user', JSON.stringify(this.data.user)); location.reload(); }},
-            doLogout: function() { localStorage.removeItem('mt_user'); location.reload(); },
-            listenStreams: function() {
-                streamBus.onmessage = (e) => {
-                    if(this.activeVid?.id === e.data.id) {
-                        const cvs = document.getElementById('liveCanvas'); const ctx = cvs.getContext('2d');
-                        const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
-                        img.src = e.data.frame;
-                    }
-                };
-            }
+            login: function() {
+                const p = prompt("Pseudo ?");
+                if(p) {
+                    this.data.user = {name: p, email: p+"@visiona.com"};
+                    localStorage.setItem('vt_user', JSON.stringify(this.data.user));
+                    location.reload();
+                }
+            },
+
+            closePlayer: function() { document.getElementById('playerOverlay').style.display='none'; document.getElementById('vPlayer').pause(); },
+            goStats: function() { alert(`Total Vidéos: ${this.data.videos.length}\nTotal Vues: ${this.data.videos.reduce((a,b)=>a+(b.views||0),0)}`); }
         };
 
         app.init();
