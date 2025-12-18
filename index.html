@@ -975,6 +975,258 @@
                 input.value = `@${author} `;
                 input.focus();
             }
+                // --- FONCTIONS DE BASE (FIX TOUS BOUTONS) ---
+            openModal: function(id) {
+                document.getElementById(id).style.display = 'flex';
+            },
+
+            closeModals: function() {
+                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+                if(this.activeStream) {
+                    this.activeStream.getTracks().forEach(track => track.stop());
+                }
+            },
+
+            closePlayer: function() {
+                const overlay = document.getElementById('player-overlay');
+                const video = document.getElementById('main-video');
+                overlay.style.display = 'none';
+                video.pause();
+                video.src = "";
+                this.activeVid = null;
+                document.body.style.overflow = 'auto';
+            },
+
+            openPlayer: function(id) {
+                const v = this.data.videos.find(x => x.id === id);
+                if (!v) return;
+                this.activeVid = v;
+                
+                const overlay = document.getElementById('player-overlay');
+                const video = document.getElementById('main-video');
+                
+                video.src = v.url;
+                document.getElementById('video-title').innerText = v.title;
+                document.getElementById('v-desc-content').innerText = v.description || "Aucune description.";
+                document.getElementById('v-stats-line').innerText = `${this.formatViews(v.views)} vues • ${this.timeAgo(v.date)}`;
+                
+                // Update Author Info
+                const author = this.data.users[v.author] || {};
+                document.getElementById('v-author-name').innerText = v.author;
+                document.getElementById('v-author-avatar').src = author.avatar || 'https://via.placeholder.com/40';
+                
+                overlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+                this.renderComments();
+                this.renderSuggestions();
+                this.addView(id);
+                
+                // Ajouter à l'historique
+                if (!this.history.includes(id)) {
+                    this.history.unshift(id);
+                    if (this.history.length > 20) this.history.pop();
+                    localStorage.setItem('v_history', JSON.stringify(this.history));
+                }
+            },
+
+            formatViews: function(num) {
+                if (!num) return "0";
+                if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+                if (num >= 1000) return (num / 1000).toFixed(1) + "k";
+                return num;
+            },
+
+            timeAgo: function(date) {
+                const seconds = Math.floor((new Date() - date) / 1000);
+                let interval = seconds / 31536000;
+                if (interval > 1) return "il y a " + Math.floor(interval) + " ans";
+                interval = seconds / 2592000;
+                if (interval > 1) return "il y a " + Math.floor(interval) + " mois";
+                interval = seconds / 86400;
+                if (interval > 1) return "il y a " + Math.floor(interval) + " jours";
+                interval = seconds / 3600;
+                if (interval > 1) return "il y a " + Math.floor(interval) + " heures";
+                interval = seconds / 60;
+                if (interval > 1) return "il y a " + Math.floor(interval) + " min";
+                return "à l'instant";
+            },
+
+            addView: function(id) {
+                const v = this.data.videos.find(x => x.id === id);
+                if (v) {
+                    v.views++;
+                    this.stats.views++;
+                    localStorage.setItem('visiona_stats', JSON.stringify(this.stats));
+                    // On ne sauvegarde pas le Gist à chaque vue pour éviter de saturer le Worker
+                }
+            },
+
+            checkAnnonces: function() {
+                const area = document.getElementById('alert-area');
+                if (this.data.annonces && this.data.annonces.length > 0) {
+                    area.innerHTML = `
+                        <div style="background:var(--blue); color:black; padding:12px; border-radius:8px; margin-bottom:20px; font-weight:500; display:flex; justify-content:space-between;">
+                            <span>📢 ${this.data.annonces[0].text}</span>
+                            <button onclick="this.parentElement.remove()" style="background:none; border:none; cursor:pointer; font-weight:bold;">✕</button>
+                        </div>`;
+                }
+            },
+            // --- 14b. FONCTIONS DE NAVIGATION ET MODALES (RÉVEIL DES BOUTONS) ---
+            openModal: function(id) {
+                const modal = document.getElementById(id);
+                if (modal) modal.style.display = 'flex';
+            },
+
+            closeModals: function() {
+                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+                if(this.activeStream) {
+                    this.activeStream.getTracks().forEach(track => track.stop());
+                }
+            },
+
+            closePlayer: function() {
+                const overlay = document.getElementById('player-overlay');
+                const video = document.getElementById('main-video');
+                overlay.style.display = 'none';
+                if(video) {
+                    video.pause();
+                    video.src = "";
+                }
+                this.activeVid = null;
+                document.body.style.overflow = 'auto';
+            },
+
+            openPlayer: function(id) {
+                const v = this.data.videos.find(x => x.id === id);
+                if (!v) return;
+                this.activeVid = v;
+                
+                const overlay = document.getElementById('player-overlay');
+                const video = document.getElementById('main-video');
+                
+                video.src = v.url;
+                document.getElementById('video-title').innerText = v.title;
+                document.getElementById('v-desc-content').innerText = v.description || "Aucune description.";
+                document.getElementById('v-stats-line').innerText = `${this.formatViews(v.views)} vues • ${this.timeAgo(v.date)}`;
+                
+                // Mise à jour des infos auteur
+                const author = this.data.users[v.author] || {};
+                document.getElementById('v-author-name').innerText = v.author;
+                document.getElementById('v-author-avatar').src = author.avatar || 'https://via.placeholder.com/40';
+                document.getElementById('v-author-subs').innerText = `${Object.keys(author.followers || {}).length} abonnés`;
+                
+                overlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+                this.renderComments();
+                this.renderSuggestions();
+                this.addView(id);
+                
+                // Mise à jour du bouton s'abonner
+                this.updateSubBtn();
+
+                // Ajout à l'historique local
+                if (!this.history.includes(id)) {
+                    this.history.unshift(id);
+                    if (this.history.length > 20) this.history.pop();
+                    localStorage.setItem('v_history', JSON.stringify(this.history));
+                }
+            },
+
+            // --- 14c. SYSTÈME D'ABONNEMENT (FONCTIONNEL) ---
+            toggleSub: async function() {
+                if (!this.user) return this.openModal('modal-auth');
+                const targetName = this.activeVid.author;
+                if (targetName === this.user.name) return alert("Vous ne pouvez pas vous abonner à vous-même !");
+
+                const me = this.data.users[this.user.name];
+                const target = this.data.users[targetName];
+
+                if (!me.subs) me.subs = {};
+                if (!target.followers) target.followers = {};
+
+                if (me.subs[targetName]) {
+                    delete me.subs[targetName];
+                    delete target.followers[this.user.name];
+                } else {
+                    me.subs[targetName] = true;
+                    target.followers[this.user.name] = true;
+                }
+
+                this.updateSubBtn();
+                this.renderSubsSidebar();
+                await this.saveGist();
+            },
+
+            updateSubBtn: function() {
+                const btn = document.getElementById('player-sub-btn');
+                if (!btn || !this.activeVid) return;
+                const targetName = this.activeVid.author;
+                
+                if (this.user && this.data.users[this.user.name]?.subs?.[targetName]) {
+                    btn.innerText = "ABONNÉ";
+                    btn.style.background = "var(--hover)";
+                    btn.style.color = "white";
+                } else {
+                    btn.innerText = "S'ABONNER";
+                    btn.style.background = "white";
+                    btn.style.color = "black";
+                }
+            },
+
+            // --- 14d. GESTION DES PROFILS ---
+            goProfile: function(name) {
+                this.activeProfile = name;
+                this.nav('profile');
+                this.renderProfile();
+            },
+
+            goMyProfile: function() {
+                if (!this.user) return this.openModal('modal-auth');
+                this.goProfile(this.user.name);
+            },
+
+            renderProfile: function() {
+                const u = this.data.users[this.activeProfile];
+                if (!u) return;
+
+                document.getElementById('prof-display-name').innerText = this.activeProfile;
+                document.getElementById('prof-avatar-img').src = u.avatar || 'https://via.placeholder.com/100';
+                document.getElementById('prof-banner-img').style.backgroundImage = `url(${u.banner || 'https://via.placeholder.com/1200x200/222/444'})`;
+                document.getElementById('prof-sub-stats').innerText = `${Object.keys(u.followers || {}).length} abonnés • ${this.data.videos.filter(v => v.author === this.activeProfile).length} vidéos`;
+                
+                this.switchTab('vids');
+            },
+
+            // --- 14e. FORMATAGE (VUES & SUGGESTIONS) ---
+            formatViews: function(num) {
+                if (!num) return "0";
+                if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+                if (num >= 1000) return (num / 1000).toFixed(1) + "k";
+                return num;
+            },
+
+            renderSuggestions: function() {
+                const list = document.getElementById('suggestions-list');
+                const vids = this.data.videos.filter(v => v.id !== this.activeVid.id).slice(0, 10);
+                
+                list.innerHTML = vids.map(v => `
+                    <div style="display:flex; gap:10px; margin-bottom:12px; cursor:pointer;" onclick="app.openPlayer('${v.id}')">
+                        <img src="${v.thumb}" style="width:160px; aspect-ratio:16/9; border-radius:8px; object-fit:cover;">
+                        <div style="flex:1;">
+                            <b style="font-size:14px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${v.title}</b>
+                            <p style="font-size:12px; color:var(--sec-text); margin:4px 0;">${v.author}</p>
+                            <p style="font-size:12px; color:var(--sec-text);">${this.formatViews(v.views)} vues</p>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            logout: function() {
+                localStorage.removeItem('visiona_user');
+                location.reload();
+            },
                 // --- 15. SYSTÈME COMMUNAUTÉ (POSTS) ---
             renderPosts: function() {
                 const container = document.getElementById('view-posts');
