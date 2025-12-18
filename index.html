@@ -196,17 +196,83 @@
                 }
             },
 
-            // 4. MOTEUR DE NAVIGATION (Fix Boutons)
-            nav: function(id) {
+           // --- SYSTÈME DE NAVIGATION ROBUSTE (FIX BOUTONS) ---
+            nav: function(pageId) {
+                console.log("Navigation vers : " + pageId);
+                
+                // 1. Fermer les éléments persistants
                 this.closeModals();
                 this.closePlayer();
+                if(this.activeStream) this.stopLiveSystem();
+
+                // 2. Liste de toutes les sections possibles
+                const sections = ['home', 'zapp', 'subs', 'history', 'posts', 'stats', 'profile'];
                 
-                // Cacher toutes les sections
-                ['home', 'zapp', 'subs', 'history', 'posts', 'stats', 'profile'].forEach(v => {
-                    const el = document.getElementById('view-' + v);
-                    if (el) el.style.display = 'none';
-                    const navEl = document.getElementById('nav-' + v);
-                    if (navEl) navEl.classList.remove('active');
+                sections.forEach(s => {
+                    const el = document.getElementById('view-' + s);
+                    const navLink = document.getElementById('nav-' + s);
+                    if (el) {
+                        el.style.display = (s === pageId) ? 'block' : 'none';
+                    }
+                    if (navLink) {
+                        if (s === pageId) navLink.classList.add('active');
+                        else navLink.classList.remove('active');
+                    }
+                });
+
+                // 3. Déclenchement des rendus spécifiques
+                switch(pageId) {
+                    case 'home': this.renderHome(); break;
+                    case 'zapp': this.renderZapp(); break;
+                    case 'stats': this.renderStats(); break;
+                    case 'history': this.renderHistory(); break;
+                    case 'posts': this.renderPosts(); break;
+                    case 'profile': this.renderProfile(); break;
+                }
+                
+                // Remonter en haut de page
+                window.scrollTo(0, 0);
+            },
+
+            // --- GESTION DES MODALES (FIX OUVERTURE) ---
+            openModal: function(modalId) {
+                console.log("Ouverture modale : " + modalId);
+                const m = document.getElementById(modalId);
+                if (m) {
+                    m.style.display = 'flex';
+                } else {
+                    // Si la modale n'existe pas dans le HTML, on la crée dynamiquement
+                    this.createDynamicModal(modalId);
+                }
+            },
+
+            closeModals: function() {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(m => m.style.display = 'none');
+                // On s'assure de supprimer les modales dynamiques pour ne pas polluer le DOM
+                const dyn = document.getElementById('modal-join');
+                if(dyn) dyn.remove();
+            },
+
+            // --- CRÉATION DE CONTENU MANQUANT (SÉCURITÉ) ---
+            createVideoCard: function(v) {
+                // Cette fonction est le cœur de l'affichage. Si elle manque, rien ne marche.
+                return `
+                <div class="video-card" onclick="app.openPlayer('${v.id}')" style="cursor:pointer; transition:0.3s; background:var(--glass); border-radius:12px; overflow:hidden;">
+                    <div style="position:relative; aspect-ratio:16/9; background:#222;">
+                        <img src="${v.thumb}" style="width:100%; height:100%; object-fit:cover;">
+                        ${v.isLive ? '<span style="position:absolute; top:10px; left:10px; background:red; color:white; padding:2px 8px; border-radius:4px; font-weight:bold; font-size:12px;">DIRECT</span>' : ''}
+                    </div>
+                    <div style="padding:12px; display:flex; gap:12px;">
+                        <img src="${this.data.users[v.author]?.avatar || 'https://via.placeholder.com/36'}" style="width:36px; height:36px; border-radius:50%; flex-shrink:0;">
+                        <div>
+                            <h4 style="margin:0; font-size:14px; color:white; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${v.title}</h4>
+                            <p style="margin:5px 0 0 0; font-size:12px; color:var(--sec-text);">${v.author}</p>
+                            <p style="margin:2px 0 0 0; font-size:12px; color:var(--sec-text);">${this.formatViews(v.views)} vues • ${this.timeAgo(v.date)}</p>
+                        </div>
+                    </div>
+                </div>`;
+            },
                 });
 
                 // Afficher la cible
