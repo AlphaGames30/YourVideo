@@ -838,6 +838,84 @@
             <button onclick="app.closeModals()" style="width:100%; padding:10px; margin-top:15px;">Quitter le Panel</button>
         </div>
     </div>
+// --- 1. FONCTION DE RENDU PRINCIPALE (Affiche les vidéos du Gist) ---
+            render: function(list = this.data.videos) {
+                const grid = document.getElementById('home-grid');
+                if(!grid) return;
+                
+                grid.innerHTML = list.map(v => {
+                    const authorData = this.data.users[v.author] || {};
+                    return `
+                    <div class="v-card" onclick="app.openPlayer('${v.id}')">
+                        <div class="v-thumb">
+                            <img src="${v.thumb}">
+                            ${v.isLive ? '<div class="live-tag">DIRECT</div>' : ''}
+                        </div>
+                        <div style="display:flex; gap:12px; margin-top:12px;">
+                            <img src="${authorData.avatar || 'https://via.placeholder.com/36'}" 
+                                 style="width:36px; height:36px; border-radius:50%;" 
+                                 onclick="event.stopPropagation(); app.goProfile('${v.author}')">
+                            <div>
+                                <b title="${v.title}">${v.title}</b>
+                                <p style="font-size:12px; color:var(--sec-text); margin:4px 0;">${v.author}</p>
+                                <p style="font-size:12px; color:var(--sec-text);">${v.views || 0} vues • ${v.date || 'il y a 2 jours'}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            },
 
+            // --- 2. OUVERTURE DU LECTEUR ---
+            openPlayer: function(id) {
+                const v = this.data.videos.find(x => x.id == id);
+                if(!v) return;
+                this.activeVid = v;
+                document.getElementById('player-overlay').style.display = 'block';
+                const player = document.getElementById('main-video');
+                player.src = v.url;
+                player.play();
+                
+                document.getElementById('playerTitle').innerText = v.title;
+                this.renderComments();
+                this.addView(id); // Système de vue avec cooldown
+            },
+
+            // --- 3. SYSTÈME DE COMMENTAIRES (Avec Coeur & Épingle) ---
+            renderComments: function() {
+                const list = document.getElementById('notif-list'); // Ajuste selon ton ID de liste
+                if(!this.activeVid.comments) this.activeVid.comments = [];
+                
+                // Ici on génère les badges et les coeurs selon l'auteur
+                this.renderCommentsUI(); 
+            },
+
+            // --- 4. GESTION DES ONGLETS (PROFIL) ---
+            tabProf: function(type) {
+                const container = document.getElementById('prof-tab-content');
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                event.target.classList.add('active');
+
+                if(type === 'vids') {
+                    const vids = this.data.videos.filter(v => v.author === this.activeProfile);
+                    container.innerHTML = vids.map(v => this.createVideoCard(v)).join('');
+                } else if(type === 'posts') {
+                    const posts = this.data.posts.filter(p => p.author === this.activeProfile);
+                    container.innerHTML = posts.map(p => `<div class="post-card"><b>${p.author}</b><p>${p.text}</p></div>`).join('');
+                } else if(type === 'about') {
+                    container.innerHTML = this.renderAbout(this.activeProfile);
+                }
+            },
+
+            // --- 5. INITIALISATION FINALE ---
+            closePlayer: function() {
+                const player = document.getElementById('main-video');
+                player.pause();
+                document.getElementById('player-overlay').style.display = 'none';
+            }
+        };
+
+        // Lancement officiel de Visiona Titan
+        app.init();
+    </script>
 </body>
 </html>
