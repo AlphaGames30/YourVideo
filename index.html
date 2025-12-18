@@ -135,3 +135,314 @@
             <div id="comments-section"></div>
         </div>
     </div>
+    <script>
+        // --- CONFIGURATION GIST & WORKER (CONSERVÉE) ---
+        const GIST_URL = "https://gist.githubusercontent.com/AlphaGames30/5248424f9cc79feb78c0560faad87c92/raw/video.json";
+        const WORKER = "https://mytubeupload.edonis-imbert.workers.dev/";
+
+        const app = {
+            data: { videos: [], users: {}, posts: [], thanks: [], annonces: [] },
+            user: JSON.parse(localStorage.getItem('visiona_user')),
+            stats: JSON.parse(localStorage.getItem('visiona_stats')) || { time: 0, views: 0, likes: 0 },
+            eggCount: 0,
+            cooldowns: JSON.parse(localStorage.getItem('v_cd')) || {},
+            activeVid: null,
+            activeProfile: null,
+
+            init: async function() {
+                await this.fetchData();
+                this.updateUI();
+                this.renderHome();
+                this.startTimers();
+                this.checkAnnonces();
+                this.renderSubsSidebar();
+            },
+
+            fetchData: async function() {
+                try {
+                    const r = await fetch(GIST_URL + "?t=" + Date.now());
+                    const json = await r.json();
+                    this.data = json;
+                } catch(e) { console.error("Erreur chargement Gist"); }
+            },
+
+            saveGist: async function() {
+                try {
+                    await fetch(WORKER, {
+                        method: 'PATCH',
+                        body: JSON.stringify({ files: { "video.json": { content: JSON.stringify(this.data, null, 2) } } })
+                    });
+                } catch(e) { console.error("Erreur sauvegarde Gist"); }
+            },
+
+            // --- RENDU ACCUEIL ---
+            renderHome: function() {
+                this.hideAll();
+                document.getElementById('view-home').style.display = 'grid';
+                const grid = document.getElementById('view-home');
+                grid.innerHTML = this.data.videos.map(v => this.createVideoCard(v)).join('');
+            },
+
+            createVideoCard: function(v) {
+                const author = this.data.users[v.author] || {};
+                return `
+                    <div class="v-card" onclick="app.openPlayer('${v.id}')">
+                        <div class="v-thumb">
+                            <img src="${v.thumb}">
+                            ${v.isLive ? '<div class="live-tag">DIRECT</div>' : ''}
+                        </div>
+                        <div style="display:flex; gap:12px; margin-top:12px;">
+                            <img src="${author.avatar || 'https://via.placeholder.com/36'}" 
+                                 style="width:36px; height:36px; border-radius:50%;" 
+                                 onclick="event.stopPropagation(); app.goProfile('${v.author}')">
+                            <div>
+                                <b style="display:block; line-height:1.2;">${v.title}</b>
+                                <p style="font-size:12px; color:var(--sec-text); margin:4px 0;">${v.author}</p>
+                                <p style="font-size:12px; color:var(--sec-text);">${v.views || 0} vues • ${v.date || 'il y a 2 jours'}</p>
+                            </div>
+                        </div>
+                    </div>`;
+            },
+
+            // --- LECTEUR & VUES (COOLDOWN 1H) ---
+            openPlayer: function(id) {
+                const v = this.data.videos.find(x => x.id == id);
+                if(!v) return;
+                this.activeVid = v;
+                document.getElementById('player-overlay').style.display = 'block';
+                const player = document.getElementById('main-video');
+                player.src = v.url;
+                player.play();
+                
+                document.getElementById('video-title').innerText = v.title;
+                document.getElementById('like-count').innerText = v.likes || 0;
+                document.getElementById('dislike-count').innerText = v.dislikes || 0;
+                
+                this.renderComments();
+                this.addView(id);
+            },
+
+            addView: function(id) {
+                const now = Date.now();
+                if(!this.cooldowns[id] || (now - this.cooldowns[id] > 3600000)) {
+                    const v = this.data.videos.find(x => x.id == id);
+                    if(v) {
+                        v.views = (v.views || 0) + 1;
+                        this.cooldowns[id] = now;
+                        localStorage.setItem('v_cd', JSON.stringify(this.cooldowns));
+                        this.stats.views++;
+                        this.saveGist();
+                    }
+                }
+            },
+
+            // --- SYSTÈME DE POSTS ---
+            showPosts: function() {
+                this.hideAll();
+                const view = document.getElementById('view-home');
+                view.style.display = 'block';
+                view.innerHTML = `<h2>Communauté</h2>` + (this.data.posts || []).map(p => `
+                    <div class="post-card" style="background:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:10px; border:1px solid #333;">
+                        <b>${p.author}</b> <small style="color:gray;">• ${new Date(p.date).toLocaleDateString()}</small>
+                        <p>${p.text}</p>
+                    </div>
+                `).join('');
+            },
+
+            // --- SYSTÈME DE ZAPP (TIKTOK STYLE) ---
+            showZapp: function() {
+                this.hideAll();
+                const container = document.getElementById('view-zapp');
+                container.style.display = 'block';
+                const zapps = this.data.videos.filter(v => v.isShort || v.url.includes('tiktok') || v.isLive);
+                
+                container.innerHTML = zapps.map(z => `
+                    <div class="zapp-card">
+                        <video class="zapp-video" src="${z.url}" loop onclick="this.paused ? this.play() : this.pause()"></video>
+                        <div style="position:absolute; bottom:20px; left:15px; text-shadow:2px 2px 4px black;">
+                            <h3>@${z.author}</h3>
+                            <p>${z.title}</p>
+                        </div>
+                        <div style="position:absolute; right:10px; bottom:100px; display:flex; flex-direction:column; gap:20px;">
+                            <button onclick="app.vote('like')" style="background:none; border:none; color:white; font-size:25px;">❤️</button>
+                            <button onclick="alert('Commentaires Zapp bientôt...')" style="background:none; border:none; color:white; font-size:25px;">💬</button>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            // --- PROFIL & ONGLETED ---
+            goProfile: function(name) {
+                this.hideAll();
+                this.activeProfile = name;
+                document.getElementById('view-profile').style.display = 'block';
+                const u = this.data.users[name] || { name: name };
+                
+                document.getElementById('p-name').innerText = name;
+                document.getElementById('p-avatar').src = u.avatar || 'https://via.placeholder.com/80';
+                document.getElementById('p-banner').style.backgroundImage = `url(${u.banner || ''})`;
+                document.getElementById('p-sub-count').innerText = (u.subCount || 0) + " abonnés";
+                
+                this.changeTab('vids', document.querySelector('.tab'));
+            },
+
+            changeTab: function(type, el) {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                el.classList.add('active');
+                const content = document.getElementById('tab-content');
+                
+                if(type === 'vids') {
+                    const vids = this.data.videos.filter(v => v.author === this.activeProfile);
+                    content.innerHTML = vids.map(v => this.createVideoCard(v)).join('');
+                } else if(type === 'posts') {
+                    const posts = this.data.posts.filter(p => p.author === this.activeProfile);
+                    content.innerHTML = posts.map(p => `<div class="post-card"><b>${p.author}</b><p>${p.text}</p></div>`).join('');
+                } else if(type === 'about') {
+                    const u = this.data.users[this.activeProfile] || {};
+                    content.innerHTML = `<div style="padding:20px;"><h3>À propos</h3><p>${u.bio || 'Aucune description.'}</p></div>`;
+                }
+            },
+
+            // --- STATS TITAN ---
+            showStats: function() {
+                this.hideAll();
+                const view = document.getElementById('view-home');
+                view.style.display = 'block';
+                const h = Math.floor(this.stats.time / 3600);
+                const m = Math.floor((this.stats.time % 3600) / 60);
+                view.innerHTML = `
+                    <div class="post-card" style="background:#1a1a1a; padding:30px; border-radius:15px; border:1px solid #333;">
+                        <h2>📊 Tes Statistiques Titan</h2>
+                        <p style="font-size:18px;">⏱️ Temps passé sur Visiona : <b>${h}h ${m}min</b></p>
+                        <p style="font-size:18px;">👁️ Vidéos visionnées : <b>${this.stats.views}</b></p>
+                        <p style="font-size:18px;">🏅 Badge actuel : <b>${this.stats.views > 50 ? 'Légende Titan' : 'Explorateur'}</b></p>
+                    </div>`;
+            },
+
+            // --- PANEL ADMIN (BANNIR / ANNONCES / REMERCIEMENTS) ---
+            openAdminPanel: function() {
+                this.openModal('modal-admin');
+                const userList = document.getElementById('admin-users-manage');
+                userList.innerHTML = Object.keys(this.data.users).map(u => `
+                    <div style="display:flex; justify-content:space-between; margin-top:10px; background:#333; padding:10px; border-radius:8px;">
+                        <span>${u}</span>
+                        <button onclick="app.banUser('${u}')" style="background:var(--red); border:none; color:white; border-radius:4px; cursor:pointer;">Bannir</button>
+                    </div>
+                `).join('');
+            },
+
+            banUser: async function(name) {
+                if(confirm("Bannir " + name + " ? Ses vidéos seront supprimées.")) {
+                    delete this.data.users[name];
+                    this.data.videos = this.data.videos.filter(v => v.author !== name);
+                    await this.saveGist();
+                    this.openAdminPanel();
+                }
+            },
+
+            // --- EASTER EGG NOEL ---
+            eggClick: function() {
+                this.eggCount++;
+                if(this.eggCount >= 10) {
+                    document.body.classList.toggle('christmas');
+                    alert("🎅 JOYEUX NOËL ! Mode spécial activé.");
+                    this.eggCount = 0;
+                }
+            },
+
+            // --- FONCTIONS SYSTÈME ---
+            hideAll: function() {
+                ['view-home', 'view-profile', 'view-zapp'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.style.display = 'none';
+                });
+            },
+
+            startTimers: function() {
+                setInterval(() => {
+                    this.stats.time += 10;
+                    localStorage.setItem('visiona_stats', JSON.stringify(this.stats));
+                }, 10000);
+            },
+
+            toggleUserMenu: function() {
+                // Si admin, on peut ouvrir le panel
+                if(this.user && (this.user.name === "Admin" || this.user.email.includes("edonis"))) {
+                    this.openAdminPanel();
+                } else {
+                    alert("Espace membre bientôt disponible.");
+                }
+            },
+
+            closePlayer: function() {
+                document.getElementById('main-video').pause();
+                document.getElementById('player-overlay').style.display = 'none';
+            },
+
+            openModal: id => document.getElementById(id).style.display = 'flex',
+            closeModals: () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'),
+
+            checkAnnonces: function() {
+                if(this.data.annonces && this.data.annonces.length > 0) {
+                    const a = this.data.annonces[0];
+                    document.getElementById('annonce-area').innerHTML = `
+                        <div style="background:rgba(255,0,0,0.1); border:1px solid var(--red); padding:15px; border-radius:12px; margin-bottom:20px;">
+                            <b style="color:var(--red);">📢 ANNONCE ADMIN :</b> ${a.text}
+                        </div>`;
+                }
+            },
+
+            renderSubsSidebar: function() {
+                // Simule les abonnements comme sur YouTube
+                const area = document.getElementById('subs-list');
+                area.innerHTML = `<p style="color:gray; font-size:12px; padding:10px;">Abonnements</p>` + 
+                Object.keys(this.data.users).slice(0, 5).map(u => `
+                    <div class="nav-item" onclick="app.goProfile('${u}')">
+                        <img src="${this.data.users[u].avatar || 'https://via.placeholder.com/24'}" style="width:24px; height:24px; border-radius:50%;">
+                        <span>${u}</span>
+                    </div>
+                `).join('');
+            }
+        };
+
+        app.init();
+    </script>
+
+    <div id="modal-upload" class="modal">
+        <div class="modal-content">
+            <h2>Publier</h2>
+            <p>Importez depuis votre appareil :</p>
+            <input type="file" id="upFile" style="margin-bottom:10px;">
+            <input type="text" id="upTitle" placeholder="Titre de la vidéo" style="width:100%; padding:10px; margin-bottom:10px; background:#121212; border:1px solid #333; color:white;">
+            <button onclick="alert('L\'upload nécessite une configuration Cloudinary active.')" style="width:100%; padding:10px; background:var(--blue); border:none; border-radius:8px;">Publier la vidéo</button>
+            <button onclick="app.closeModals()" style="width:100%; margin-top:10px; background:none; border:none; color:gray;">Annuler</button>
+        </div>
+    </div>
+
+    <div id="modal-admin" class="modal">
+        <div class="modal-content" style="max-width:600px;">
+            <h2>🛡️ Panel Admin Titan</h2>
+            <div style="max-height:400px; overflow-y:auto;">
+                <h4>Utilisateurs</h4>
+                <div id="admin-users-manage"></div>
+                <hr>
+                <h4>Remerciements</h4>
+                <input type="text" id="thanksName" placeholder="Nom">
+                <button onclick="app.addThanks()" style="background:var(--green); color:white; border:none; padding:5px 10px;">Ajouter</button>
+            </div>
+            <button onclick="app.closeModals()" style="width:100%; margin-top:20px; padding:10px;">Fermer</button>
+        </div>
+    </div>
+
+    <div id="modal-stream" class="modal">
+        <div class="modal-content">
+            <h2>Lancer un Live 🔴</h2>
+            <p>Voulez-vous diffuser votre caméra en direct sur Visiona ?</p>
+            <video id="streamPreview" autoplay muted style="width:100%; background:black; border-radius:8px;"></video>
+            <button onclick="navigator.mediaDevices.getUserMedia({video:true}).then(s=>{document.getElementById('streamPreview').srcObject=s})" style="width:100%; padding:10px; margin-top:10px;">Tester la caméra</button>
+            <button onclick="app.closeModals()" style="width:100%; margin-top:10px; background:none; border:none; color:gray;">Fermer</button>
+        </div>
+    </div>
+
+</body>
+</html>
