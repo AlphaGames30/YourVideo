@@ -455,6 +455,26 @@
             </div>
         </div>
     </div>
+        <div id="modal-auth" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <h2>Rejoindre Visiona</h2>
+            <p style="color:var(--sec-text); margin-bottom:20px;">Connectez-vous pour interagir, publier et vous abonner.</p>
+            <input type="text" id="auth-username" placeholder="Nom d'utilisateur" style="width:100%; padding:12px; background:#121212; border:1px solid #333; color:white; border-radius:8px; margin-bottom:10px;">
+            <input type="email" id="auth-email" placeholder="Email" style="width:100%; padding:12px; background:#121212; border:1px solid #333; color:white; border-radius:8px; margin-bottom:20px;">
+            <button onclick="app.handleAuth()" style="width:100%; padding:14px; background:white; color:black; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">SE CONNECTER / S'INSCRIRE</button>
+            <button onclick="app.closeModals()" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer;">Annuler</button>
+        </div>
+    </div>
+
+    <div id="modal-admin" class="modal">
+        <div class="modal-content" style="max-width:800px; width:95%;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>🛡️ Panel Titan Administration</h2>
+                <button onclick="app.closeModals()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;">✕</button>
+            </div>
+            <div id="admin-panel-content"></div>
+        </div>
+    </div>
         <script>
         // --- 1. CONFIGURATION ET ÉTAT GLOBAL ---
         // On conserve tes URLs de base du Worker et du Gist
@@ -494,6 +514,32 @@
                         document.getElementById('profile-dropdown').style.display = 'none';
                     }
                 };
+            },
+            
+            handleAuth: async function() {
+                const name = document.getElementById('auth-username').value.trim();
+                const email = document.getElementById('auth-email').value.trim();
+                if (!name || !email) return alert("Remplissez tous les champs !");
+
+                // Création ou récupération de l'utilisateur dans la base Titan
+                if (!this.data.users[name]) {
+                    this.data.users[name] = {
+                        email: email,
+                        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
+                        banner: "https://images.unsplash.com/photo-1579546678195-a9d20f0b4d44",
+                        subs: {},
+                        followers: {},
+                        date: Date.now()
+                    };
+                    await this.saveGist();
+                }
+
+                const userData = { name: name, email: email };
+                localStorage.setItem('visiona_user', JSON.stringify(userData));
+                this.user = userData;
+                
+                alert(`Bienvenue ${name} !`);
+                location.reload();
             },
 
             // --- 3. GESTION DES DONNÉES (GIST & WORKER) ---
@@ -974,104 +1020,8 @@
                 const input = document.getElementById('com-input');
                 input.value = `@${author} `;
                 input.focus();
-            }
-                // --- FONCTIONS DE BASE (FIX TOUS BOUTONS) ---
-            openModal: function(id) {
-                document.getElementById(id).style.display = 'flex';
             },
-
-            closeModals: function() {
-                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-                if(this.activeStream) {
-                    this.activeStream.getTracks().forEach(track => track.stop());
-                }
-            },
-
-            closePlayer: function() {
-                const overlay = document.getElementById('player-overlay');
-                const video = document.getElementById('main-video');
-                overlay.style.display = 'none';
-                video.pause();
-                video.src = "";
-                this.activeVid = null;
-                document.body.style.overflow = 'auto';
-            },
-
-            openPlayer: function(id) {
-                const v = this.data.videos.find(x => x.id === id);
-                if (!v) return;
-                this.activeVid = v;
-                
-                const overlay = document.getElementById('player-overlay');
-                const video = document.getElementById('main-video');
-                
-                video.src = v.url;
-                document.getElementById('video-title').innerText = v.title;
-                document.getElementById('v-desc-content').innerText = v.description || "Aucune description.";
-                document.getElementById('v-stats-line').innerText = `${this.formatViews(v.views)} vues • ${this.timeAgo(v.date)}`;
-                
-                // Update Author Info
-                const author = this.data.users[v.author] || {};
-                document.getElementById('v-author-name').innerText = v.author;
-                document.getElementById('v-author-avatar').src = author.avatar || 'https://via.placeholder.com/40';
-                
-                overlay.style.display = 'block';
-                document.body.style.overflow = 'hidden';
-                
-                this.renderComments();
-                this.renderSuggestions();
-                this.addView(id);
-                
-                // Ajouter à l'historique
-                if (!this.history.includes(id)) {
-                    this.history.unshift(id);
-                    if (this.history.length > 20) this.history.pop();
-                    localStorage.setItem('v_history', JSON.stringify(this.history));
-                }
-            },
-
-            formatViews: function(num) {
-                if (!num) return "0";
-                if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
-                if (num >= 1000) return (num / 1000).toFixed(1) + "k";
-                return num;
-            },
-
-            timeAgo: function(date) {
-                const seconds = Math.floor((new Date() - date) / 1000);
-                let interval = seconds / 31536000;
-                if (interval > 1) return "il y a " + Math.floor(interval) + " ans";
-                interval = seconds / 2592000;
-                if (interval > 1) return "il y a " + Math.floor(interval) + " mois";
-                interval = seconds / 86400;
-                if (interval > 1) return "il y a " + Math.floor(interval) + " jours";
-                interval = seconds / 3600;
-                if (interval > 1) return "il y a " + Math.floor(interval) + " heures";
-                interval = seconds / 60;
-                if (interval > 1) return "il y a " + Math.floor(interval) + " min";
-                return "à l'instant";
-            },
-
-            addView: function(id) {
-                const v = this.data.videos.find(x => x.id === id);
-                if (v) {
-                    v.views++;
-                    this.stats.views++;
-                    localStorage.setItem('visiona_stats', JSON.stringify(this.stats));
-                    // On ne sauvegarde pas le Gist à chaque vue pour éviter de saturer le Worker
-                }
-            },
-
-            checkAnnonces: function() {
-                const area = document.getElementById('alert-area');
-                if (this.data.annonces && this.data.annonces.length > 0) {
-                    area.innerHTML = `
-                        <div style="background:var(--blue); color:black; padding:12px; border-radius:8px; margin-bottom:20px; font-weight:500; display:flex; justify-content:space-between;">
-                            <span>📢 ${this.data.annonces[0].text}</span>
-                            <button onclick="this.parentElement.remove()" style="background:none; border:none; cursor:pointer; font-weight:bold;">✕</button>
-                        </div>`;
-                }
-            },
+               
             // --- 14b. FONCTIONS DE NAVIGATION ET MODALES (RÉVEIL DES BOUTONS) ---
             openModal: function(id) {
                 const modal = document.getElementById(id);
