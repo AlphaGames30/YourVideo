@@ -1,3 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Visiona Titan - Version Corrigée</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- SYSTÈME DE VARIABLES (TON STYLE ORIGINAL) --- */
+        :root { 
+            --bg: #0f0f0f; --header: #0f0f0f; --text: #ffffff; --sec-text: #aaaaaa; 
+            --hover: #272727; --blue: #3ea6ff; --red: #ff0000; --green: #00a854; --gold: #ffc107;
+            --glass: rgba(255, 255, 255, 0.05); --sidebar-width: 240px;
+        }
+
+        /* EASTER EGG NOEL */
+        body.christmas-mode {
+            --bg: #0b1d0e; --header: #1a0505; --blue: #00ff00; --red: #ff0000;
+            background-image: url('https://www.transparenttextures.com/patterns/snow.png');
+        }
+
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Roboto', sans-serif; overflow-x: hidden; padding-bottom: 60px; transition: 0.5s; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; height: 56px; background: var(--header); position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid #222; }
+        .logo { font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; user-select: none; }
+        .logo::before { content: '▶'; color: var(--red); font-size: 24px; margin-right: 5px; }
+
+        .search-box { display: flex; flex: 1; max-width: 600px; margin: 0 40px; }
+        .search-box input { width: 100%; background: #121212; border: 1px solid #333; color: white; padding: 10px 16px; border-radius: 40px 0 0 40px; outline: none; font-size: 16px; }
+        .search-box button { background: #222; border: 1px solid #333; border-left: none; color: white; padding: 0 20px; border-radius: 0 40px 40px 0; cursor: pointer; }
+
+        .container { display: flex; min-height: calc(100vh - 56px); }
+        .sidebar { width: var(--sidebar-width); background: var(--bg); padding: 12px; height: calc(100vh - 56px); position: fixed; top: 56px; overflow-y: auto; border-right: 1px solid #222; z-index: 1000; }
+        .nav-item { display: flex; align-items: center; gap: 20px; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-size: 14px; color: var(--text); margin-bottom: 2px; }
+        .nav-item:hover { background: var(--hover); }
+        .nav-item.active { background: var(--hover); font-weight: bold; }
+        .sidebar hr { border: 0; border-top: 1px solid #333; margin: 12px 0; }
+
+        .main-content { flex: 1; margin-left: var(--sidebar-width); padding: 24px; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+        .v-card { cursor: pointer; border-radius: 12px; overflow: hidden; transition: transform 0.2s; }
+        .v-card:hover { transform: scale(1.02); }
+        .v-thumb { width: 100%; aspect-ratio: 16/9; background: #222; border-radius: 12px; overflow: hidden; position: relative; }
+        .v-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .v-duration { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8); color: white; padding: 2px 4px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+        .live-tag { position: absolute; top: 8px; left: 8px; background: var(--red); color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+
+        /* ZAPPS */
+        .zapp-view { display: none; height: calc(100vh - 100px); overflow-y: scroll; scroll-snap-type: y mandatory; max-width: 420px; margin: 0 auto; scrollbar-width: none; }
+        .zapp-view::-webkit-scrollbar { display: none; }
+        .zapp-card { height: 100%; scroll-snap-align: start; position: relative; background: #000; border-radius: 16px; margin-bottom: 20px; overflow: hidden; display: flex; justify-content: center;}
+        .zapp-video { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+        .zapp-ui { position: absolute; right: 12px; bottom: 40px; display: flex; flex-direction: column; gap: 20px; z-index: 10; align-items: center; }
+        .zapp-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 20px; backdrop-filter: blur(10px); }
+
+        /* PLAYER & MODALS */
+        #player-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 3000; overflow-y: auto; padding: 20px; }
+        .player-container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 4000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .modal-content { background: #1e1e1e; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; border: 1px solid #333; max-height: 90vh; overflow-y: auto; }
+        
+        .titan-input { width: 100%; padding: 12px; background: #121212; border: 1px solid #333; color: white; border-radius: 8px; margin-bottom: 10px; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-blue { background: var(--blue); color: black; }
+        .btn-red { background: var(--red); color: white; }
+
+        /* LIVE & ADMIN STYLES (AJOUT) */
+        #live-interface { display: none; position: fixed; inset: 0; background: #000; z-index: 4500; grid-template-columns: 1fr 300px; }
+        .chat-box { background: #1a1a1a; border-left: 1px solid #333; display: flex; flex-direction: column; height: 100vh; }
+        .chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-size: 13px; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .admin-table th, .admin-table td { text-align: left; padding: 8px; border-bottom: 1px solid #333; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; }
+            .player-container { grid-template-columns: 1fr; }
+            #live-interface { grid-template-columns: 1fr; grid-template-rows: 1fr 200px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo" onclick="app.clickEgg()">Visiona</div>
+        <div class="search-box">
+            <input type="text" id="mainSearch" placeholder="Rechercher..." onkeyup="if(event.key==='Enter') app.search()">
+            <button onclick="app.search()">🔍</button>
+        </div>
+        <div style="display:flex; gap:18px; align-items:center;">
+            <button onclick="app.openModal('modal-upload')" style="background:none; border:none; color:white; font-size:22px; cursor:pointer;">➕</button>
+            <div onclick="app.toggleProfileMenu()" id="header-profile-area" style="cursor:pointer;">
+                <button class="btn-blue" style="width:auto; padding: 5px 15px;">Connexion</button>
+            </div>
+        </div>
+    </header>
+
+    <div id="profile-dropdown" style="display:none; position:fixed; right:16px; top:60px; background:#282828; border:1px solid #444; border-radius:12px; width:250px; z-index:5000; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+        <div style="padding:15px; border-bottom:1px solid #444; display:flex; align-items:center; gap:10px;">
+            <div id="dropdown-avatar" style="width:40px; height:40px;"></div>
+            <b id="dropdown-username">Non connecté</b>
+        </div>
+        <div class="nav-item" onclick="app.goMyProfile()">👤 Ma chaîne</div>
+        <div class="nav-item" onclick="app.nav('stats')">📊 Mes Statistiques</div>
+        <div id="admin-panel-btn" class="nav-item" style="display:none; color:var(--gold);" onclick="app.nav('admin')">🛡️ Panel Admin</div>
+        <div class="nav-item" onclick="app.logout()" style="color:var(--red);">🚪 Déconnexion</div>
+    </div>
 <div class="container">
         <aside class="sidebar">
             <div class="nav-item active" id="btn-home" onclick="app.nav('home', this)">🏠 Accueil</div>
