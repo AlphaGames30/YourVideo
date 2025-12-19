@@ -1,988 +1,833 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Visiona Titan - Ultimate Production</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <style>
-        /* =========================================
-           1. VARIABLES & SYSTÈME DE COULEURS
-           ========================================= */
-        :root {
-            --bg-color: #0f0f0f;
-            --header-bg: #0f0f0f;
-            --sidebar-bg: #0f0f0f;
-            --card-bg: #0f0f0f;
-            --text-main: #ffffff;
-            --text-sec: #aaaaaa;
-            --border-color: #2a2a2a;
-            --hover-color: #272727;
-            --accent-blue: #3ea6ff;
-            --accent-red: #ff0000;
-            --accent-gold: #ffc107;
-            --accent-green: #2ba640;
-            --sidebar-width: 240px;
-            --header-height: 56px;
-            --transition-speed: 0.2s;
-        }
+<div class="container">
+        <aside class="sidebar">
+            <div class="nav-item active" id="btn-home" onclick="app.nav('home', this)">🏠 Accueil</div>
+            <div class="nav-item" id="btn-zapp" onclick="app.nav('zapp', this)">⚡ Zapp</div>
+            <div class="nav-item" id="btn-subs" onclick="app.nav('subs', this)">🔔 Abonnements</div>
+            <hr>
+            <div class="nav-item" onclick="app.nav('history', this)">🕒 Historique</div>
+            <div class="nav-item" onclick="app.nav('posts', this)">📝 Communauté</div>
+            <div class="nav-item" onclick="app.openModal('modal-upload')">🔴 Direct</div>
+            <hr>
+            <div class="nav-item" onclick="app.nav('stats', this)">📊 Statistiques</div>
+            <div class="nav-item" onclick="app.nav('thanks', this)">💎 Remerciements</div>
+            <hr>
+            <div style="padding:0 12px; font-size:12px; color:var(--sec-text); margin-bottom:10px;">VOS ABONNEMENTS</div>
+            <div id="subs-list-container"></div>
+        </aside>
 
-        /* --- THÈMES EASTER EGGS --- */
-        
-        /* Mode Noël (10 clics logo) */
-        body.christmas-mode {
-            --bg-color: #0b1d0e;
-            --header-bg: #1a0505;
-            --sidebar-bg: #0f2b15;
-            --accent-blue: #00ff00;
-            --accent-red: #ff0000;
-            background-image: url('https://www.transparenttextures.com/patterns/snow.png');
-        }
+        <main class="main-content">
+            <section id="view-home">
+                <div id="announcement-area"></div>
+                <div class="video-grid" id="home-grid"></div>
+            </section>
 
-        /* Mode Matrix (Konami Code) */
-        body.matrix-mode {
-            --bg-color: #000000;
-            --header-bg: #001100;
-            --text-main: #00ff00;
-            --text-sec: #008800;
-            --accent-blue: #00ff00;
-            --accent-red: #00ff00;
-            font-family: 'Courier New', monospace;
-        }
+            <section id="view-zapp" class="zapp-view"></section>
+            
+            <section id="view-subs" style="display:none;">
+                <h2>Vidéos de vos abonnements</h2>
+                <div class="video-grid" id="subs-grid"></div>
+            </section>
 
-        /* Mode Rainbow (Clic Version) */
-        body.rainbow-mode {
-            animation: rainbow-bg 5s infinite;
-        }
-        @keyframes rainbow-bg {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
-        }
-
-        /* =========================================
-           2. RESET & BASE
-           ========================================= */
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            margin: 0; padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Roboto', sans-serif;
-            overflow-x: hidden;
-            transition: background-color 0.5s ease, color 0.5s ease;
-        }
-
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-color); }
-        ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #888; }
-
-        /* =========================================
-           3. HEADER (BARRE DU HAUT)
-           ========================================= */
-        header {
-            position: fixed; top: 0; left: 0; right: 0;
-            height: var(--header-height);
-            background: var(--header-bg);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 16px;
-            z-index: 2000;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .logo-section {
-            display: flex; align-items: center; gap: 5px;
-            cursor: pointer; user-select: none;
-        }
-        .logo-icon {
-            color: var(--accent-red); font-size: 28px;
-            transition: transform 0.3s;
-        }
-        .logo-text {
-            font-size: 20px; font-weight: 700; letter-spacing: -1px;
-            position: relative;
-        }
-        .logo-text span { font-weight: 300; color: var(--text-main); }
-        
-        /* Décoration Noël sur le logo */
-        body.christmas-mode .logo-icon::after { content: '🎅'; position: absolute; top: -10px; left: -10px; font-size: 20px; }
-
-        .search-container {
-            flex: 1; max-width: 650px; margin: 0 20px; display: flex;
-        }
-        .search-input {
-            width: 100%;
-            background: #121212;
-            border: 1px solid var(--border-color);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 40px 0 0 40px;
-            font-size: 16px;
-            transition: border 0.2s;
-        }
-        .search-input:focus { border-color: var(--accent-blue); }
-        .search-btn {
-            background: #222;
-            border: 1px solid var(--border-color);
-            border-left: none;
-            color: var(--text-sec);
-            padding: 0 20px;
-            border-radius: 0 40px 40px 0;
-            cursor: pointer;
-        }
-        .search-btn:hover { background: #333; color: white; }
-
-        .header-actions {
-            display: flex; align-items: center; gap: 15px;
-        }
-
-        .icon-btn {
-            background: none; border: none; color: white;
-            font-size: 24px; cursor: pointer; padding: 8px;
-            border-radius: 50%; transition: background 0.2s;
-        }
-        .icon-btn:hover { background: rgba(255,255,255,0.1); }
-
-        .auth-btn {
-            background: transparent;
-            border: 1px solid var(--accent-blue);
-            color: var(--accent-blue);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex; align-items: center; gap: 5px;
-        }
-        .auth-btn:hover { background: rgba(62, 166, 255, 0.1); }
-
-        .user-avatar-header {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: #333; cursor: pointer; overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-        .user-avatar-header img { width: 100%; height: 100%; object-fit: cover; }
-        /* Fallback avatar (lettre) */
-        .user-avatar-header div { 
-            width: 100%; height: 100%; display: flex; 
-            align-items: center; justify-content: center; 
-            font-weight: bold; color: white; 
-        }
-
-        /* =========================================
-           4. SIDEBAR (NAVIGATION GAUCHE)
-           ========================================= */
-        .sidebar {
-            position: fixed; top: var(--header-height); bottom: 0; left: 0;
-            width: var(--sidebar-width);
-            background: var(--sidebar-bg);
-            overflow-y: auto;
-            padding: 12px;
-            z-index: 1000;
-            transform: translateX(0);
-            transition: transform 0.3s ease;
-        }
-        
-        .nav-item {
-            display: flex; align-items: center; gap: 20px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            color: var(--text-main);
-            font-size: 14px;
-            margin-bottom: 2px;
-        }
-        .nav-item:hover { background: var(--hover-color); }
-        .nav-item.active { background: var(--hover-color); font-weight: 500; }
-        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-
-        .separator {
-            border: 0; border-top: 1px solid var(--border-color);
-            margin: 12px 0;
-        }
-
-        .section-title {
-            font-size: 13px; font-weight: bold; color: var(--text-sec);
-            padding: 8px 12px; text-transform: uppercase;
-        }
-
-        /* =========================================
-           5. MAIN CONTENT (ZONE PRINCIPALE)
-           ========================================= */
-        .main-container {
-            margin-top: var(--header-height);
-            margin-left: var(--sidebar-width);
-            padding: 24px;
-            min-height: calc(100vh - var(--header-height));
-            transition: margin-left 0.3s ease;
-        }
-
-        /* Grid Vidéos */
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .video-card {
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .video-card:hover { transform: scale(1.02); }
-
-        .thumbnail-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: #222;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .thumbnail-img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        .duration-badge {
-            position: absolute; bottom: 5px; right: 5px;
-            background: rgba(0,0,0,0.8);
-            color: white; padding: 2px 6px;
-            border-radius: 4px; font-size: 12px; font-weight: 500;
-        }
-        .live-badge {
-            position: absolute; top: 8px; left: 8px;
-            background: var(--accent-red);
-            color: white; padding: 2px 6px;
-            border-radius: 4px; font-size: 12px; font-weight: bold;
-            display: flex; align-items: center; gap: 4px;
-        }
-        .live-badge::before {
-            content: ''; display: block; width: 6px; height: 6px;
-            background: white; border-radius: 50%;
-        }
-
-        .video-info {
-            display: flex; gap: 12px; margin-top: 12px;
-        }
-        .channel-avatar-small {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: #333; flex-shrink: 0;
-        }
-        .video-title {
-            font-size: 16px; font-weight: bold;
-            line-height: 1.3; margin-bottom: 4px;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-            overflow: hidden; color: var(--text-main);
-        }
-        .video-meta {
-            font-size: 13px; color: var(--text-sec);
-            display: flex; flex-direction: column;
-        }
-        .video-meta span:hover { color: var(--text-main); }
-
-        /* =========================================
-           6. ZAPPS & POSTS
-           ========================================= */
-        .zapp-container {
-            height: calc(100vh - 80px);
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            max-width: 450px;
-            margin: 0 auto;
-            scrollbar-width: none;
-        }
-        .zapp-container::-webkit-scrollbar { display: none; }
-
-        .zapp-item {
-            height: 100%;
-            scroll-snap-align: start;
-            position: relative;
-            background: #000;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            display: flex; justify-content: center;
-            overflow: hidden;
-        }
-        .zapp-video {
-            height: 100%; width: 100%; object-fit: cover;
-        }
-        .zapp-overlay {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            padding: 20px;
-            display: flex; align-items: flex-end; justify-content: space-between;
-        }
-        .zapp-actions {
-            display: flex; flex-direction: column; gap: 20px; align-items: center;
-        }
-        .action-btn {
-            background: rgba(255,255,255,0.1);
-            width: 45px; height: 45px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            flex-direction: column; color: white; cursor: pointer;
-            backdrop-filter: blur(5px);
-        }
-        .action-btn small { font-size: 10px; margin-top: 2px; }
-
-        .post-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            max-width: 800px;
-        }
-
-        /* =========================================
-           7. MODALES (LOGIN, UPLOAD, ADMIN)
-           ========================================= */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.8); z-index: 5000;
-            align-items: center; justify-content: center;
-            backdrop-filter: blur(5px);
-        }
-        .modal-box {
-            background: #212121;
-            padding: 25px;
-            border-radius: 15px;
-            width: 90%; max-width: 600px;
-            border: 1px solid #333;
-            animation: slideUp 0.3s ease;
-            max-height: 90vh; overflow-y: auto;
-        }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-        }
-        .modal-title { font-size: 20px; font-weight: bold; }
-        .close-btn { background: none; border: none; color: #aaa; font-size: 24px; cursor: pointer; }
-        
-        .form-group { margin-bottom: 15px; }
-        .titan-input {
-            width: 100%; background: #121212; border: 1px solid #333;
-            color: white; padding: 12px; border-radius: 8px; font-family: inherit;
-        }
-        .titan-input:focus { border-color: var(--accent-blue); }
-        
-        .btn-primary {
-            width: 100%; background: var(--accent-blue); color: black;
-            padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
-        }
-        .btn-danger { background: var(--accent-red); color: white; }
-        
-        /* =========================================
-           8. PLAYER, LIVE & ADMIN
-           ========================================= */
-        #player-overlay {
-            display: none; position: fixed; inset: 0;
-            background: var(--bg-color); z-index: 4000;
-            overflow-y: auto; padding: 20px;
-        }
-        .player-layout {
-            max-width: 1400px; margin: 0 auto;
-            display: grid; grid-template-columns: 1fr 400px; gap: 24px;
-        }
-
-        /* LIVE SPLIT VIEW */
-        #live-dashboard {
-            display: none; position: fixed; inset: 0;
-            background: #000; z-index: 4500;
-            grid-template-columns: 1fr 350px;
-        }
-        .live-video-area {
-            position: relative; background: #111;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .live-chat-area {
-            background: #1a1a1a; border-left: 1px solid #333;
-            display: flex; flex-direction: column;
-        }
-        .chat-messages {
-            flex: 1; overflow-y: auto; padding: 10px;
-            font-size: 13px;
-        }
-        .chat-msg { margin-bottom: 8px; line-height: 1.4; }
-        .chat-msg b { color: #aaa; margin-right: 5px; }
-        .chat-input-area {
-            padding: 10px; border-top: 1px solid #333;
-        }
-        
-        /* ADMIN TABLES */
-        .admin-table {
-            width: 100%; border-collapse: collapse; margin-top: 10px;
-        }
-        .admin-table th, .admin-table td {
-            text-align: left; padding: 10px; border-bottom: 1px solid #333;
-        }
-        .admin-table th { color: var(--text-sec); font-size: 12px; text-transform: uppercase; }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-            .main-container { margin-left: 0; }
-            .player-layout { grid-template-columns: 1fr; }
-            #live-dashboard { grid-template-columns: 1fr; grid-template-rows: 1fr 200px; }
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="logo-section" onclick="app.easterEggs.clickLogo()">
-            <div class="logo-icon">▶</div>
-            <div class="logo-text">Visiona<span>Titan</span></div>
-        </div>
-
-        <div class="search-container">
-            <input type="text" class="search-input" id="search-input" placeholder="Rechercher..." onkeyup="if(event.key==='Enter') app.search()">
-            <button class="search-btn" onclick="app.search()">🔍</button>
-        </div>
-
-        <div class="header-actions">
-            <button class="icon-btn" onclick="app.openModal('modal-create')" title="Créer">📹</button>
-            <div style="position:relative;">
-                <button class="icon-btn" onclick="alert('Aucune nouvelle notification.')">🔔</button>
-            </div>
-            <div id="auth-section"></div>
-        </div>
-    </header>
-
-    <div id="user-dropdown" style="display:none; position:fixed; right:15px; top:60px; background:#282828; width:250px; border-radius:12px; z-index:4500; border:1px solid #333; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-        <div style="padding:15px; border-bottom:1px solid #333; display:flex; align-items:center; gap:10px;">
-            <div id="dropdown-pp" class="user-avatar-header"></div>
-            <b id="dropdown-name" style="font-size:16px;">Pseudo</b>
-        </div>
-        <div class="nav-item" onclick="app.nav('profile')">👤 Ma Chaîne</div>
-        <div class="nav-item" onclick="app.nav('stats')">📊 Titan Studio</div>
-        <div id="admin-entry" class="nav-item" style="display:none; color:var(--accent-gold);" onclick="app.nav('admin')">🛡️ Panel Admin</div>
-        <div class="separator"></div>
-        <div class="nav-item" onclick="app.auth.logout()" style="color:var(--accent-red);">🚪 Déconnexion</div>
-    </div>
-
-    <nav class="sidebar" id="sidebar">
-        <div class="nav-item active" id="btn-home" onclick="app.nav('home')">
-            <span class="nav-icon">🏠</span> Accueil
-        </div>
-        <div class="nav-item" id="btn-zapp" onclick="app.nav('zapp')">
-            <span class="nav-icon">⚡</span> Zapps
-        </div>
-        <div class="nav-item" id="btn-subs" onclick="app.nav('subs')">
-            <span class="nav-icon">📺</span> Abonnements
-        </div>
-        <div class="separator"></div>
-        <div class="nav-item" onclick="app.nav('history')">
-            <span class="nav-icon">🕒</span> Historique
-        </div>
-        <div class="nav-item" onclick="app.nav('community')">
-            <span class="nav-icon">📝</span> Communauté
-        </div>
-        <div class="nav-item" onclick="app.nav('thanks')">
-            <span class="nav-icon">💎</span> Remerciements
-        </div>
-        <div class="separator"></div>
-        <div class="section-title">Abonnements</div>
-        <div id="subs-list"></div>
-        <div style="margin-top:auto; padding:10px; font-size:10px; color:#555; cursor:pointer;" onclick="app.easterEggs.clickVersion()">v3.5 Ultimate</div>
-    </nav>
-
-    <main class="main-container">
-        
-        <section id="view-home">
-            <div id="announcement-area"></div>
-            <div class="video-grid" id="grid-home"></div>
-        </section>
-
-        <section id="view-zapp" style="display:none;">
-            <div class="zapp-container" id="container-zapp"></div>
-        </section>
-
-        <section id="view-subs" style="display:none;">
-            <h2>Vidéos de vos abonnements</h2>
-            <div class="video-grid" id="grid-subs"></div>
-        </section>
-
-        <section id="view-history" style="display:none;">
-            <div style="display:flex; justify-content:space-between;">
+            <section id="view-history" style="display:none;">
                 <h2>Historique</h2>
-                <button onclick="app.history.clear()" style="background:none; border:none; color:var(--accent-blue); cursor:pointer;">Tout effacer</button>
-            </div>
-            <div class="video-grid" id="grid-history"></div>
-        </section>
+                <div class="video-grid" id="history-grid"></div>
+            </section>
 
-        <section id="view-community" style="display:none;">
-            <h2>Flux Communauté</h2>
-            <div id="community-input-area"></div>
-            <div id="community-feed"></div>
-        </section>
+            <section id="view-posts" style="display:none;">
+                <h2>Flux Communautaire</h2>
+                <div id="posts-feed"></div>
+            </section>
 
-        <section id="view-thanks" style="display:none;">
-            <h1 style="color:var(--accent-gold); text-align:center;">💎 LE PANTHÉON TITAN</h1>
-            <p style="text-align:center; color:#aaa;">Liste officielle des contributeurs.</p>
-            <div id="thanks-list" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-top:30px;"></div>
-        </section>
+            <section id="view-thanks" style="display:none;">
+                <h1 style="color:var(--gold); text-align:center;">Panthéon Visiona</h1>
+                <div id="thanks-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 30px;"></div>
+            </section>
 
-        <section id="view-admin" style="display:none;">
-            <h1 style="color:var(--accent-red);">🛡️ PANEL ADMINISTRATEUR</h1>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                <div style="background:#1e1e1e; padding:15px; border-radius:10px;">
-                    <h3>Annonce Globale</h3>
-                    <textarea id="admin-announcement" class="titan-input" style="height:60px;"></textarea>
-                    <button class="btn-primary" style="margin-top:10px; background:var(--accent-green);" onclick="app.admin.postAnnounce()">PUBLIER</button>
+            <section id="view-admin" style="display:none;">
+                <h1 style="color:var(--red);">🛡️ Panel Administrateur (Edonis)</h1>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="background:#1e1e1e; padding:15px; border-radius:10px;">
+                        <h3>Gestion Vidéos</h3>
+                        <table class="admin-table">
+                            <thead><tr><th>Titre</th><th>Auteur</th><th>Action</th></tr></thead>
+                            <tbody id="admin-video-list"></tbody>
+                        </table>
+                    </div>
+                    <div style="background:#1e1e1e; padding:15px; border-radius:10px;">
+                        <h3>Annonce Globale</h3>
+                        <textarea id="admin-ann-txt" class="titan-input" style="height:60px;"></textarea>
+                        <button class="btn btn-blue" onclick="app.admin.postAnn()">Publier</button>
+                        <hr>
+                        <h3>Ajouter au Panthéon</h3>
+                        <input id="admin-thx-input" class="titan-input" placeholder="Nom">
+                        <button class="btn btn-blue" onclick="app.admin.addThanks()">Ajouter</button>
+                    </div>
                 </div>
-                <div style="background:#1e1e1e; padding:15px; border-radius:10px;">
-                    <h3>Gestion Panthéon</h3>
-                    <input id="admin-thanks-input" class="titan-input" placeholder="Nom du donateur">
-                    <button class="btn-primary" style="margin-top:10px;" onclick="app.admin.addThanks()">AJOUTER</button>
-                </div>
-            </div>
-            
-            <h3>Gestion des Vidéos (Suppression Définitive)</h3>
-            <div style="background:#1e1e1e; padding:10px; border-radius:10px;">
-                <table class="admin-table">
-                    <thead><tr><th>Titre</th><th>Auteur</th><th>Action</th></tr></thead>
-                    <tbody id="admin-video-table"></tbody>
-                </table>
-            </div>
+            </section>
 
-            <h3>Gestion des Remerciements</h3>
-            <div id="admin-thanks-list" style="margin-top:10px;"></div>
-        </section>
+            <section id="view-profile" style="display:none;">
+                <div id="prof-banner" style="height:200px; background:#333; border-radius:15px; background-size:cover;"></div>
+                <div style="display:flex; gap:20px; align-items:center; margin-top:-40px; padding:0 30px;">
+                    <div id="prof-pp" style="width:120px; height:120px; border-radius:50%; border:5px solid var(--bg); background:#222; overflow:hidden;"></div>
+                    <div style="margin-top:40px;">
+                        <h1 id="prof-name" style="margin:0;">Nom</h1>
+                        <p id="prof-stats" style="color:#aaa;">0 abonnés</p>
+                    </div>
+                    <div style="margin-left:auto; margin-top:40px; display:flex; gap:10px;">
+                        <button id="btn-edit-prof" class="btn btn-blue" style="width:auto; display:none;" onclick="app.openModal('modal-custom')">Personnaliser</button>
+                        <button id="btn-sub-prof" class="btn btn-red" style="width:auto;" onclick="app.toggleSubFromProfile()">S'ABONNER</button>
+                    </div>
+                </div>
+                <div style="display:flex; border-bottom:1px solid #333; margin-top:20px;">
+                    <div class="nav-item active" onclick="app.profile.tab('videos')">VIDÉOS</div>
+                    <div class="nav-item" onclick="app.profile.tab('zapps')">ZAPPS</div>
+                    <div class="nav-item" onclick="app.profile.tab('posts')">POSTS</div>
+                    <div class="nav-item" onclick="app.profile.tab('about')">À PROPOS</div>
+                </div>
+                <div id="prof-content" class="video-grid" style="padding-top:20px;"></div>
+            </section>
 
-        <section id="view-profile" style="display:none;">
-            <div id="profile-banner" style="width:100%; height:200px; background:#333; background-size:cover; border-radius:15px;"></div>
-            <div style="display:flex; gap:20px; align-items:center; margin-top:-40px; padding:0 30px;">
-                <div id="profile-pp" style="width:120px; height:120px; border-radius:50%; border:5px solid var(--bg-color); background:#222; overflow:hidden;"></div>
-                <div style="margin-top:40px;">
-                    <h1 id="profile-name" style="margin:0;">Nom</h1>
-                    <p id="profile-stats" style="color:#aaa;">0 abonnés</p>
+            <section id="view-stats" style="display:none;">
+                <h1>Statistiques</h1>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                    <div style="background:#1e1e1e; padding:20px; border-radius:10px;"><h3>Vues</h3><h1 id="stat-views">0</h1></div>
+                    <div style="background:#1e1e1e; padding:20px; border-radius:10px;"><h3>Abonnés</h3><h1 id="stat-subs">0</h1></div>
+                    <div style="background:#1e1e1e; padding:20px; border-radius:10px;"><h3>J'aime</h3><h1 id="stat-likes">0</h1></div>
                 </div>
-                <div style="margin-left:auto; margin-top:40px;">
-                    <button id="btn-subscribe" class="btn-primary" style="background:white; color:black; border-radius:20px; padding:10px 25px;" onclick="app.social.toggleSubscribe()">S'ABONNER</button>
-                    <button id="btn-customize" class="btn-primary" style="background:#333; color:white; border-radius:20px; padding:10px 25px; display:none;" onclick="app.openModal('modal-custom')">PERSONNALISER</button>
-                </div>
-            </div>
-            
-            <div style="display:flex; border-bottom:1px solid #333; margin-top:20px;">
-                <div class="nav-item active" onclick="app.profile.switchTab('videos')">VIDÉOS</div>
-                <div class="nav-item" onclick="app.profile.switchTab('zapps')">ZAPPS</div>
-                <div class="nav-item" onclick="app.profile.switchTab('posts')">PUBLICATIONS</div>
-                <div class="nav-item" onclick="app.profile.switchTab('about')">À PROPOS</div>
-            </div>
-            
-            <div id="profile-content" style="padding-top:20px;"></div>
-        </section>
-        
-        <section id="view-stats" style="display:none;">
-            <h1>📊 Titan Studio</h1>
-            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:20px;">
-                <div style="background:#1e1e1e; padding:20px; border-radius:10px; text-align:center;">
-                    <h2 id="stat-views" style="color:var(--accent-blue);">0</h2>
-                    <p>Vues Totales</p>
-                </div>
-                <div style="background:#1e1e1e; padding:20px; border-radius:10px; text-align:center;">
-                    <h2 id="stat-subs" style="color:var(--accent-gold);">0</h2>
-                    <p>Abonnés</p>
-                </div>
-                <div style="background:#1e1e1e; padding:20px; border-radius:10px; text-align:center;">
-                    <h2 id="stat-likes" style="color:var(--accent-green);">0</h2>
-                    <p>J'aime reçus</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <div id="live-dashboard">
-        <div class="live-video-area">
-            <video id="live-stream-monitor" autoplay muted style="max-width:100%; max-height:100%;"></video>
-            <div style="position:absolute; top:20px; left:20px; background:red; color:white; padding:5px 10px; border-radius:5px; font-weight:bold;">EN DIRECT 🔴</div>
-            <button onclick="app.live.stop()" style="position:absolute; bottom:20px; padding:10px 20px; background:red; color:white; border:none; cursor:pointer; border-radius:5px; font-weight:bold;">ARRÊTER LE DIRECT</button>
-        </div>
-        <div class="live-chat-area">
-            <div style="padding:10px; border-bottom:1px solid #333; font-weight:bold;">Tchat du direct</div>
-            <div class="chat-messages" id="live-chat-messages">
-                <div style="color:#aaa; text-align:center; margin-top:20px;">Le tchat est connecté...</div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" id="live-chat-input" class="titan-input" placeholder="Envoyer un message..." onkeyup="if(event.key==='Enter') app.live.sendMessage()">
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-create" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <div class="modal-title">Créer du contenu</div>
-                <button class="close-btn" onclick="app.closeModals()">×</button>
-            </div>
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button class="btn-primary" onclick="document.getElementById('tab-upload').style.display='block';document.getElementById('tab-live').style.display='none'">IMPORTER</button>
-                <button class="btn-primary" style="background:var(--accent-red);" onclick="document.getElementById('tab-upload').style.display='none';document.getElementById('tab-live').style.display='block'">DIRECT</button>
-            </div>
-            <div id="tab-upload">
-                <input type="text" id="up-title" class="titan-input" placeholder="Titre" style="margin-bottom:10px;">
-                <textarea id="up-desc" class="titan-input" placeholder="Description" style="margin-bottom:10px;"></textarea>
-                <div class="form-group"><label>Vidéo</label><input type="file" id="up-file" class="titan-input" accept="video/*"></div>
-                <div class="form-group"><label>Miniature</label><input type="file" id="up-thumb" class="titan-input" accept="image/*"></div>
-                <label><input type="checkbox" id="up-is-short"> Est un Zapp (Short)</label>
-                <button class="btn-primary" style="margin-top:20px;" onclick="app.upload.process()">METTRE EN LIGNE</button>
-            </div>
-            <div id="tab-live" style="display:none;">
-                <input type="text" id="live-title" class="titan-input" placeholder="Titre du live" style="margin-bottom:10px;">
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-primary" style="background:#444;" onclick="app.live.setup('cam')">📷 CAMÉRA</button>
-                    <button class="btn-primary" style="background:#444;" onclick="app.live.setup('screen')">💻 ÉCRAN</button>
-                </div>
-                <video id="pre-live-preview" autoplay muted style="width:100%; background:black; margin-top:10px; border-radius:5px;"></video>
-                <button class="btn-primary" style="margin-top:15px; background:red;" onclick="app.live.start()">LANCER LE DIRECT</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-custom" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <div class="modal-title">Personnaliser ma chaîne</div>
-                <button class="close-btn" onclick="app.closeModals()">×</button>
-            </div>
-            <div class="form-group">
-                <label>Photo de Profil (Image Locale)</label>
-                <input type="file" id="cust-pp-file" class="titan-input" accept="image/*">
-            </div>
-            <div class="form-group">
-                <label>Bannière (Image Locale)</label>
-                <input type="file" id="cust-banner-file" class="titan-input" accept="image/*">
-            </div>
-            <label>Bio</label>
-            <textarea id="cust-bio" class="titan-input"></textarea>
-            <button class="btn-primary" style="margin-top:15px;" onclick="app.profile.save()">ENREGISTRER</button>
-        </div>
-    </div>
-
-    <div id="modal-auth" class="modal-overlay">
-        <div class="modal-box" style="text-align:center;">
-            <h2 style="color:var(--accent-blue);">Connexion Titan</h2>
-            <input type="text" id="login-user" class="titan-input" placeholder="Pseudo" style="margin-bottom:10px;">
-            <button class="btn-primary" onclick="app.auth.login()">SE CONNECTER</button>
-        </div>
+            </section>
+        </main>
     </div>
 
     <div id="player-overlay">
-        <div class="player-layout">
+        <div class="player-container">
             <div>
-                <button onclick="app.player.close()" style="margin-bottom:10px; background:none; border:none; color:white; font-size:18px; cursor:pointer;">✕ FERMER</button>
-                <div style="width:100%; aspect-ratio:16/9; background:black; border-radius:12px; overflow:hidden;">
-                    <video id="main-player" controls autoplay style="width:100%; height:100%;"></video>
+                <button onclick="app.closePlayer()" style="color:white; background:none; border:none; font-size:20px; cursor:pointer;">✕ Fermer</button>
+                <div style="width:100%; aspect-ratio:16/9; background:black; border-radius:12px; overflow:hidden; margin-top:10px;">
+                    <video id="main-video" controls autoplay style="width:100%; height:100%;"></video>
                 </div>
-                <h1 id="p-title" style="font-size:20px; margin:15px 0 5px 0;">Titre vidéo</h1>
+                <h1 id="vid-title" style="font-size:22px; margin:15px 0 5px 0;">Titre</h1>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="app.navToAuthor()">
-                        <div id="p-author-pp" style="width:40px; height:40px; border-radius:50%; background:#444; overflow:hidden;"></div>
-                        <div>
-                            <b id="p-author-name">Auteur</b>
-                            <div id="p-author-subs" style="font-size:12px; color:#aaa;">0 abonnés</div>
-                        </div>
-                        <button id="p-sub-btn" onclick="event.stopPropagation(); app.social.toggleSubscribePlayer()" style="margin-left:15px; background:white; color:black; border:none; padding:8px 16px; border-radius:20px; font-weight:bold; cursor:pointer;">S'ABONNER</button>
+                    <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="app.goProfile(app.activeVid.author)">
+                        <div id="vid-auth-pp" style="width:40px; height:40px;"></div>
+                        <div><b id="vid-auth-name">Auteur</b><div id="vid-auth-sub-count" style="font-size:12px; color:#aaa;"></div></div>
+                        <button id="vid-sub-btn" class="btn btn-red" style="width:auto; padding:5px 15px; margin-left:10px;" onclick="event.stopPropagation(); app.toggleSub()">S'ABONNER</button>
                     </div>
-                    <div style="display:flex; gap:10px;">
-                        <button onclick="app.social.vote(1)" style="background:#222; color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer;">👍 <span id="p-likes">0</span></button>
-                    </div>
+                    <button class="btn btn-blue" style="width:auto;" onclick="app.toggleLike()">👍 <span id="vid-likes">0</span></button>
                 </div>
-                <div style="background:#1e1e1e; padding:15px; border-radius:10px; margin-top:15px;">
-                    <b id="p-views-date" style="font-size:14px;">0 vues • Il y a 1h</b>
-                    <p id="p-desc" style="font-size:14px; margin-top:10px; white-space:pre-wrap;">Description...</p>
+                <div style="background:#1e1e1e; padding:15px; margin-top:15px; border-radius:10px;">
+                    <b id="vid-meta">0 vues • date</b>
+                    <p id="vid-desc" style="margin-top:10px; white-space:pre-wrap;"></p>
                 </div>
                 <div style="margin-top:20px;">
                     <h3>Commentaires</h3>
                     <div style="display:flex; gap:10px; margin-bottom:20px;">
-                        <input id="com-input" type="text" placeholder="Ajouter un commentaire..." style="width:100%; background:none; border:none; border-bottom:1px solid #333; color:white; padding:10px;">
-                        <button onclick="app.social.postComment()" style="background:var(--accent-blue); border:none; padding:8px 16px; border-radius:20px; font-weight:bold; cursor:pointer;">Ajouter</button>
+                        <input id="com-input" class="titan-input" placeholder="Ajouter un commentaire..." style="margin:0;">
+                        <button class="btn btn-blue" style="width:auto; margin:0;" onclick="app.postComment()">Envoyer</button>
                     </div>
-                    <div id="comments-list"></div>
+                    <div id="com-list"></div>
                 </div>
             </div>
             <div>
-                <h3>À suivre</h3>
+                <h3>Suggestions</h3>
                 <div id="suggestions-list"></div>
             </div>
         </div>
     </div>
-        <header>
-        <div class="logo-section" onclick="app.easterEggs.clickLogo()">
-            <div class="logo-icon">▶</div>
-            <div class="logo-text">Visiona<span>Titan</span></div>
+
+    <div id="live-interface">
+        <div style="background:black; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+            <video id="live-stream-preview" autoplay muted style="max-width:100%; max-height:80%;"></video>
+            <div style="color:red; font-weight:bold; margin-top:20px; animation: blink 1s infinite;">🔴 EN DIRECT</div>
+            <button class="btn btn-red" style="width:auto; margin-top:10px;" onclick="app.live.stop()">ARRÊTER LE DIRECT</button>
         </div>
-
-        <div class="search-container">
-            <input type="text" class="search-input" id="search-input" placeholder="Rechercher..." onkeyup="if(event.key==='Enter') app.search()">
-            <button class="search-btn" onclick="app.search()">🔍</button>
-        </div>
-
-        <div class="header-actions">
-            <button class="icon-btn" onclick="app.openModal('modal-create')" title="Créer">📹</button>
-            <div style="position:relative;">
-                <button class="icon-btn" onclick="alert('Aucune nouvelle notification.')">🔔</button>
-            </div>
-            <div id="auth-section"></div>
-        </div>
-    </header>
-
-    <div id="user-dropdown" style="display:none; position:fixed; right:15px; top:60px; background:#282828; width:250px; border-radius:12px; z-index:4500; border:1px solid #333; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-        <div style="padding:15px; border-bottom:1px solid #333; display:flex; align-items:center; gap:10px;">
-            <div id="dropdown-pp" class="user-avatar-header"></div>
-            <b id="dropdown-name" style="font-size:16px;">Pseudo</b>
-        </div>
-        <div class="nav-item" onclick="app.nav('profile')">👤 Ma Chaîne</div>
-        <div class="nav-item" onclick="app.nav('stats')">📊 Titan Studio</div>
-        <div id="admin-entry" class="nav-item" style="display:none; color:var(--accent-gold);" onclick="app.nav('admin')">🛡️ Panel Admin</div>
-        <div class="separator"></div>
-        <div class="nav-item" onclick="app.auth.logout()" style="color:var(--accent-red);">🚪 Déconnexion</div>
-    </div>
-
-    <nav class="sidebar" id="sidebar">
-        <div class="nav-item active" id="btn-home" onclick="app.nav('home')">
-            <span class="nav-icon">🏠</span> Accueil
-        </div>
-        <div class="nav-item" id="btn-zapp" onclick="app.nav('zapp')">
-            <span class="nav-icon">⚡</span> Zapps
-        </div>
-        <div class="nav-item" id="btn-subs" onclick="app.nav('subs')">
-            <span class="nav-icon">📺</span> Abonnements
-        </div>
-        <div class="separator"></div>
-        <div class="nav-item" onclick="app.nav('history')">
-            <span class="nav-icon">🕒</span> Historique
-        </div>
-        <div class="nav-item" onclick="app.nav('community')">
-            <span class="nav-icon">📝</span> Communauté
-        </div>
-        <div class="nav-item" onclick="app.nav('thanks')">
-            <span class="nav-icon">💎</span> Remerciements
-        </div>
-        <div class="separator"></div>
-        <div class="section-title">Abonnements</div>
-        <div id="subs-list"></div>
-        <div style="margin-top:auto; padding:10px; font-size:10px; color:#555; cursor:pointer;" onclick="app.easterEggs.clickVersion()">v3.5 Ultimate</div>
-    </nav>
-
-    <main class="main-container">
-        
-        <section id="view-home">
-            <div id="announcement-area"></div>
-            <div class="video-grid" id="grid-home"></div>
-        </section>
-
-        <section id="view-zapp" style="display:none;">
-            <div class="zapp-container" id="container-zapp"></div>
-        </section>
-
-        <section id="view-subs" style="display:none;">
-            <h2>Vidéos de vos abonnements</h2>
-            <div class="video-grid" id="grid-subs"></div>
-        </section>
-
-        <section id="view-history" style="display:none;">
-            <div style="display:flex; justify-content:space-between;">
-                <h2>Historique</h2>
-                <button onclick="app.history.clear()" style="background:none; border:none; color:var(--accent-blue); cursor:pointer;">Tout effacer</button>
-            </div>
-            <div class="video-grid" id="grid-history"></div>
-        </section>
-
-        <section id="view-community" style="display:none;">
-            <h2>Flux Communauté</h2>
-            <div id="community-input-area"></div>
-            <div id="community-feed"></div>
-        </section>
-
-        <section id="view-thanks" style="display:none;">
-            <h1 style="color:var(--accent-gold); text-align:center;">💎 LE PANTHÉON TITAN</h1>
-            <p style="text-align:center; color:#aaa;">Liste officielle des contributeurs.</p>
-            <div id="thanks-list" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-top:30px;"></div>
-        </section>
-
-        <section id="view-admin" style="display:none;">
-            <h1 style="color:var(--accent-red);">🛡️ PANEL ADMINISTRATEUR</h1>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                <div style="background:#1e1e1e; padding:15px; border-radius:10px;">
-                    <h3>Annonce Globale</h3>
-                    <textarea id="admin-announcement" class="titan-input" style="height:60px;"></textarea>
-                    <button class="btn-primary" style="margin-top:10px; background:var(--accent-green);" onclick="app.admin.postAnnounce()">PUBLIER</button>
-                </div>
-                <div style="background:#1e1e1e; padding:15px; border-radius:10px;">
-                    <h3>Gestion Panthéon</h3>
-                    <input id="admin-thanks-input" class="titan-input" placeholder="Nom du donateur">
-                    <button class="btn-primary" style="margin-top:10px;" onclick="app.admin.addThanks()">AJOUTER</button>
-                </div>
-            </div>
-            
-            <h3>Gestion des Vidéos (Suppression Définitive)</h3>
-            <div style="background:#1e1e1e; padding:10px; border-radius:10px;">
-                <table class="admin-table">
-                    <thead><tr><th>Titre</th><th>Auteur</th><th>Action</th></tr></thead>
-                    <tbody id="admin-video-table"></tbody>
-                </table>
-            </div>
-
-            <h3>Gestion des Remerciements</h3>
-            <div id="admin-thanks-list" style="margin-top:10px;"></div>
-        </section>
-
-        <section id="view-profile" style="display:none;">
-            <div id="profile-banner" style="width:100%; height:200px; background:#333; background-size:cover; border-radius:15px;"></div>
-            <div style="display:flex; gap:20px; align-items:center; margin-top:-40px; padding:0 30px;">
-                <div id="profile-pp" style="width:120px; height:120px; border-radius:50%; border:5px solid var(--bg-color); background:#222; overflow:hidden;"></div>
-                <div style="margin-top:40px;">
-                    <h1 id="profile-name" style="margin:0;">Nom</h1>
-                    <p id="profile-stats" style="color:#aaa;">0 abonnés</p>
-                </div>
-                <div style="margin-left:auto; margin-top:40px;">
-                    <button id="btn-subscribe" class="btn-primary" style="background:white; color:black; border-radius:20px; padding:10px 25px;" onclick="app.social.toggleSubscribe()">S'ABONNER</button>
-                    <button id="btn-customize" class="btn-primary" style="background:#333; color:white; border-radius:20px; padding:10px 25px; display:none;" onclick="app.openModal('modal-custom')">PERSONNALISER</button>
-                </div>
-            </div>
-            
-            <div style="display:flex; border-bottom:1px solid #333; margin-top:20px;">
-                <div class="nav-item active" onclick="app.profile.switchTab('videos')">VIDÉOS</div>
-                <div class="nav-item" onclick="app.profile.switchTab('zapps')">ZAPPS</div>
-                <div class="nav-item" onclick="app.profile.switchTab('posts')">PUBLICATIONS</div>
-                <div class="nav-item" onclick="app.profile.switchTab('about')">À PROPOS</div>
-            </div>
-            
-            <div id="profile-content" style="padding-top:20px;"></div>
-        </section>
-        
-        <section id="view-stats" style="display:none;">
-            <h1>📊 Titan Studio</h1>
-            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:20px;">
-                <div style="background:#1e1e1e; padding:20px; border-radius:10px; text-align:center;">
-                    <h2 id="stat-views" style="color:var(--accent-blue);">0</h2>
-                    <p>Vues Totales</p>
-                </div>
-                <div style="background:#1e1e1e; padding:20px; border-radius:10px; text-align:center;">
-                    <h2 id="stat-subs" style="color:var(--accent-gold);">0</h2>
-                    <p>Abonnés</p>
-                </div>
-                <div style="background:#1e1e1e; padding:20px; border-radius:10px; text-align:center;">
-                    <h2 id="stat-likes" style="color:var(--accent-green);">0</h2>
-                    <p>J'aime reçus</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <div id="live-dashboard">
-        <div class="live-video-area">
-            <video id="live-stream-monitor" autoplay muted style="max-width:100%; max-height:100%;"></video>
-            <div style="position:absolute; top:20px; left:20px; background:red; color:white; padding:5px 10px; border-radius:5px; font-weight:bold;">EN DIRECT 🔴</div>
-            <button onclick="app.live.stop()" style="position:absolute; bottom:20px; padding:10px 20px; background:red; color:white; border:none; cursor:pointer; border-radius:5px; font-weight:bold;">ARRÊTER LE DIRECT</button>
-        </div>
-        <div class="live-chat-area">
-            <div style="padding:10px; border-bottom:1px solid #333; font-weight:bold;">Tchat du direct</div>
-            <div class="chat-messages" id="live-chat-messages">
-                <div style="color:#aaa; text-align:center; margin-top:20px;">Le tchat est connecté...</div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" id="live-chat-input" class="titan-input" placeholder="Envoyer un message..." onkeyup="if(event.key==='Enter') app.live.sendMessage()">
+        <div class="chat-box">
+            <div style="padding:10px; border-bottom:1px solid #333; font-weight:bold;">Tchat du Direct</div>
+            <div id="live-chat-msgs" class="chat-messages"></div>
+            <div style="padding:10px; border-top:1px solid #333;">
+                <input id="live-chat-input" class="titan-input" placeholder="Message..." onkeyup="if(event.key==='Enter') app.live.sendChat()">
             </div>
         </div>
     </div>
 
-    <div id="modal-create" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <div class="modal-title">Créer du contenu</div>
-                <button class="close-btn" onclick="app.closeModals()">×</button>
+    <div id="modal-upload" class="modal">
+        <div class="modal-content">
+            <h2>Créer</h2>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button class="btn btn-blue" onclick="document.getElementById('form-up').style.display='block';document.getElementById('form-live').style.display='none'">Importer Vidéo</button>
+                <button class="btn btn-red" onclick="document.getElementById('form-up').style.display='none';document.getElementById('form-live').style.display='block'">Lancer Direct</button>
             </div>
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button class="btn-primary" onclick="document.getElementById('tab-upload').style.display='block';document.getElementById('tab-live').style.display='none'">IMPORTER</button>
-                <button class="btn-primary" style="background:var(--accent-red);" onclick="document.getElementById('tab-upload').style.display='none';document.getElementById('tab-live').style.display='block'">DIRECT</button>
+            <div id="form-up">
+                <input id="up-title" class="titan-input" placeholder="Titre">
+                <textarea id="up-desc" class="titan-input" placeholder="Description"></textarea>
+                <label>Fichier Vidéo: <input type="file" id="up-file" class="titan-input" accept="video/*"></label>
+                <label>Miniature: <input type="file" id="up-thumb" class="titan-input" accept="image/*"></label>
+                <label><input type="checkbox" id="up-short"> Est un Zapp (Short)</label>
+                <button class="btn btn-blue" onclick="app.upload.start()">METTRE EN LIGNE</button>
             </div>
-            <div id="tab-upload">
-                <input type="text" id="up-title" class="titan-input" placeholder="Titre" style="margin-bottom:10px;">
-                <textarea id="up-desc" class="titan-input" placeholder="Description" style="margin-bottom:10px;"></textarea>
-                <div class="form-group"><label>Vidéo</label><input type="file" id="up-file" class="titan-input" accept="video/*"></div>
-                <div class="form-group"><label>Miniature</label><input type="file" id="up-thumb" class="titan-input" accept="image/*"></div>
-                <label><input type="checkbox" id="up-is-short"> Est un Zapp (Short)</label>
-                <button class="btn-primary" style="margin-top:20px;" onclick="app.upload.process()">METTRE EN LIGNE</button>
-            </div>
-            <div id="tab-live" style="display:none;">
-                <input type="text" id="live-title" class="titan-input" placeholder="Titre du live" style="margin-bottom:10px;">
+            <div id="form-live" style="display:none;">
+                <input id="live-title" class="titan-input" placeholder="Titre du Live">
                 <div style="display:flex; gap:10px;">
-                    <button class="btn-primary" style="background:#444;" onclick="app.live.setup('cam')">📷 CAMÉRA</button>
-                    <button class="btn-primary" style="background:#444;" onclick="app.live.setup('screen')">💻 ÉCRAN</button>
+                    <button class="btn btn-blue" onclick="app.live.init('cam')">📷 Caméra</button>
+                    <button class="btn btn-blue" onclick="app.live.init('screen')">💻 Écran</button>
                 </div>
-                <video id="pre-live-preview" autoplay muted style="width:100%; background:black; margin-top:10px; border-radius:5px;"></video>
-                <button class="btn-primary" style="margin-top:15px; background:red;" onclick="app.live.start()">LANCER LE DIRECT</button>
+                <video id="pre-live-vid" autoplay muted style="width:100%; background:black; margin-top:10px; border-radius:5px;"></video>
+                <button class="btn btn-red" onclick="app.live.go()">PASSER EN DIRECT</button>
             </div>
+            <button class="btn" style="background:none; color:#aaa;" onclick="app.closeModals()">Annuler</button>
         </div>
     </div>
 
-    <div id="modal-custom" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <div class="modal-title">Personnaliser ma chaîne</div>
-                <button class="close-btn" onclick="app.closeModals()">×</button>
-            </div>
-            <div class="form-group">
-                <label>Photo de Profil (Image Locale)</label>
-                <input type="file" id="cust-pp-file" class="titan-input" accept="image/*">
-            </div>
-            <div class="form-group">
-                <label>Bannière (Image Locale)</label>
-                <input type="file" id="cust-banner-file" class="titan-input" accept="image/*">
-            </div>
-            <label>Bio</label>
-            <textarea id="cust-bio" class="titan-input"></textarea>
-            <button class="btn-primary" style="margin-top:15px;" onclick="app.profile.save()">ENREGISTRER</button>
+    <div id="modal-auth" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <h2>Connexion</h2>
+            <input id="auth-user" class="titan-input" placeholder="Pseudo">
+            <button class="btn btn-blue" onclick="app.auth.login()">SE CONNECTER</button>
         </div>
     </div>
 
-    <div id="modal-auth" class="modal-overlay">
-        <div class="modal-box" style="text-align:center;">
-            <h2 style="color:var(--accent-blue);">Connexion Titan</h2>
-            <input type="text" id="login-user" class="titan-input" placeholder="Pseudo" style="margin-bottom:10px;">
-            <button class="btn-primary" onclick="app.auth.login()">SE CONNECTER</button>
+    <div id="modal-custom" class="modal">
+        <div class="modal-content">
+            <h2>Personnaliser</h2>
+            <label>Avatar (Image): <input type="file" id="cust-pp" class="titan-input" accept="image/*"></label>
+            <label>Bannière (Image): <input type="file" id="cust-banner" class="titan-input" accept="image/*"></label>
+            <label>Bio: <textarea id="cust-bio" class="titan-input"></textarea></label>
+            <button class="btn btn-blue" onclick="app.profile.save()">ENREGISTRER</button>
+            <button class="btn" onclick="app.closeModals()">Fermer</button>
         </div>
     </div>
+    <script>
+    /* TITAN ENGINE V5 - ULTIMATE CORRECTION */
+    const app = {
+        data: {
+            videos: [],
+            users: {
+                "Edonis": { pp:"", banner:"", bio:"Admin Suprême", subs:[], followers:[], role:"admin", created: Date.now() }
+            },
+            posts: [],
+            annonces: ["Bienvenue sur Visiona Titan !"],
+            thanks: ["Edonis", "Toi"]
+        },
+        user: null, // Pseudo string
+        activeVid: null,
+        stream: null,
+        eggClicks: 0,
 
-    <div id="player-overlay">
-        <div class="player-layout">
-            <div>
-                <button onclick="app.player.close()" style="margin-bottom:10px; background:none; border:none; color:white; font-size:18px; cursor:pointer;">✕ FERMER</button>
-                <div style="width:100%; aspect-ratio:16/9; background:black; border-radius:12px; overflow:hidden;">
-                    <video id="main-player" controls autoplay style="width:100%; height:100%;"></video>
+        init: function() {
+            // Chargement Persistant
+            const db = localStorage.getItem('titan_db_final');
+            if(db) this.data = JSON.parse(db);
+            this.user = localStorage.getItem('titan_user');
+            
+            this.auth.updateHeader();
+            this.nav('home');
+            
+            // Easter Egg Noël reset
+            this.eggClicks = 0;
+        },
+
+        save: function() {
+            localStorage.setItem('titan_db_final', JSON.stringify(this.data));
+            this.auth.updateHeader(); // Rafraichir UI
+        },
+
+        // --- NAVIGATION ---
+        nav: function(page, el) {
+            document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            
+            const target = document.getElementById('view-'+page);
+            if(target) target.style.display = 'block';
+            if(el) el.classList.add('active');
+            
+            document.getElementById('user-dropdown').style.display = 'none';
+            document.getElementById('player-overlay').style.display = 'none'; // Ferme player si chgmt page
+            if(this.activeVid && document.getElementById('main-video')) document.getElementById('main-video').pause();
+
+            if(page === 'home') this.renderHome();
+            if(page === 'zapp') this.renderZapp();
+            if(page === 'subs') this.renderSubs();
+            if(page === 'history') this.renderHistory();
+            if(page === 'posts') this.renderPosts();
+            if(page === 'thanks') this.renderThanks();
+            if(page === 'admin') this.admin.render();
+            if(page === 'stats') this.renderStats();
+            
+            window.scrollTo(0,0);
+        },
+
+        // --- RENDUS ---
+        renderHome: function() {
+            const vids = this.data.videos.filter(v => !v.isShort).sort((a,b) => b.date - a.date);
+            document.getElementById('announcement-area').innerHTML = this.data.annonces.map(a => `<div style="background:var(--blue); color:black; padding:10px; border-radius:8px; margin-bottom:15px;">📢 ${a}</div>`).join('');
+            document.getElementById('home-grid').innerHTML = vids.map(v => this.card(v)).join('');
+        },
+        renderZapp: function() {
+            const vids = this.data.videos.filter(v => v.isShort);
+            document.getElementById('view-zapp').innerHTML = vids.map(v => `
+                <div class="zapp-card">
+                    <video class="zapp-video" src="${v.url}" loop onclick="this.paused?this.play():this.pause()"></video>
+                    <div class="zapp-ui">
+                        <div class="zapp-btn" onclick="app.player.load(${v.id})">❤️ <small>${v.likes}</small></div>
+                        <div class="zapp-btn" onclick="app.goProfile('${v.author}')">👤</div>
+                    </div>
                 </div>
-                <h1 id="p-title" style="font-size:20px; margin:15px 0 5px 0;">Titre vidéo</h1>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="app.navToAuthor()">
-                        <div id="p-author-pp" style="width:40px; height:40px; border-radius:50%; background:#444; overflow:hidden;"></div>
+            `).join('');
+        },
+        renderSubs: function() {
+            if(!this.user) return document.getElementById('subs-grid').innerHTML = "<p>Connectez-vous.</p>";
+            const subs = this.data.users[this.user].subs;
+            const vids = this.data.videos.filter(v => subs.includes(v.author) && !v.isShort);
+            document.getElementById('subs-grid').innerHTML = vids.map(v => this.card(v)).join('');
+        },
+        renderHistory: function() {
+            const h = JSON.parse(localStorage.getItem('titan_hist') || "[]");
+            const vids = h.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
+            document.getElementById('history-grid').innerHTML = vids.map(v => this.card(v)).join('');
+        },
+        renderPosts: function() {
+            const area = document.getElementById('posts-feed');
+            let html = "";
+            if(this.user) html += `<div class="post-card"><textarea id="new-post-txt" class="titan-input" placeholder="Exprimez-vous..."></textarea><button class="btn btn-blue" onclick="app.addPost()">Publier</button></div>`;
+            html += this.data.posts.map(p => `
+                <div class="post-card">
+                    <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                        ${this.utils.avatar(p.author, 30)} <b>${p.author}</b> <span style="color:#aaa; font-size:12px;">${this.utils.ago(p.date)}</span>
+                    </div>
+                    ${p.text}
+                </div>
+            `).join('');
+            area.innerHTML = html;
+        },
+        renderThanks: function() {
+            document.getElementById('thanks-grid').innerHTML = this.data.thanks.map(t => `
+                <div style="background:#1e1e1e; padding:20px; border:1px solid gold; border-radius:10px; text-align:center;">🏆 ${t}</div>
+            `).join('');
+        },
+
+        card: function(v) {
+            return `
+            <div class="v-card" onclick="app.player.load(${v.id})">
+                <div class="v-thumb">
+                    <img src="${v.thumb}">
+                    ${v.isLive ? '<div class="live-tag">DIRECT</div>' : `<div class="v-duration">${v.duration}</div>`}
+                </div>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <div style="width:36px; height:36px;">${this.utils.avatar(v.author)}</div>
+                    <div>
+                        <div style="font-weight:bold; font-size:14px; line-height:1.2;">${v.title}</div>
+                        <div style="font-size:12px; color:#aaa;">${v.author} • ${v.views} vues</div>
+                    </div>
+                </div>
+            </div>`;
+        },
+
+        // --- PLAYER ---
+        player: {
+            load: function(id) {
+                const v = app.data.videos.find(x => x.id == id);
+                app.activeVid = v;
+                
+                // COOLDOWN VUE 1H
+                const now = Date.now();
+                if(!v.viewers) v.viewers = {};
+                if(!app.user || !v.viewers[app.user] || (now - v.viewers[app.user] > 3600000)) {
+                    v.views++;
+                    if(app.user) v.viewers[app.user] = now;
+                    app.save();
+                }
+
+                // HISTORIQUE
+                let h = JSON.parse(localStorage.getItem('titan_hist') || "[]");
+                if(!h.includes(id)) h.unshift(id);
+                localStorage.setItem('titan_hist', JSON.stringify(h));
+
+                const p = document.getElementById('player-overlay');
+                const vid = document.getElementById('main-video');
+                p.style.display = 'block';
+                
+                // Source
+                if(v.isLive && v.streamRef) vid.srcObject = v.streamRef;
+                else { vid.srcObject = null; vid.src = v.url; }
+
+                document.getElementById('vid-title').innerText = v.title;
+                document.getElementById('vid-auth-name').innerText = v.author;
+                document.getElementById('vid-auth-sub-count').innerText = app.data.users
+                <script>
+ 
+                    /* TITAN ENGINE V5 - ULTIMATE CORRECTION */
+    const app = {
+        data: {
+            videos: [],
+            users: {
+                "Edonis": { pp:"", banner:"", bio:"Admin Suprême", subs:[], followers:[], role:"admin", created: Date.now() }
+            },
+            posts: [],
+            annonces: ["Bienvenue sur Visiona Titan !"],
+            thanks: ["Edonis", "Toi"]
+        },
+        user: null, // Pseudo string
+        activeVid: null,
+        stream: null,
+        eggClicks: 0,
+
+        init: function() {
+            // Chargement Persistant
+            const db = localStorage.getItem('titan_db_final');
+            if(db) this.data = JSON.parse(db);
+            this.user = localStorage.getItem('titan_user');
+            
+            this.auth.updateHeader();
+            this.nav('home');
+            
+            // Easter Egg Noël reset
+            this.eggClicks = 0;
+        },
+
+        save: function() {
+            localStorage.setItem('titan_db_final', JSON.stringify(this.data));
+            this.auth.updateHeader(); // Rafraichir UI
+        },
+
+        // --- NAVIGATION ---
+        nav: function(page, el) {
+            document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            
+            const target = document.getElementById('view-'+page);
+            if(target) target.style.display = 'block';
+            if(el) el.classList.add('active');
+            
+            document.getElementById('user-dropdown').style.display = 'none';
+            document.getElementById('player-overlay').style.display = 'none'; // Ferme player si chgmt page
+            if(this.activeVid && document.getElementById('main-video')) document.getElementById('main-video').pause();
+
+            if(page === 'home') this.renderHome();
+            if(page === 'zapp') this.renderZapp();
+            if(page === 'subs') this.renderSubs();
+            if(page === 'history') this.renderHistory();
+            if(page === 'posts') this.renderPosts();
+            if(page === 'thanks') this.renderThanks();
+            if(page === 'admin') this.admin.render();
+            if(page === 'stats') this.renderStats();
+            
+            window.scrollTo(0,0);
+        },
+
+        // --- RENDUS ---
+        renderHome: function() {
+            const vids = this.data.videos.filter(v => !v.isShort).sort((a,b) => b.date - a.date);
+            document.getElementById('announcement-area').innerHTML = this.data.annonces.map(a => `<div style="background:var(--blue); color:black; padding:10px; border-radius:8px; margin-bottom:15px;">📢 ${a}</div>`).join('');
+            document.getElementById('home-grid').innerHTML = vids.map(v => this.card(v)).join('');
+        },
+        renderZapp: function() {
+            const vids = this.data.videos.filter(v => v.isShort);
+            document.getElementById('view-zapp').innerHTML = vids.map(v => `
+                <div class="zapp-card">
+                    <video class="zapp-video" src="${v.url}" loop onclick="this.paused?this.play():this.pause()"></video>
+                    <div class="zapp-ui">
+                        <div class="zapp-btn" onclick="app.player.load(${v.id})">❤️ <small>${v.likes}</small></div>
+                        <div class="zapp-btn" onclick="app.goProfile('${v.author}')">👤</div>
+                    </div>
+                </div>
+            `).join('');
+        },
+        renderSubs: function() {
+            if(!this.user) return document.getElementById('subs-grid').innerHTML = "<p>Connectez-vous.</p>";
+            const subs = this.data.users[this.user].subs;
+            const vids = this.data.videos.filter(v => subs.includes(v.author) && !v.isShort);
+            document.getElementById('subs-grid').innerHTML = vids.map(v => this.card(v)).join('');
+        },
+        renderHistory: function() {
+            const h = JSON.parse(localStorage.getItem('titan_hist') || "[]");
+            const vids = h.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
+            document.getElementById('history-grid').innerHTML = vids.map(v => this.card(v)).join('');
+        },
+        renderPosts: function() {
+            const area = document.getElementById('posts-feed');
+            let html = "";
+            if(this.user) html += `<div class="post-card"><textarea id="new-post-txt" class="titan-input" placeholder="Exprimez-vous..."></textarea><button class="btn btn-blue" onclick="app.addPost()">Publier</button></div>`;
+            html += this.data.posts.map(p => `
+                <div class="post-card">
+                    <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                        ${this.utils.avatar(p.author, 30)} <b>${p.author}</b> <span style="color:#aaa; font-size:12px;">${this.utils.ago(p.date)}</span>
+                    </div>
+                    ${p.text}
+                </div>
+            `).join('');
+            area.innerHTML = html;
+        },
+        renderThanks: function() {
+            document.getElementById('thanks-grid').innerHTML = this.data.thanks.map(t => `
+                <div style="background:#1e1e1e; padding:20px; border:1px solid gold; border-radius:10px; text-align:center;">🏆 ${t}</div>
+            `).join('');
+        },
+
+        card: function(v) {
+            return `
+            <div class="v-card" onclick="app.player.load(${v.id})">
+                <div class="v-thumb">
+                    <img src="${v.thumb}">
+                    ${v.isLive ? '<div class="live-tag">DIRECT</div>' : `<div class="v-duration">${v.duration}</div>`}
+                </div>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <div style="width:36px; height:36px;">${this.utils.avatar(v.author)}</div>
+                    <div>
+                        <div style="font-weight:bold; font-size:14px; line-height:1.2;">${v.title}</div>
+                        <div style="font-size:12px; color:#aaa;">${v.author} • ${v.views} vues</div>
+                    </div>
+                </div>
+            </div>`;
+        },
+
+        // --- PLAYER ---
+        player: {
+            load: function(id) {
+                const v = app.data.videos.find(x => x.id == id);
+                app.activeVid = v;
+                
+                // COOLDOWN VUE 1H
+                const now = Date.now();
+                if(!v.viewers) v.viewers = {};
+                if(!app.user || !v.viewers[app.user] || (now - v.viewers[app.user] > 3600000)) {
+                    v.views++;
+                    if(app.user) v.viewers[app.user] = now;
+                    app.save();
+                }
+
+                // HISTORIQUE
+                let h = JSON.parse(localStorage.getItem('titan_hist') || "[]");
+                if(!h.includes(id)) h.unshift(id);
+                localStorage.setItem('titan_hist', JSON.stringify(h));
+
+                const p = document.getElementById('player-overlay');
+                const vid = document.getElementById('main-video');
+                p.style.display = 'block';
+                
+                // Source
+                if(v.isLive && v.streamRef) vid.srcObject = v.streamRef;
+                else { vid.srcObject = null; vid.src = v.url; }
+
+                document.getElementById('vid-title').innerText = v.title;
+                document.getElementById('vid-auth-name').innerText = v.author;
+                document.getElementById('vid-auth-sub-count').innerText = app.data.users[v.author].followers.length + " abonnés";
+                document.getElementById('vid-auth-pp').innerHTML = app.utils.avatar(v.author);
+                document.getElementById('vid-likes').innerText = v.likes;
+                document.getElementById('vid-meta').innerText = `${v.views} vues • ${app.utils.ago(v.date)}`;
+                document.getElementById('vid-desc').innerText = v.desc;
+
+                app.social.updateSubBtn();
+                app.social.renderComs();
+
+                // SUGGESTIONS
+                const recos = app.data.videos.filter(x => !x.isShort && x.id != id).slice(0, 5);
+                document.getElementById('suggestions-list').innerHTML = recos.map(r => `
+                    <div style="display:flex; gap:10px; margin-bottom:10px; cursor:pointer;" onclick="app.player.load(${r.id})">
+                        <img src="${r.thumb}" style="width:120px; border-radius:5px;">
+                        <div><b style="font-size:13px;">${r.title}</b><div style="font-size:12px; color:#aaa;">${r.author}</div></div>
+                    </div>
+                `).join('');
+            },
+            close: function() {
+                document.getElementById('player-overlay').style.display = 'none';
+                document.getElementById('main-video').pause();
+            }
+        },
+
+        // --- SOCIAL (SUBS, LIKES, COEUR) ---
+        social: {
+            toggleSubscribe: function() {
+                const target = document.getElementById('prof-name').innerText;
+                this.doSub(target);
+                app.profile.load(target);
+            },
+            toggleSubscribePlayer: function() {
+                this.doSub(app.activeVid.author);
+                this.updateSubBtn();
+            },
+            doSub: function(target) {
+                if(!app.user) return app.openModal('modal-auth');
+                if(target === app.user) return alert("Impossible");
+                
+                const me = app.data.users[app.user];
+                const them = app.data.users[target];
+                
+                if(me.subs.includes(target)) {
+                    me.subs = me.subs.filter(x => x !== target); // Désabonnement
+                    them.followers = them.followers.filter(x => x !== app.user); // -1 abonnés
+                } else {
+                    me.subs.push(target); // Abonnement
+                    them.followers.push(app.user); // +1 abonnés
+                }
+                app.save();
+                app.auth.updateSidebar();
+            },
+            updateSubBtn: function() {
+                const target = app.activeVid.author;
+                const isSub = app.data.users[app.user]?.subs.includes(target);
+                const btn = document.getElementById('vid-sub-btn');
+                btn.innerText = isSub ? "ABONNÉ" : "S'ABONNER";
+                btn.className = isSub ? "btn" : "btn btn-red";
+                btn.style.background = isSub ? "#333" : "var(--red)";
+            },
+            vote: function(val) {
+                if(!app.user) return app.openModal('modal-auth');
+                const v = app.activeVid;
+                if(!v.voters) v.voters = [];
+                
+                if(v.voters.includes(app.user)) return alert("Déjà voté !");
+                v.likes += val;
+                v.voters.push(app.user);
+                app.save();
+                document.getElementById('vid-likes').innerText = v.likes;
+            },
+            postComment: function() {
+                const t = document.getElementById('com-input').value;
+                if(!t) return;
+                app.activeVid.comments.unshift({author: app.user, text: t, date: Date.now(), heart: false});
+                app.save(); this.renderComs();
+                document.getElementById('com-input').value = "";
+            },
+            renderComs: function() {
+                document.getElementById('com-list').innerHTML = (app.activeVid.comments||[]).map((c,i) => `
+                    <div style="margin-bottom:15px; display:flex; gap:10px;">
+                        <div style="width:30px;">${app.utils.avatar(c.author)}</div>
                         <div>
-                            <b id="p-author-name">Auteur</b>
-                            <div id="p-author-subs" style="font-size:12px; color:#aaa;">0 abonnés</div>
+                            <div style="font-size:12px;"><b>${c.author}</b> ${app.utils.ago(c.date)}</div>
+                            <div>${c.text}</div>
+                            ${c.heart ? '<span style="color:red; font-size:12px;">❤️ Aimé par l\'auteur</span>' : ''}
+                            ${app.user === app.activeVid.author ? `<button onclick="app.social.heart(${i})" style="border:none; background:none; cursor:pointer;">❤️</button>` : ''}
                         </div>
-                        <button id="p-sub-btn" onclick="event.stopPropagation(); app.social.toggleSubscribePlayer()" style="margin-left:15px; background:white; color:black; border:none; padding:8px 16px; border-radius:20px; font-weight:bold; cursor:pointer;">S'ABONNER</button>
                     </div>
-                    <div style="display:flex; gap:10px;">
-                        <button onclick="app.social.vote(1)" style="background:#222; color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer;">👍 <span id="p-likes">0</span></button>
-                    </div>
-                </div>
-                <div style="background:#1e1e1e; padding:15px; border-radius:10px; margin-top:15px;">
-                    <b id="p-views-date" style="font-size:14px;">0 vues • Il y a 1h</b>
-                    <p id="p-desc" style="font-size:14px; margin-top:10px; white-space:pre-wrap;">Description...</p>
-                </div>
-                <div style="margin-top:20px;">
-                    <h3>Commentaires</h3>
-                    <div style="display:flex; gap:10px; margin-bottom:20px;">
-                        <input id="com-input" type="text" placeholder="Ajouter un commentaire..." style="width:100%; background:none; border:none; border-bottom:1px solid #333; color:white; padding:10px;">
-                        <button onclick="app.social.postComment()" style="background:var(--accent-blue); border:none; padding:8px 16px; border-radius:20px; font-weight:bold; cursor:pointer;">Ajouter</button>
-                    </div>
-                    <div id="comments-list"></div>
-                </div>
-            </div>
-            <div>
-                <h3>À suivre</h3>
-                <div id="suggestions-list"></div>
-            </div>
-        </div>
-    </div>
+                `).join('');
+            },
+            heart: function(idx) {
+                app.activeVid.comments[idx].heart = !app.activeVid.comments[idx].heart;
+                app.save(); this.renderComs();
+            }
+        },
+
+        // --- UPLOAD & LIVE ---
+        upload: {
+            start: function() {
+                const f = document.getElementById('up-file').files[0];
+                const t = document.getElementById('up-thumb').files[0];
+                const title = document.getElementById('up-title').value;
+                if(!f || !title) return alert("Fichier manquant");
+
+                // FILE READER (VRAI UPLOAD LOCAL)
+                const r = new FileReader();
+                r.onload = (e) => {
+                    const vidUrl = e.target.result;
+                    // Durée réelle
+                    const vidTemp = document.createElement('video');
+                    vidTemp.src = vidUrl;
+                    vidTemp.onloadedmetadata = () => {
+                        const dur = Math.floor(vidTemp.duration);
+                        const min = Math.floor(dur/60); const sec = dur%60;
+                        const durationStr = `${min}:${sec<10?'0'+sec:sec}`;
+                        
+                        if(t) {
+                            const rt = new FileReader();
+                            rt.onload = (ev) => app.upload.finish(title, vidUrl, ev.target.result, durationStr);
+                            rt.readAsDataURL(t);
+                        } else app.upload.finish(title, vidUrl, "https://via.placeholder.com/640x360", durationStr);
+                    };
+                };
+                r.readAsDataURL(f);
+            },
+            finish: function(title, url, thumb, dur) {
+                app.data.videos.unshift({
+                    id: Date.now(), title: title, desc: document.getElementById('up-desc').value,
+                    author: app.user, url: url, thumb: thumb, duration: dur,
+                    views: 0, likes: 0, date: Date.now(), isShort: document.getElementById('up-short').checked,
+                    comments: [], voters: [], viewers: {}
+                });
+                app.save(); app.closeModals(); app.nav('home');
+            }
+        },
+
+        live: {
+            init: async function(type) {
+                try {
+                    if(type === 'cam') app.stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+                    else app.stream = await navigator.mediaDevices.getDisplayMedia({video:true, audio:true});
+                    document.getElementById('pre-live-vid').srcObject = app.stream;
+                } catch(e) { alert("Erreur: " + e); }
+            },
+            go: function() {
+                if(!app.stream) return alert("Source manquante");
+                const title = document.getElementById('live-title').value;
+                app.data.videos.unshift({
+                    id: Date.now(), title: "🔴 " + title, author: app.user, isLive: true,
+                    streamRef: app.stream, thumb: "", views: 0, likes: 0, date: Date.now(), comments: []
+                });
+                // Ouvrir Interface Live
+                document.getElementById('live-interface').style.display = 'grid';
+                document.getElementById('live-stream-preview').srcObject = app.stream;
+                app.save(); app.closeModals();
+            },
+            stop: function() {
+                app.stream.getTracks().forEach(t => t.stop());
+                document.getElementById('live-interface').style.display = 'none';
+                app.nav('home');
+            },
+            sendChat: function() {
+                const i = document.getElementById('live-chat-input');
+                document.getElementById('live-chat-msgs').innerHTML += `<div><b>${app.user}:</b> ${i.value}</div>`;
+                i.value = "";
+            }
+        },
+
+        // --- PROFIL ---
+        profile: {
+            load: function(name) {
+                if(!app.data.users[name]) app.data.users[name] = { pp:"", banner:"", bio:"Nouveau", subs:[], followers:[] };
+                const u = app.data.users[name];
+                document.getElementById('prof-name').innerText = name;
+                document.getElementById('prof-stats').innerText = u.followers.length + " abonnés";
+                document.getElementById('prof-pp').innerHTML = app.utils.avatar(name, 120);
+                if(u.banner) document.getElementById('prof-banner').style.backgroundImage = `url(${u.banner})`;
+                
+                const isMe = name === app.user;
+                document.getElementById('btn-edit-prof').style.display = isMe ? 'block' : 'none';
+                document.getElementById('btn-sub-prof').style.display = isMe ? 'none' : 'block';
+                
+                if(!isMe) {
+                    const isSub = app.data.users[app.user]?.subs.includes(name);
+                    document.getElementById('btn-sub-prof').innerText = isSub ? "ABONNÉ" : "S'ABONNER";
+                    document.getElementById('btn-sub-prof').style.background = isSub ? "#333" : "var(--red)";
+                }
+                this.tab('videos');
+            },
+            save: function() {
+                const pp = document.getElementById('cust-pp').files[0];
+                const bn = document.getElementById('cust-banner').files[0];
+                const u = app.data.users[app.user];
+                u.bio = document.getElementById('cust-bio').value;
+                
+                const done = () => { app.save(); app.closeModals(); app.profile.load(app.user); app.auth.updateHeader(); };
+                
+                if(pp) {
+                    const r = new FileReader();
+                    r.onload = (e) => { u.pp = e.target.result; if(bn) loadBn(); else done(); };
+                    r.readAsDataURL(pp);
+                } else if(bn) loadBn(); else done();
+
+                function loadBn() {
+                    const r = new FileReader();
+                    r.onload = (e) => { u.banner = e.target.result; done(); };
+                    r.readAsDataURL(bn);
+                }
+            },
+            tab: function(t) {
+                const c = document.getElementById('prof-content');
+                const u = document.getElementById('prof-name').innerText;
+                const vids = app.data.videos.filter(v => v.author === u);
+                
+                if(t === 'videos') c.innerHTML = vids.filter(v => !v.isShort).map(v => app.card(v)).join('');
+                if(t === 'zapps') c.innerHTML = vids.filter(v => v.isShort).map(v => app.card(v)).join('');
+                if(t === 'posts') c.innerHTML = app.data.posts.filter(p => p.author === u).map(p => `<div style="background:#1e1e1e; padding:10px; margin-bottom:10px; border-radius:5px;">${p.text}</div>`).join('');
+                if(t === 'about') c.innerHTML = `<div style="padding:20px;">${app.data.users[u].bio}</div>`;
+            }
+        },
+
+        // --- ADMIN ---
+        admin: {
+            render: function() {
+                const rows = app.data.videos.map(v => `
+                    <tr><td>${v.title}</td><td>${v.author}</td><td><button onclick="app.admin.delVid(${v.id})" style="color:red;">Suppr</button></td></tr>
+                `).join('');
+                document.getElementById('admin-video-list').innerHTML = rows;
+            },
+            delVid: function(id) {
+                if(confirm("Supprimer ?")) {
+                    app.data.videos = app.data.videos.filter(v => v.id !== id);
+                    app.save(); this.render();
+                }
+            },
+            addThanks: function() {
+                app.data.thanks.push(document.getElementById('admin-thx-input').value);
+                app.save(); alert("Ajouté !");
+            },
+            postAnn: function() {
+                app.data.annonces.unshift(document.getElementById('admin-ann-txt').value);
+                app.save(); alert("Publié");
+            }
+        },
+
+        // --- AUTH & UTILS ---
+        auth: {
+            login: function() {
+                const u = document.getElementById('auth-user').value;
+                if(!u) return;
+                if(!app.data.users[u]) app.data.users[u] = { pp:"", banner:"", bio:"Nouveau", subs:[], followers:[] };
+                app.user = u;
+                localStorage.setItem('titan_user', u);
+                app.closeModals();
+                app.init();
+            },
+            logout: function() { localStorage.removeItem('titan_user'); location.reload(); },
+            updateHeader: function() {
+                const area = document.getElementById('auth-section');
+                if(app.user) {
+                    area.innerHTML = `<div onclick="app.toggleProfileMenu()">${app.utils.avatar(app.user, 36)}</div>`;
+                    document.getElementById('dropdown-avatar').innerHTML = app.utils.avatar(app.user, 40);
+                    document.getElementById('dropdown-username').innerText = app.user;
+                    if(app.user === "Edonis") document.getElementById('admin-panel-btn').style.display = 'block';
+                    this.updateSidebar();
+                } else {
+                    area.innerHTML = `<button class="btn-blue" onclick="app.openModal('modal-auth')" style="width:auto; padding:5px 15px;">Connexion</button>`;
+                }
+            },
+            updateSidebar: function() {
+                if(!app.user) return;
+                document.getElementById('subs-list-container').innerHTML = app.data.users[app.user].subs.map(s => `
+                    <div class="nav-item" onclick="app.goProfile('${s}')">${app.utils.avatar(s, 20)} ${s}</div>
+                `).join('');
+            }
+        },
+
+        utils: {
+            avatar: function(u, s=40) {
+                const usr = app.data.users[u];
+                if(usr && usr.pp) return `<img src="${usr.pp}" style="width:${s}px; height:${s}px; border-radius:50%; object-fit:cover;">`;
+                const c = '#'+Math.floor(Math.random()*16777215).toString(16);
+                return `<div style="width:${s}px; height:${s}px; background:${c}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:white;">${u[0].toUpperCase()}</div>`;
+            },
+            ago: function(d) {
+                const min = Math.floor((Date.now()-d)/60000);
+                if(min<60) return min + " min";
+                const h = Math.floor(min/60);
+                if(h<24) return h + " h";
+                return Math.floor(h/24) + " j";
+            }
+        },
+
+        // Easter Egg
+        clickEgg: function() {
+            this.eggClicks++;
+            if(this.eggClicks >= 10) {
+                document.body.classList.add('christmas-mode');
+                alert("🎅 MODE NOËL ACTIVÉ !");
+            }
+        },
+        
+        // Helpers
+        openModal: function(id) { document.getElementById(id).style.display='flex'; },
+        closeModals: function() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); },
+        goProfile: function(u) { app.profile.load(u); app.nav('profile'); },
+        goMyProfile: function() { app.profile.load(app.user); app.nav('profile'); },
+        closePlayer: function() { document.getElementById('player-overlay').style.display='none'; document.getElementById('main-video').pause(); },
+        toggleProfileMenu: function() { const m = document.getElementById('profile-dropdown'); m.style.display = m.style.display==='none'?'block':'none'; },
+        addPost: function() {
+            const t = document.getElementById('new-post-txt').value;
+            app.data.posts.unshift({author:app.user, text:t, date:Date.now()});
+            app.save(); app.renderPosts();
+        },
+        history: { clear: function() { localStorage.removeItem('titan_hist'); app.renderHistory(); } }
+    };
+
+    window.onload = function() { app.init(); };
+    </script>
+</body>
+</html>
