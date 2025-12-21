@@ -3,1139 +3,643 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Visiona Titan - Ultimate Production</title>
+    <title>Visiona Titan - Ultimate Fix</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        /* ==========================================================================
-           1. VARIABLES GLOBALES & THÈMES
-           ========================================================================== */
+        /* --- 1. VARIABLES --- */
         :root {
-            --bg-primary: #0f0f0f;
-            --bg-secondary: #1f1f1f;
-            --bg-hover: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #aaaaaa;
-            --border-color: #3e3e3e;
-            --accent-blue: #3ea6ff;
-            --accent-red: #ff0000;
-            --accent-green: #2ba640;
-            --accent-gold: #ffd700;
-            --header-height: 60px;
-            --sidebar-width: 240px;
-            --z-header: 1000;
-            --z-modal: 2000;
-            --z-overlay: 1500;
+            --bg: #0f0f0f; --header: #0f0f0f; --sidebar: #0f0f0f; --hover: #272727;
+            --text: #fff; --text-sec: #aaa; --border: #333;
+            --blue: #3ea6ff; --red: #ff0000; --gold: #ffd700; --green: #2ba640;
+            --sidebar-w: 240px; --header-h: 56px;
         }
 
-        /* Thème Noël (Activé par Easter Egg) */
-        body.theme-christmas {
-            --bg-primary: #0b1a0e;
-            --bg-secondary: #142b1a;
-            --accent-blue: #00ff00;
-            --accent-red: #ff0000;
-            background-image: url('https://www.transparenttextures.com/patterns/snow.png');
-        }
-
-        /* Thème Matrix (Activé par Easter Egg) */
-        body.theme-matrix {
-            --bg-primary: #000000;
-            --bg-secondary: #0a0a0a;
-            --text-primary: #00ff00;
-            --text-secondary: #008800;
-            --accent-blue: #00ff00;
-            --accent-red: #00ff00;
-            font-family: 'Courier New', monospace;
-        }
-
-        /* ==========================================================================
-           2. RESET & BASE CSS
-           ========================================================================== */
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        /* Thèmes Easter Eggs */
+        body.christmas { --bg: #0b1d0e; --header: #1a0505; --blue: #0f0; --red: #f00; background-image: url('https://www.transparenttextures.com/patterns/snow.png'); }
+        body.matrix { --bg: #000; --text: #0f0; --text-sec: #080; font-family: 'Courier New', monospace; }
         
-        body {
-            margin: 0; padding: 0;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: 'Roboto', sans-serif;
-            overflow-x: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        a { text-decoration: none; color: inherit; }
-        ul { list-style: none; padding: 0; margin: 0; }
+        * { box-sizing: border-box; outline: none; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Roboto', sans-serif; overflow-x: hidden; }
         
-        /* Scrollbar personnalisée */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-primary); }
-        ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #777; }
-
-        /* ==========================================================================
-           3. HEADER (BARRE DE NAVIGATION SUPÉRIEURE)
-           ========================================================================== */
-        header {
-            position: fixed; top: 0; left: 0; right: 0;
-            height: var(--header-height);
-            background-color: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px;
-            z-index: var(--z-header);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .menu-toggle { font-size: 24px; cursor: pointer; padding: 5px; border-radius: 50%; }
-        .menu-toggle:hover { background: var(--bg-hover); }
+        /* HEADER */
+        header { position: fixed; top: 0; left: 0; right: 0; height: var(--header-h); background: var(--header); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 2000; border-bottom: 1px solid var(--border); }
+        .logo { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: bold; font-size: 20px; user-select: none; }
+        .logo span { color: var(--red); font-size: 24px; }
+        .search-bar { flex: 1; max-width: 600px; margin: 0 20px; display: flex; }
+        .search-bar input { width: 100%; background: #121212; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 40px 0 0 40px; }
+        .search-bar button { background: #222; border: 1px solid var(--border); border-left: none; color: white; padding: 0 20px; border-radius: 0 40px 40px 0; cursor: pointer; }
         
-        .logo-container { display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; }
-        .logo-icon { color: var(--accent-red); font-size: 28px; transition: transform 0.3s; }
-        .logo-text { font-size: 22px; font-weight: 700; letter-spacing: -1px; }
-        .logo-text span { font-weight: 300; color: var(--text-primary); }
+        .actions { display: flex; gap: 15px; align-items: center; }
+        .icon-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
 
-        .search-container { flex: 1; max-width: 600px; margin: 0 20px; display: flex; align-items: center; }
-        .search-input {
-            width: 100%; background: #121212; border: 1px solid var(--border-color);
-            color: white; padding: 10px 15px; border-radius: 20px 0 0 20px; font-size: 16px;
-        }
-        .search-input:focus { border-color: var(--accent-blue); }
-        .search-btn {
-            background: var(--bg-hover); border: 1px solid var(--border-color); border-left: none;
-            color: var(--text-secondary); padding: 10px 20px; border-radius: 0 20px 20px 0; cursor: pointer;
-        }
-        .search-btn:hover { background: #444; color: white; }
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-h); bottom: 0; left: 0; width: var(--sidebar-w); background: var(--sidebar); overflow-y: auto; padding: 10px; border-right: 1px solid var(--border); z-index: 1000; }
+        .nav-item { display: flex; align-items: center; gap: 20px; padding: 10px; border-radius: 10px; cursor: pointer; margin-bottom: 2px; }
+        .nav-item:hover, .nav-item.active { background: var(--hover); font-weight: bold; }
+        hr { border: 0; border-top: 1px solid var(--border); margin: 10px 0; }
 
-        .header-right { display: flex; align-items: center; gap: 15px; }
-        .icon-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s; }
-        .icon-btn:hover { background: var(--bg-hover); }
-
-        .auth-btn {
-            background: transparent; border: 1px solid var(--accent-blue); color: var(--accent-blue);
-            padding: 8px 15px; border-radius: 2px; font-weight: 500; cursor: pointer; text-transform: uppercase;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .auth-btn:hover { background: rgba(62, 166, 255, 0.1); }
-
-        .user-avatar {
-            width: 36px; height: 36px; border-radius: 50%; background: #555;
-            cursor: pointer; overflow: hidden; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 18px; color: white;
-        }
-        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* ==========================================================================
-           4. SIDEBAR (NAVIGATION LATÉRALE)
-           ========================================================================== */
-        .sidebar {
-            position: fixed; top: var(--header-height); bottom: 0; left: 0;
-            width: var(--sidebar-width); background: var(--bg-primary);
-            overflow-y: auto; padding: 10px;
-            transform: translateX(0); transition: transform 0.3s ease;
-            z-index: 900;
-        }
-        .sidebar.closed { transform: translateX(-100%); }
-
-        .nav-link {
-            display: flex; align-items: center; gap: 20px; padding: 10px 15px;
-            color: var(--text-primary); border-radius: 10px; cursor: pointer;
-            margin-bottom: 2px; transition: background 0.2s;
-        }
-        .nav-link:hover { background: var(--bg-hover); }
-        .nav-link.active { background: var(--bg-hover); font-weight: bold; }
-        .nav-icon { width: 24px; text-align: center; font-size: 20px; }
+        /* MAIN */
+        .main { margin-left: var(--sidebar-w); margin-top: var(--header-h); padding: 24px; min-height: 100vh; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         
-        .divider { border-top: 1px solid var(--border-color); margin: 15px 0; }
-        .section-title { font-size: 14px; font-weight: bold; color: var(--text-secondary); padding: 5px 15px; margin-bottom: 5px; }
-
-        /* ==========================================================================
-           5. MAIN CONTENT (ZONE PRINCIPALE)
-           ========================================================================== */
-        .main-container {
-            margin-top: var(--header-height); margin-left: var(--sidebar-width);
-            padding: 24px; min-height: calc(100vh - var(--header-height));
-            transition: margin-left 0.3s ease;
-        }
-        .main-container.expanded { margin-left: 0; }
-
-        /* GRILLES */
-        .video-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
-        }
-
-        /* CARTE VIDÉO */
-        .video-card { cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; }
-        .video-card:hover { transform: scale(1.02); }
-        .thumbnail {
-            position: relative; width: 100%; aspect-ratio: 16/9; background: #222;
-            border-radius: 12px; overflow: hidden;
-        }
-        .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
-        .duration {
-            position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8);
-            color: white; padding: 3px 6px; border-radius: 4px; font-size: 12px; font-weight: 500;
-        }
-        .live-badge {
-            position: absolute; top: 8px; left: 8px; background: var(--accent-red);
-            color: white; padding: 3px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;
-            display: flex; align-items: center; gap: 5px;
-        }
-        .live-badge::before { content: ''; width: 8px; height: 8px; background: white; border-radius: 50%; }
-
-        .details { display: flex; gap: 12px; margin-top: 12px; }
-        .channel-icon { width: 36px; height: 36px; border-radius: 50%; background: #333; overflow: hidden; flex-shrink: 0; }
-        .channel-icon img { width: 100%; height: 100%; object-fit: cover; }
-        .meta { display: flex; flex-direction: column; }
-        .video-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .video-info { font-size: 13px; color: var(--text-secondary); }
-
-        /* ==========================================================================
-           6. ZAPPS (SHORTS / TIKTOK STYLE)
-           ========================================================================== */
-        .zapp-container {
-            height: calc(100vh - 100px); overflow-y: scroll; scroll-snap-type: y mandatory;
-            max-width: 450px; margin: 0 auto; scrollbar-width: none;
-        }
+        /* CARD VIDEO */
+        .card { cursor: pointer; transition: 0.2s; } .card:hover { transform: scale(1.02); }
+        .thumb { position: relative; width: 100%; aspect-ratio: 16/9; background: #222; border-radius: 12px; overflow: hidden; }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .duration { position: absolute; bottom: 5px; right: 5px; background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .live-badge { position: absolute; top: 5px; left: 5px; background: var(--red); padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        
+        .info { display: flex; gap: 12px; margin-top: 10px; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #333; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; font-weight: bold; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* ZAPP */
+        .zapp-container { height: calc(100vh - 80px); overflow-y: scroll; scroll-snap-type: y mandatory; max-width: 450px; margin: 0 auto; }
         .zapp-container::-webkit-scrollbar { display: none; }
+        .zapp-item { height: 100%; scroll-snap-align: start; position: relative; background: #000; border-radius: 15px; margin-bottom: 20px; overflow: hidden; display: flex; justify-content: center; }
+        .zapp-video { height: 100%; width: 100%; object-fit: cover; }
+        .zapp-ui { position: absolute; right: 10px; bottom: 80px; display: flex; flex-direction: column; gap: 20px; align-items: center; text-shadow: 1px 1px 2px black; }
+        .z-btn { background: rgba(255,255,255,0.2); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(5px); }
+
+        /* UI ELEMENTS */
+        .btn { padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; margin-top: 5px; }
+        .btn-blue { background: var(--blue); color: black; }
+        .btn-red { background: var(--red); color: white; }
+        .input { width: 100%; background: #121212; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
         
-        .zapp-card {
-            height: 100%; scroll-snap-align: start; position: relative;
-            background: #000; border-radius: 15px; margin-bottom: 20px;
-            display: flex; justify-content: center; overflow: hidden;
-        }
-        .zapp-video { width: 100%; height: 100%; object-fit: cover; }
-        .zapp-ui {
-            position: absolute; right: 10px; bottom: 100px;
-            display: flex; flex-direction: column; gap: 20px; align-items: center;
-        }
-        .zapp-btn {
-            width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.15);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: white; backdrop-filter: blur(5px); cursor: pointer; transition: 0.2s;
-        }
-        .zapp-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.3); }
-        .zapp-info {
-            position: absolute; bottom: 20px; left: 15px; right: 80px;
-            text-shadow: 1px 1px 2px black;
-        }
-
-        /* ==========================================================================
-           7. MODALES & POPUPS
-           ========================================================================== */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            z-index: var(--z-modal); align-items: center; justify-content: center;
-            backdrop-filter: blur(5px);
-        }
-        .modal-content {
-            background: var(--bg-secondary); padding: 30px; border-radius: 15px;
-            width: 90%; max-width: 600px; border: 1px solid var(--border-color);
-            animation: slideUp 0.3s ease; max-height: 90vh; overflow-y: auto;
-        }
-        @keyframes slideUp { from {transform: translateY(50px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
-
-        .form-group { margin-bottom: 20px; }
-        .titan-input {
-            width: 100%; padding: 12px; background: #121212; border: 1px solid #444;
-            color: white; border-radius: 8px; font-size: 14px;
-        }
-        .titan-input:focus { border-color: var(--accent-blue); }
+        /* MODALES */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 5000; align-items: center; justify-content: center; }
+        .modal-box { background: #212121; padding: 25px; border-radius: 15px; width: 90%; max-width: 500px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
         
-        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; }
-        .btn-primary { background: var(--accent-blue); color: black; }
-        .btn-primary:hover { filter: brightness(1.1); }
-        .btn-danger { background: var(--accent-red); color: white; }
-        .btn-secondary { background: var(--bg-hover); color: white; }
-
-        /* ==========================================================================
-           8. INTERFACE LIVE & PLAYER
-           ========================================================================== */
-        #player-overlay {
-            display: none; position: fixed; inset: 0; background: var(--bg-primary);
-            z-index: var(--z-overlay); overflow-y: auto; padding: 20px;
-        }
-        .player-grid {
-            max-width: 1600px; margin: 0 auto; display: grid; grid-template-columns: 1fr 400px; gap: 24px;
-        }
+        /* PLAYER & LIVE */
+        #player-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 4000; overflow-y: auto; padding: 20px; }
+        .player-layout { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 350px; gap: 24px; }
         
-        #live-studio {
-            display: none; position: fixed; inset: 0; background: #000; z-index: 3000;
-            grid-template-columns: 1fr 350px;
-        }
-        .live-chat-col {
-            background: var(--bg-secondary); border-left: 1px solid var(--border-color);
-            display: flex; flex-direction: column; height: 100vh;
-        }
-        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; font-size: 14px; }
-        .chat-msg { margin-bottom: 8px; line-height: 1.4; animation: fadeIn 0.2s; }
-        .chat-msg b { color: var(--text-secondary); margin-right: 5px; }
+        #live-studio { display: none; position: fixed; inset: 0; background: #000; z-index: 4500; grid-template-columns: 1fr 300px; }
+        .chat-box { background: #1a1a1a; border-left: 1px solid var(--border); display: flex; flex-direction: column; height: 100vh; }
+        .chat-feed { flex: 1; padding: 10px; overflow-y: auto; font-size: 13px; }
 
-        /* Mobile */
-        @media (max-width: 900px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.active { transform: translateX(0); }
-            .main-container { margin-left: 0; }
-            .player-grid { grid-template-columns: 1fr; }
-            #live-studio { grid-template-columns: 1fr; grid-template-rows: 1fr 300px; }
-        }
+        /* ADMIN & PROFIL */
+        .admin-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--border); background: #1a1a1a; align-items: center; }
+        .pp-big { width: 120px; height: 120px; border-radius: 50%; border: 5px solid var(--bg); background: #222; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+        .pp-big img { width: 100%; height: 100%; object-fit: cover; }
+
+        @media(max-width: 900px) { .sidebar { display: none; } .main { margin-left: 0; } .player-layout { grid-template-columns: 1fr; } #live-studio { grid-template-columns: 1fr; grid-template-rows: 1fr 200px; } }
     </style>
 </head>
 <body>
-    <header>
-    <div class="header-left">
-        <div class="menu-toggle" onclick="app.ui.toggleSidebar()">☰</div>
-        <div class="logo-container" onclick="app.easterEggs.logoClick()">
-            <div class="logo-icon">▶</div>
-            <div class="logo-text">Visiona<span>Titan</span></div>
-        </div>
+    <div id="modal-auth" class="modal">
+    <div class="modal-box" style="text-align:center;">
+        <h2 style="color:var(--blue);">Connexion Titan</h2>
+        <input id="auth-user" class="input" placeholder="Pseudo (Admin: Edonis)">
+        <button class="btn btn-blue" onclick="app.auth.login()">SE CONNECTER</button>
+        <button class="btn" style="background:none; color:#888;" onclick="app.ui.closeModals()">Fermer</button>
     </div>
+</div>
 
-    <div class="search-container">
-        <input type="text" class="search-input" id="search-input" placeholder="Rechercher..." onkeyup="if(event.key==='Enter') app.search()">
-        <button class="search-btn" onclick="app.search()">🔍</button>
-    </div>
-
-    <div class="header-right">
-        <button class="icon-btn" onclick="app.ui.openModal('modal-create')" title="Créer">📹</button>
-        <div style="position:relative;">
-            <button class="icon-btn" onclick="alert('Pas de nouvelles notifications')">🔔</button>
-            <div id="notif-dot" style="display:none; position:absolute; top:5px; right:5px; width:8px; height:8px; background:red; border-radius:50%;"></div>
+<div id="modal-upload" class="modal">
+    <div class="modal-box">
+        <h2>Créer</h2>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <button class="btn btn-blue" style="flex:1;" onclick="app.ui.tab('up')">IMPORTER</button>
+            <button class="btn btn-red" style="flex:1;" onclick="app.ui.tab('live')">DIRECT</button>
         </div>
+        
+        <div id="tab-up">
+            <input id="up-title" class="input" placeholder="Titre">
+            <textarea id="up-desc" class="input" placeholder="Description"></textarea>
+            <label>Vidéo: <input type="file" id="up-file" class="input" accept="video/*"></label>
+            <label>Miniature: <input type="file" id="up-thumb" class="input" accept="image/*"></label>
+            <label><input type="checkbox" id="up-short"> C'est un Zapp (Short)</label>
+            <button class="btn btn-blue" style="width:100%; margin-top:15px;" onclick="app.upload.process()">METTRE EN LIGNE</button>
+        </div>
+
+        <div id="tab-live" style="display:none;">
+            <input id="live-title" class="input" placeholder="Titre du Live">
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-gray" onclick="app.live.init('cam')">📷 Caméra</button>
+                <button class="btn btn-gray" onclick="app.live.init('screen')">💻 Écran</button>
+            </div>
+            <video id="pre-live" autoplay muted style="width:100%; background:black; margin-top:10px; border-radius:8px;"></video>
+            <button class="btn btn-red" style="width:100%; margin-top:10px;" onclick="app.live.go()">LANCER LE DIRECT</button>
+        </div>
+        <button class="btn" style="width:100%; background:#333;" onclick="app.ui.closeModals()">Annuler</button>
+    </div>
+</div>
+
+<div id="modal-custom" class="modal">
+    <div class="modal-box">
+        <h2>Modifier Profil</h2>
+        <label>Avatar: <input type="file" id="cust-pp" class="input" accept="image/*"></label>
+        <label>Bannière: <input type="file" id="cust-banner" class="input" accept="image/*"></label>
+        <label>Bio: <textarea id="cust-bio" class="input"></textarea></label>
+        <button class="btn btn-blue" onclick="app.profile.save()">ENREGISTRER</button>
+        <button class="btn" onclick="app.ui.closeModals()">Fermer</button>
+    </div>
+</div>
+
+<header>
+    <div class="logo" onclick="app.eggs.clickLogo()"><span>▶</span> Visiona Titan</div>
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Rechercher..." onkeyup="if(event.key==='Enter') app.search()">
+        <button onclick="app.search()">🔍</button>
+    </div>
+    <div class="actions">
+        <button class="icon-btn" onclick="app.ui.openModal('modal-upload')">📹</button>
         <div id="auth-area"></div>
     </div>
 </header>
 
-<div id="user-menu" style="display:none; position:fixed; right:20px; top:70px; background:var(--bg-secondary); width:250px; border-radius:10px; border:1px solid var(--border-color); z-index: 2500; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
-    <div style="padding:15px; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:10px;">
-        <div id="menu-avatar" class="user-avatar"></div>
-        <b id="menu-username">Pseudo</b>
-    </div>
-    <div class="nav-link" onclick="app.nav('profile')">👤 Ma Chaîne</div>
-    <div class="nav-link" onclick="app.nav('stats')">📊 Titan Studio</div>
-    <div id="admin-link" class="nav-link" style="display:none; color:var(--accent-gold);" onclick="app.nav('admin')">🛡️ Admin Panel</div>
-    <div class="divider"></div>
-    <div class="nav-link" onclick="app.auth.logout()" style="color:var(--accent-red);">🚪 Déconnexion</div>
+<div id="user-menu" style="display:none; position:fixed; right:10px; top:60px; background:#222; width:200px; padding:10px; border-radius:10px; z-index:4500; border:1px solid #444;">
+    <div class="nav-item" onclick="app.nav('profile')">👤 Ma Chaîne</div>
+    <div class="nav-item" onclick="app.nav('stats')">📊 Studio</div>
+    <div id="admin-link" class="nav-item" style="display:none; color:var(--gold);" onclick="app.nav('admin')">🛡️ Admin</div>
+    <div class="nav-item" onclick="app.auth.logout()" style="color:var(--red);">🚪 Déconnexion</div>
 </div>
 
-<nav class="sidebar" id="sidebar">
-    <div class="nav-link active" id="link-home" onclick="app.nav('home', this)"><span class="nav-icon">🏠</span> Accueil</div>
-    <div class="nav-link" id="link-zapp" onclick="app.nav('zapp', this)"><span class="nav-icon">⚡</span> Zapps</div>
-    <div class="nav-link" id="link-subs" onclick="app.nav('subs', this)"><span class="nav-icon">📺</span> Abonnements</div>
-    <div class="divider"></div>
-    <div class="nav-link" onclick="app.nav('history')"><span class="nav-icon">🕒</span> Historique</div>
-    <div class="nav-link" onclick="app.nav('community')"><span class="nav-icon">📝</span> Communauté</div>
-    <div class="nav-link" onclick="app.nav('thanks')"><span class="nav-icon">💎</span> Panthéon</div>
-    <div class="divider"></div>
-    <div class="section-title">VOS ABONNEMENTS</div>
-    <div id="subs-list"></div>
+<nav class="sidebar">
+    <div class="nav-item active" id="btn-home" onclick="app.nav('home', this)">🏠 Accueil</div>
+    <div class="nav-item" id="btn-zapp" onclick="app.nav('zapp', this)">⚡ Zapps</div>
+    <div class="nav-item" id="btn-subs" onclick="app.nav('subs', this)">📺 Abonnements</div>
+    <hr>
+    <div class="nav-item" onclick="app.nav('history')">🕒 Historique</div>
+    <div class="nav-item" onclick="app.nav('community')">📝 Communauté</div>
+    <div class="nav-item" onclick="app.nav('thanks')">💎 Panthéon</div>
+    <hr>
+    <div id="sidebar-subs" style="font-size:13px; color:#aaa;"></div>
 </nav>
 
-<main class="main-container">
-    
+<main class="main">
     <section id="view-home">
-        <div id="announcement-bar"></div>
-        <div class="video-grid" id="home-grid"></div>
+        <div id="announce-box"></div>
+        <div class="grid" id="home-grid"></div>
     </section>
 
     <section id="view-zapp" style="display:none;">
         <div class="zapp-container" id="zapp-feed"></div>
     </section>
 
-    <section id="view-subs" style="display:none;">
-        <h2>Vidéos de vos abonnements</h2>
-        <div class="video-grid" id="subs-grid"></div>
-    </section>
-
-    <section id="view-history" style="display:none;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2>Historique de visionnage</h2>
-            <button class="btn btn-secondary" onclick="app.history.clear()">Tout effacer</button>
-        </div>
-        <div class="video-grid" id="history-grid" style="margin-top:20px;"></div>
-    </section>
-
+    <section id="view-subs" style="display:none;"><div class="grid" id="subs-grid"></div></section>
+    <section id="view-history" style="display:none;"><div class="grid" id="history-grid"></div></section>
+    
     <section id="view-community" style="display:none;">
-        <h2>Flux Communautaire</h2>
-        <div id="community-input"></div>
-        <div id="community-feed" style="margin-top:20px;"></div>
+        <div id="post-input"></div>
+        <div id="posts-feed" style="margin-top:20px;"></div>
     </section>
 
     <section id="view-thanks" style="display:none;">
-        <h1 style="text-align:center; color:var(--accent-gold);">🏆 Le Panthéon Titan</h1>
-        <p style="text-align:center; color:var(--text-secondary);">Les contributeurs légendaires.</p>
-        <div id="thanks-grid" class="video-grid" style="margin-top:40px;"></div>
+        <h1 style="color:var(--gold); text-align:center;">Panthéon</h1>
+        <div class="grid" id="thanks-grid"></div>
     </section>
 
     <section id="view-admin" style="display:none;">
-        <h1 style="color:var(--accent-red);">🛡️ Panel Administrateur (Edonis)</h1>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-            <div style="background:var(--bg-secondary); padding:20px; border-radius:10px;">
-                <h3>Annonce Globale</h3>
-                <textarea id="admin-ann-txt" class="titan-input" style="height:80px;"></textarea>
-                <button class="btn btn-primary" style="margin-top:10px;" onclick="app.admin.postAnnouncement()">PUBLIER</button>
+        <h1 style="color:var(--red);">Admin Panel (Edonis)</h1>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+            <div style="background:#222; padding:15px; border-radius:10px;">
+                <h3>Annonce</h3>
+                <textarea id="adm-ann" class="input"></textarea>
+                <button class="btn btn-blue" onclick="app.admin.postAnn()">Publier</button>
             </div>
-            <div style="background:var(--bg-secondary); padding:20px; border-radius:10px;">
-                <h3>Ajouter au Panthéon</h3>
-                <input id="admin-thx-name" class="titan-input" placeholder="Nom du donateur">
-                <button class="btn btn-primary" style="margin-top:10px;" onclick="app.admin.addThanks()">AJOUTER</button>
+            <div style="background:#222; padding:15px; border-radius:10px;">
+                <h3>Panthéon</h3>
+                <input id="adm-thx" class="input" placeholder="Nom">
+                <button class="btn btn-blue" onclick="app.admin.addThx()">Ajouter</button>
             </div>
         </div>
-        <h3>Gestion des Vidéos</h3>
-        <div id="admin-video-list"></div>
+        <div id="adm-vids"></div>
     </section>
 
     <section id="view-profile" style="display:none;">
-        <div id="prof-banner" style="width:100%; height:250px; background:#333; background-size:cover; border-radius:15px;"></div>
-        <div style="display:flex; align-items:center; gap:25px; margin-top:-50px; padding:0 30px;">
-            <div id="prof-pp" style="width:140px; height:140px; border-radius:50%; border:6px solid var(--bg-primary); background:#222; overflow:hidden;"></div>
-            <div style="margin-top:50px;">
-                <h1 id="prof-name" style="margin:0; font-size:32px;">Nom</h1>
-                <p id="prof-stats" style="color:var(--text-secondary);">0 abonnés</p>
-            </div>
-            <div style="margin-left:auto; margin-top:50px;">
-                <button id="prof-action-btn" class="btn btn-primary" onclick="app.profile.handleAction()">S'ABONNER</button>
-            </div>
+        <div id="prof-banner" class="banner"></div>
+        <div style="display:flex; gap:20px; align-items:center; padding:0 30px; margin-top:-40px;">
+            <div id="prof-pp" class="pp-big"></div>
+            <div><h1 id="prof-name">Nom</h1><p id="prof-subs">0 abonnés</p></div>
+            <div style="margin-left:auto;"><button id="prof-btn" class="btn" onclick="app.profile.action()">ACTION</button></div>
         </div>
-        
-        <div style="display:flex; border-bottom:1px solid var(--border-color); margin-top:30px;">
-            <div class="nav-link active" onclick="app.profile.switchTab('videos')">VIDÉOS</div>
-            <div class="nav-link" onclick="app.profile.switchTab('zapps')">ZAPPS</div>
-            <div class="nav-link" onclick="app.profile.switchTab('posts')">POSTS</div>
-            <div class="nav-link" onclick="app.profile.switchTab('about')">À PROPOS</div>
+        <div style="display:flex; border-bottom:1px solid #333; margin-top:20px;">
+            <div class="nav-item active" onclick="app.profile.tab('videos')">VIDÉOS</div>
+            <div class="nav-item" onclick="app.profile.tab('zapps')">ZAPPS</div>
+            <div class="nav-item" onclick="app.profile.tab('posts')">POSTS</div>
+            <div class="nav-item" onclick="app.profile.tab('about')">À PROPOS</div>
         </div>
-        <div id="prof-content" class="video-grid" style="padding-top:30px;"></div>
+        <div id="prof-content" class="grid" style="margin-top:20px;"></div>
     </section>
 
     <section id="view-stats" style="display:none;">
-        <h1>📊 Titan Studio</h1>
-        <div class="video-grid">
-            <div style="background:var(--bg-secondary); padding:20px; border-radius:10px; text-align:center;">
-                <h2 id="stat-views" style="color:var(--accent-blue); font-size:40px;">0</h2>
-                <p>Vues Totales</p>
-            </div>
-            <div style="background:var(--bg-secondary); padding:20px; border-radius:10px; text-align:center;">
-                <h2 id="stat-subs" style="color:var(--accent-gold); font-size:40px;">0</h2>
-                <p>Abonnés</p>
-            </div>
-            <div style="background:var(--bg-secondary); padding:20px; border-radius:10px; text-align:center;">
-                <h2 id="stat-likes" style="color:var(--accent-green); font-size:40px;">0</h2>
-                <p>J'aime reçus</p>
-            </div>
+        <div class="grid" style="grid-template-columns:repeat(3,1fr);">
+            <div style="background:#222; padding:20px; text-align:center;"><h1 id="st-views" style="color:var(--blue)">0</h1>Vues</div>
+            <div style="background:#222; padding:20px; text-align:center;"><h1 id="st-subs" style="color:var(--gold)">0</h1>Abonnés</div>
+            <div style="background:#222; padding:20px; text-align:center;"><h1 id="st-likes" style="color:var(--green)">0</h1>J'aime</div>
         </div>
     </section>
 </main>
 
-<div id="modal-auth" class="modal-overlay">
-    <div class="modal-content" style="text-align:center;">
-        <h2 style="color:var(--accent-blue);">Connexion Titan</h2>
-        <input type="text" id="login-user" class="titan-input" placeholder="Entrez votre pseudo" style="margin-bottom:15px;">
-        <button class="btn btn-primary" style="width:100%;" onclick="app.auth.login()">SE CONNECTER</button>
-        <p style="font-size:12px; color:var(--text-secondary); margin-top:15px;">
-            Pour accéder au Panel Admin, connectez-vous en tant que <b>Edonis</b>.
-        </p>
-        <button class="btn btn-secondary" onclick="app.ui.closeModals()">Annuler</button>
+<div id="live-studio">
+    <div style="position:relative; background:#000; display:flex; justify-content:center;">
+        <video id="live-monitor" autoplay muted style="max-width:100%; max-height:100%;"></video>
+        <div style="position:absolute; top:20px; left:20px; background:red; padding:5px 10px; font-weight:bold;">EN DIRECT</div>
+        <button class="btn btn-red" style="position:absolute; bottom:20px;" onclick="app.live.stop()">ARRÊTER</button>
     </div>
-</div>
-
-<div id="modal-create" class="modal-overlay">
-    <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <h2>Créer du contenu</h2>
-            <button class="icon-btn" onclick="app.ui.closeModals()">×</button>
-        </div>
-        
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <button class="btn btn-primary" style="flex:1;" onclick="app.ui.switchUploadTab('upload')">IMPORTER</button>
-            <button class="btn btn-danger" style="flex:1;" onclick="app.ui.switchUploadTab('live')">DIRECT</button>
-        </div>
-
-        <div id="form-upload">
-            <div class="form-group">
-                <label>Titre</label>
-                <input type="text" id="up-title" class="titan-input">
-            </div>
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="up-desc" class="titan-input"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Fichier Vidéo (MP4, WebM)</label>
-                <input type="file" id="up-file" class="titan-input" accept="video/*">
-            </div>
-            <div class="form-group">
-                <label>Miniature (Image)</label>
-                <input type="file" id="up-thumb" class="titan-input" accept="image/*">
-            </div>
-            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-                <input type="checkbox" id="up-short"> C'est un Zapp (Short)
-            </label>
-            <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="app.upload.process()">METTRE EN LIGNE</button>
-        </div>
-
-        <div id="form-live" style="display:none;">
-            <input type="text" id="live-title" class="titan-input" placeholder="Titre du Live" style="margin-bottom:15px;">
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <button class="btn btn-secondary" onclick="app.live.setup('cam')">📷 Caméra</button>
-                <button class="btn btn-secondary" onclick="app.live.setup('screen')">💻 Écran</button>
-            </div>
-            <video id="live-preview" autoplay muted style="width:100%; aspect-ratio:16/9; background:black; border-radius:8px; margin-bottom:15px;"></video>
-            <button class="btn btn-danger" style="width:100%;" onclick="app.live.goLive()">LANCER LE DIRECT</button>
-        </div>
-    </div>
-</div>
-
-<div id="modal-custom" class="modal-overlay">
-    <div class="modal-content">
-        <h2>Modifier ma chaîne</h2>
-        <div class="form-group">
-            <label>Photo de Profil</label>
-            <input type="file" id="cust-pp" class="titan-input" accept="image/*">
-        </div>
-        <div class="form-group">
-            <label>Bannière</label>
-            <input type="file" id="cust-banner" class="titan-input" accept="image/*">
-        </div>
-        <div class="form-group">
-            <label>Biographie</label>
-            <textarea id="cust-bio" class="titan-input"></textarea>
-        </div>
-        <button class="btn btn-primary" style="width:100%;" onclick="app.profile.save()">ENREGISTRER</button>
-        <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="app.ui.closeModals()">Annuler</button>
+    <div class="chat-box">
+        <div style="padding:10px; border-bottom:1px solid #333;">Tchat Direct</div>
+        <div id="live-chat" class="chat-feed"></div>
+        <div style="padding:10px;"><input id="live-input" class="input" placeholder="Message..." onkeyup="if(event.key==='Enter') app.live.send()"></div>
     </div>
 </div>
 
 <div id="player-overlay">
-    <div class="player-grid">
+    <div class="player-layout">
         <div>
-            <button class="icon-btn" onclick="app.player.close()" style="margin-bottom:10px;">✕ Fermer</button>
-            <div style="width:100%; aspect-ratio:16/9; background:black; border-radius:12px; overflow:hidden;">
+            <button onclick="app.player.close()" class="btn" style="background:none;">✕ Fermer</button>
+            <div style="width:100%; aspect-ratio:16/9; background:#000; margin-top:10px;">
                 <video id="main-player" controls autoplay style="width:100%; height:100%;"></video>
             </div>
-            <h1 id="p-title" style="font-size:22px; margin:15px 0 5px 0;">Titre</h1>
-            
+            <h1 id="p-title">Titre</h1>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="app.navToAuthor()">
-                    <div id="p-auth-pp" style="width:40px; height:40px; border-radius:50%; background:#444; overflow:hidden;"></div>
-                    <div>
-                        <b id="p-auth-name">Auteur</b>
-                        <div id="p-auth-subs" style="font-size:12px; color:var(--text-secondary);">0 abonnés</div>
-                    </div>
-                    <button id="p-sub-btn" class="btn btn-danger" style="padding:5px 15px; margin-left:15px;" onclick="event.stopPropagation(); app.social.toggleSubPlayer()">S'ABONNER</button>
+                <div style="display:flex; gap:10px; cursor:pointer;" onclick="app.navToAuthor()">
+                    <div id="p-pp" class="avatar"></div>
+                    <div><b id="p-author">Auteur</b><div id="p-subs" style="font-size:12px;"></div></div>
                 </div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-secondary" onclick="app.social.vote(1)">👍 <span id="p-likes">0</span></button>
-                </div>
+                <button id="p-sub-btn" class="btn btn-red" onclick="app.social.subPlayer()">S'ABONNER</button>
+                <button class="btn btn-blue" onclick="app.social.vote()">👍 <span id="p-likes">0</span></button>
             </div>
-
-            <div style="background:var(--bg-secondary); padding:15px; border-radius:10px; margin-top:15px;">
-                <b id="p-meta">0 vues • date</b>
-                <p id="p-desc" style="margin-top:10px; font-size:14px; white-space:pre-wrap;"></p>
-            </div>
-
+            <div style="background:#222; padding:15px; margin-top:15px;"><p id="p-desc"></p></div>
             <div style="margin-top:20px;">
-                <h3>Commentaires</h3>
-                <div style="display:flex; gap:10px; margin-bottom:20px;">
-                    <input id="com-input" type="text" class="titan-input" placeholder="Ajouter un commentaire..." style="margin-bottom:0;">
-                    <button class="btn btn-primary" onclick="app.social.postComment()">Envoyer</button>
-                </div>
-                <div id="com-list"></div>
+                <input id="com-input" class="input" placeholder="Commentaire..."><button class="btn btn-blue" onclick="app.social.comment()">Envoyer</button>
+                <div id="com-list" style="margin-top:15px;"></div>
             </div>
         </div>
-
-        <div>
-            <h3>À suivre</h3>
-            <div id="reco-list" style="display:flex; flex-direction:column; gap:10px;"></div>
-        </div>
-    </div>
-</div>
-
-<div id="live-studio">
-    <div style="background:black; position:relative; display:flex; align-items:center; justify-content:center;">
-        <video id="live-monitor" autoplay muted style="max-width:100%; max-height:100%;"></video>
-        <div style="position:absolute; top:20px; left:20px; background:red; color:white; padding:5px 10px; border-radius:5px; font-weight:bold; animation: pulse 1s infinite;">🔴 EN DIRECT</div>
-        <button class="btn btn-danger" style="position:absolute; bottom:20px;" onclick="app.live.stop()">ARRÊTER LE DIRECT</button>
-    </div>
-    <div class="live-chat-col">
-        <div style="padding:15px; border-bottom:1px solid var(--border-color); font-weight:bold;">Tchat du Direct</div>
-        <div id="live-chat-msgs" class="chat-messages">
-            <div style="color:#666; text-align:center;">Le tchat est connecté...</div>
-        </div>
-        <div style="padding:15px; border-top:1px solid var(--border-color);">
-            <input type="text" id="live-chat-input" class="titan-input" placeholder="Message..." onkeyup="if(event.key==='Enter') app.live.sendMessage()">
-        </div>
+        <div id="reco-list"></div>
     </div>
 </div>
     <script>
-    /* ==========================================================================
-       TITAN ENGINE v6.0 - NO BUGS EDITION
-       ========================================================================== */
-    const app = {
-        // --- DONNÉES GLOBALES ---
-        data: {
-            videos: [],
-            users: {
-                "Edonis": { pp:"", banner:"", bio:"Créateur de Visiona Titan", subs:[], followers:[], role:"admin", created: Date.now() }
-            },
-            posts: [],
-            annonces: ["Bienvenue sur la version Ultime de Visiona Titan !"],
-            thanks: ["Edonis", "Toi"]
-        },
-        user: null, // Pseudo de l'utilisateur connecté
-        activeVid: null,
-        stream: null,
-        eggClicks: 0,
+/* TITAN ENGINE v7 - FINAL FIX */
+const app = {
+    data: {
+        videos: [],
+        users: { "Edonis": { pp:"", banner:"", bio:"Admin Suprême", subs:[], followers:[], role:"admin" } },
+        posts: [], annonces: ["Bienvenue sur Visiona Titan !"], thanks: ["Edonis"]
+    },
+    user: null, activeVid: null, stream: null, eggC: 0,
 
-        // --- 1. INITIALISATION ---
-        init: function() {
-            console.log("Titan Engine : Démarrage...");
-            
-            // 1. Charger la base de données locale
-            const db = localStorage.getItem('titan_db_v6');
-            if(db) {
-                this.data = JSON.parse(db);
-            } else {
-                // DONNÉES DE DÉPART (POUR NE PAS AVOIR UN SITE VIDE)
-                this.seedData();
+    init: function() {
+        // Chargement base de données
+        const db = localStorage.getItem('titan_db_v7');
+        if(db) this.data = JSON.parse(db);
+        else this.seed(); // Génère des données si vide
+
+        this.user = localStorage.getItem('titan_user');
+        this.auth.updateUI();
+        this.nav('home');
+        document.addEventListener('keydown', (e)=>{if(e.key==='Control')document.body.classList.toggle('matrix')});
+    },
+
+    seed: function() {
+        // Données de base pour éviter l'écran blanc
+        this.data.videos = [
+            { id:1, title:"Bienvenue !", author:"Edonis", url:"https://www.w3schools.com/html/mov_bbb.mp4", thumb:"https://via.placeholder.com/640x360", views:100, likes:10, isShort:false, date:Date.now(), comments:[], voters:[] }
+        ];
+        this.save();
+    },
+
+    save: function() {
+        localStorage.setItem('titan_db_v7', JSON.stringify(this.data));
+        this.auth.updateUI();
+    },
+
+    // --- NAVIGATION ---
+    nav: function(p, el) {
+        document.querySelectorAll('section').forEach(s=>s.style.display='none');
+        document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+        const t = document.getElementById('view-'+p);
+        if(t) t.style.display='block';
+        if(el) el.classList.add('active');
+        document.getElementById('user-menu').style.display='none';
+        document.getElementById('player-overlay').style.display='none';
+        if(this.activeVid) document.getElementById('main-player').pause();
+
+        if(p==='home') this.renderHome();
+        if(p==='zapp') this.renderZapp();
+        if(p==='subs') this.renderSubs();
+        if(p==='history') this.renderHist();
+        if(p==='posts') this.renderPosts();
+        if(p==='thanks') this.renderThanks();
+        if(p==='admin') this.admin.render();
+        if(p==='stats') this.renderStats();
+        if(p==='profile') this.profile.load(this.user);
+        window.scrollTo(0,0);
+    },
+
+    // --- RENDU ---
+    renderHome: function() {
+        const v = this.data.videos.filter(x=>!x.isShort).sort((a,b)=>b.date-a.date);
+        document.getElementById('announce-box').innerHTML = this.data.annonces.map(a=>`<div style="background:var(--blue); color:black; padding:10px; border-radius:5px; margin-bottom:15px;">📢 ${a}</div>`).join('');
+        document.getElementById('home-grid').innerHTML = v.map(x=>this.card(x)).join('');
+    },
+    renderZapp: function() {
+        const v = this.data.videos.filter(x=>x.isShort);
+        document.getElementById('zapp-feed').innerHTML = v.map(x=>`
+            <div class="zapp-item">
+                <video class="zapp-video" src="${x.url}" loop onclick="this.paused?this.play():this.pause()"></video>
+                <div class="zapp-ui">
+                    <div class="z-btn" onclick="app.player.load(${x.id})">❤️ ${x.likes}</div>
+                    <div class="z-btn" onclick="app.goProfile('${x.author}')">👤</div>
+                </div>
+            </div>`).join('');
+    },
+    renderSubs: function() {
+        if(!this.user) return document.getElementById('subs-grid').innerHTML="<p>Connectez-vous.</p>";
+        const s = this.data.users[this.user].subs;
+        const v = this.data.videos.filter(x=>s.includes(x.author) && !x.isShort);
+        document.getElementById('subs-grid').innerHTML = v.map(x=>this.card(x)).join('');
+    },
+    renderHist: function() {
+        const h = JSON.parse(localStorage.getItem('titan_h')||"[]");
+        const v = h.map(id=>this.data.videos.find(x=>x.id==id)).filter(x=>x);
+        document.getElementById('history-grid').innerHTML = v.map(x=>this.card(x)).join('');
+    },
+    renderPosts: function() {
+        const pf = document.getElementById('posts-feed');
+        let h = "";
+        if(this.user) h+=`<div style="background:#222; padding:15px; border-radius:10px;"><textarea id="pf-txt" class="input" placeholder="Message..."></textarea><button class="btn btn-blue" onclick="app.addPost()">Publier</button></div>`;
+        h += this.data.posts.map(p=>`<div style="background:#222; padding:15px; margin-top:10px; border-radius:10px;"><b>${p.author}</b>: ${p.text}</div>`).join('');
+        pf.innerHTML = h;
+    },
+    renderThanks: function() {
+        document.getElementById('thanks-grid').innerHTML = this.data.thanks.map(t=>`<div style="background:#222; padding:20px; border:1px solid gold; border-radius:10px; text-align:center;">🏆 ${t}</div>`).join('');
+    },
+    renderStats: function() {
+        if(!this.user) return;
+        const u = this.data.users[this.user];
+        const v = this.data.videos.filter(x=>x.author===this.user);
+        document.getElementById('st-views').innerText = v.reduce((a,b)=>a+b.views,0);
+        document.getElementById('st-subs').innerText = u.followers.length;
+        document.getElementById('st-likes').innerText = v.reduce((a,b)=>a+b.likes,0);
+    },
+    card: function(v) {
+        return `<div class="card" onclick="app.player.load(${v.id})"><div class="thumb"><img src="${v.thumb}">${v.isLive?'<div class="live-badge">LIVE</div>':`<div class="duration">${v.dur}</div>`}</div><div class="info">${this.utils.av(v.author)}<div><div style="font-weight:bold;">${v.title}</div><div style="font-size:12px; color:#aaa;">${v.author} • ${v.views} vues</div></div></div></div>`;
+    },
+
+    // --- PLAYER ---
+    player: {
+        load: function(id) {
+            const v = app.data.videos.find(x=>x.id==id);
+            app.activeVid = v;
+            // Cooldown Vue 1h
+            const now = Date.now();
+            if(!v.viewers) v.viewers={};
+            if(!app.user || !v.viewers[app.user] || (now-v.viewers[app.user]>3600000)) {
+                v.views++; if(app.user) v.viewers[app.user]=now; app.save();
             }
+            // Historique
+            let h = JSON.parse(localStorage.getItem('titan_h')||"[]");
+            if(!h.includes(id)) h.unshift(id);
+            localStorage.setItem('titan_h', JSON.stringify(h));
 
-            // 2. Charger l'utilisateur
-            const savedUser = localStorage.getItem('titan_user');
-            if(savedUser) this.user = savedUser;
-
-            // 3. Lancer l'interface
-            this.auth.updateHeader();
-            this.nav('home');
-
-            // 4. Easter Egg Konami Code
-            document.addEventListener('keydown', (e) => {
-                if(e.key === 'Control') document.body.classList.toggle('theme-matrix');
-            });
-        },
-
-        seedData: function() {
-            // Création de fausses vidéos pour tester
-            this.data.videos = [
-                { id: 1, title: "Bienvenue sur Titan", author: "Edonis", views: 1500, date: Date.now(), url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "https://via.placeholder.com/640x360", isShort: false, likes: 100, comments: [], voters:[] },
-                { id: 2, title: "Zapp Test", author: "Edonis", views: 500, date: Date.now(), url: "https://www.w3schools.com/html/mov_bbb.mp4", thumb: "", isShort: true, likes: 50, comments: [], voters:[] }
-            ];
-            this.save();
-        },
-
-        save: function() {
-            localStorage.setItem('titan_db_v6', JSON.stringify(this.data));
-            this.auth.updateHeader();
-        },
-
-        // --- 2. NAVIGATION ---
-        nav: function(page, el) {
-            // Cacher toutes les sections
-            document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-            document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+            const p = document.getElementById('player-overlay');
+            const vid = document.getElementById('main-player');
+            p.style.display='block';
             
-            // Afficher la cible
-            const target = document.getElementById('view-' + page);
-            if(target) target.style.display = 'block';
-            if(el) el.classList.add('active');
+            if(v.isLive && v.streamRef) vid.srcObject = v.streamRef;
+            else { vid.srcObject=null; vid.src = v.url; }
+
+            document.getElementById('p-title').innerText = v.title;
+            document.getElementById('p-author').innerText = v.author;
+            document.getElementById('p-subs').innerText = app.data.users[v.author].followers.length+" abonnés";
+            document.getElementById('p-pp').innerHTML = app.utils.av(v.author);
+            document.getElementById('p-likes').innerText = v.likes;
+            document.getElementById('p-desc').innerText = v.desc || "";
+            app.social.updBtn();
+            app.social.renderComs();
             
-            // Fermer les menus
-            document.getElementById('user-menu').style.display = 'none';
-            document.getElementById('player-overlay').style.display = 'none';
-            if(this.activeVid && document.getElementById('main-player')) document.getElementById('main-player').pause();
-
-            // Logique par page
-            if(page === 'home') this.renderHome();
-            if(page === 'zapp') this.renderZapp();
-            if(page === 'subs') this.renderSubs();
-            if(page === 'history') this.renderHistory();
-            if(page === 'posts') this.renderPosts();
-            if(page === 'thanks') this.renderThanks();
-            if(page === 'admin') this.admin.render();
-            if(page === 'stats') this.renderStats();
-            if(page === 'profile') this.profile.load(this.user);
-            
-            window.scrollTo(0,0);
+            // Reco
+            const r = app.data.videos.filter(x=>!x.isShort && x.id!=id).slice(0,5);
+            document.getElementById('reco-list').innerHTML = r.map(x=>`<div style="display:flex; gap:10px; margin-bottom:10px; cursor:pointer;" onclick="app.player.load(${x.id})"><img src="${x.thumb}" style="width:120px; border-radius:5px;"><div><b>${x.title}</b><div style="font-size:12px; color:#aaa;">${x.author}</div></div></div>`).join('');
         },
+        close: function() { document.getElementById('player-overlay').style.display='none'; document.getElementById('main-player').pause(); }
+    },
 
-        // --- 3. RENDUS ---
-        renderHome: function() {
-            const vids = this.data.videos.filter(v => !v.isShort).sort((a,b) => b.date - a.date);
-            document.getElementById('announcement-bar').innerHTML = this.data.annonces.map(a => `<div style="background:var(--accent-blue); color:black; padding:10px; border-radius:8px; margin-bottom:20px; font-weight:bold;">📢 ${a}</div>`).join('');
-            document.getElementById('home-grid').innerHTML = vids.map(v => this.createCard(v)).join('');
-        },
-
-        renderZapp: function() {
-            const vids = this.data.videos.filter(v => v.isShort);
-            document.getElementById('zapp-feed').innerHTML = vids.map(v => `
-                <div class="zapp-card">
-                    <video class="zapp-video" src="${v.url}" loop onclick="this.paused ? this.play() : this.pause()"></video>
-                    <div class="zapp-ui">
-                        <div class="zapp-btn" onclick="app.player.load(${v.id})">❤️ <small>${v.likes}</small></div>
-                        <div class="zapp-btn" onclick="app.goProfile('${v.author}')">👤</div>
-                    </div>
-                    <div class="zapp-info">
-                        <b>@${v.author}</b>
-                        <p>${v.title}</p>
-                    </div>
-                </div>
-            `).join('');
-        },
-
-        renderSubs: function() {
-            if(!this.user) return document.getElementById('subs-grid').innerHTML = "<p>Veuillez vous connecter.</p>";
-            const subs = this.data.users[this.user].subs;
-            const vids = this.data.videos.filter(v => subs.includes(v.author) && !v.isShort);
-            document.getElementById('subs-grid').innerHTML = vids.map(v => this.createCard(v)).join('');
-        },
-
-        renderHistory: function() {
-            const h = JSON.parse(localStorage.getItem('titan_hist') || "[]");
-            const vids = h.map(id => this.data.videos.find(v => v.id == id)).filter(v => v);
-            document.getElementById('history-grid').innerHTML = vids.map(v => this.createCard(v)).join('');
-        },
-
-        renderPosts: function() {
-            const feed = document.getElementById('community-feed');
-            let html = "";
-            if(this.user) html += `<div style="background:var(--bg-secondary); padding:15px; border-radius:10px; margin-bottom:20px;"><textarea id="post-txt" class="titan-input" placeholder="Exprimez-vous..."></textarea><button class="btn btn-primary" style="margin-top:10px;" onclick="app.addPost()">PUBLIER</button></div>`;
-            html += this.data.posts.map(p => `
-                <div style="background:var(--bg-secondary); padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid var(--border-color);">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                        ${this.utils.avatar(p.author, 30)} <b>${p.author}</b> <span style="color:#aaa; font-size:12px;">${this.utils.ago(p.date)}</span>
-                    </div>
-                    ${p.text}
-                </div>
-            `).join('');
-            feed.innerHTML = html;
-        },
-
-        renderThanks: function() {
-            document.getElementById('thanks-grid').innerHTML = this.data.thanks.map(t => `
-                <div style="background:var(--bg-secondary); padding:20px; border:1px solid var(--accent-gold); border-radius:10px; text-align:center;">🏆 ${t}</div>
-            `).join('');
-        },
-
-        renderStats: function() {
-            if(!this.user) return;
-            const u = this.data.users[this.user];
-            const myVids = this.data.videos.filter(v => v.author === this.user);
-            const totalViews = myVids.reduce((a,b) => a + b.views, 0);
-            const totalLikes = myVids.reduce((a,b) => a + b.likes, 0);
-            
-            document.getElementById('stat-views').innerText = totalViews;
-            document.getElementById('stat-subs').innerText = u.followers.length;
-            document.getElementById('stat-likes').innerText = totalLikes;
-        },
-
-        createCard: function(v) {
-            return `
-            <div class="video-card" onclick="app.player.load(${v.id})">
-                <div class="thumbnail">
-                    <img src="${v.thumb}">
-                    ${v.isLive ? '<div class="live-badge">DIRECT</div>' : `<div class="duration">${v.duration || "0:00"}</div>`}
-                </div>
-                <div class="details">
-                    <div class="channel-icon">${this.utils.avatar(v.author)}</div>
-                    <div class="meta">
-                        <div class="video-title">${v.title}</div>
-                        <div class="video-info">${v.author} • ${v.views} vues • ${this.utils.ago(v.date)}</div>
-                    </div>
-                </div>
-            </div>`;
-        },
-
-        // --- 4. PLAYER ---
-        player: {
-            load: function(id) {
-                const v = app.data.videos.find(x => x.id == id);
-                app.activeVid = v;
-                
-                // Cooldown Vues (1h)
-                const now = Date.now();
-                if(!v.viewers) v.viewers = {};
-                if(!app.user || !v.viewers[app.user] || (now - v.viewers[app.user] > 3600000)) {
-                    v.views++;
-                    if(app.user) v.viewers[app.user] = now;
-                    app.save();
-                }
-
-                // Historique
-                let h = JSON.parse(localStorage.getItem('titan_hist') || "[]");
-                if(!h.includes(id)) h.unshift(id);
-                localStorage.setItem('titan_hist', JSON.stringify(h));
-
-                const p = document.getElementById('player-overlay');
-                const vid = document.getElementById('main-player');
-                p.style.display = 'block';
-                
-                // Source Live ou Video
-                if(v.isLive && v.streamRef) {
-                    vid.srcObject = v.streamRef;
-                } else {
-                    vid.srcObject = null;
-                    vid.src = v.url;
-                }
-
-                document.getElementById('p-title').innerText = v.title;
-                document.getElementById('p-auth-name').innerText = v.author;
-                document.getElementById('p-auth-subs').innerText = app.data.users[v.author].followers.length + " abonnés";
-                document.getElementById('p-auth-pp').innerHTML = app.utils.avatar(v.author);
-                document.getElementById('p-likes').innerText = v.likes;
-                document.getElementById('p-meta').innerText = `${v.views} vues • ${app.utils.ago(v.date)}`;
-                document.getElementById('p-desc').innerText = v.desc || "Pas de description";
-
-                app.social.updateSubBtnPlayer();
-                app.social.renderComs();
-                
-                // Suggestions
-                const recos = app.data.videos.filter(x => !x.isShort && x.id != id).slice(0, 5);
-                document.getElementById('reco-list').innerHTML = recos.map(r => `
-                    <div style="display:flex; gap:10px; cursor:pointer;" onclick="app.player.load(${r.id})">
-                        <img src="${r.thumb}" style="width:140px; border-radius:8px;">
-                        <div>
-                            <div style="font-weight:bold; font-size:14px;">${r.title}</div>
-                            <div style="font-size:12px; color:#aaa;">${r.author}</div>
-                        </div>
-                    </div>
-                `).join('');
-            },
-            close: function() {
-                document.getElementById('player-overlay').style.display = 'none';
-                document.getElementById('main-player').pause();
-            }
-        },
-
-        // --- 5. SOCIAL ---
-        social: {
-            vote: function(val) {
-                if(!app.user) return app.ui.openModal('modal-auth');
-                const v = app.activeVid;
-                if(!v.voters) v.voters = [];
-                
-                if(v.voters.includes(app.user)) return alert("Vous avez déjà voté !");
-                v.likes += val;
-                v.voters.push(app.user);
-                app.save();
-                document.getElementById('p-likes').innerText = v.likes;
-            },
-            toggleSubPlayer: function() {
-                this.doSub(app.activeVid.author);
-                this.updateSubBtnPlayer();
-            },
-            toggleSubscribe: function() {
-                const target = document.getElementById('prof-name').innerText;
-                this.doSub(target);
-                app.profile.load(target);
-            },
-            doSub: function(target) {
-                if(!app.user) return app.ui.openModal('modal-auth');
-                if(target === app.user) return alert("Impossible de s'abonner à soi-même.");
-                
-                const me = app.data.users[app.user];
-                const them = app.data.users[target];
-                
-                if(me.subs.includes(target)) {
-                    me.subs = me.subs.filter(x => x !== target);
-                    them.followers = them.followers.filter(x => x !== app.user); // -1
-                } else {
-                    me.subs.push(target);
-                    them.followers.push(app.user); // +1
-                }
-                app.save();
-                app.auth.updateSidebar();
-            },
-            updateSubBtnPlayer: function() {
-                const target = app.activeVid.author;
-                const isSub = app.data.users[app.user]?.subs.includes(target);
-                const btn = document.getElementById('p-sub-btn');
-                btn.innerText = isSub ? "ABONNÉ" : "S'ABONNER";
-                btn.className = isSub ? "btn btn-secondary" : "btn btn-danger";
-            },
-            postComment: function() {
-                const txt = document.getElementById('com-input').value;
-                if(!txt) return;
-                app.activeVid.comments.unshift({ author: app.user, text: txt, date: Date.now() });
-                app.save();
-                this.renderComs();
-                document.getElementById('com-input').value = "";
-            },
-            renderComs: function() {
-                document.getElementById('com-list').innerHTML = (app.activeVid.comments || []).map(c => `
-                    <div style="margin-bottom:15px; display:flex; gap:10px;">
-                        <div style="width:30px;">${app.utils.avatar(c.author)}</div>
-                        <div>
-                            <div style="font-size:13px; font-weight:bold;">${c.author} <span style="font-weight:normal; color:#aaa; font-size:12px;">${app.utils.ago(c.date)}</span></div>
-                            <div style="margin-top:2px;">${c.text}</div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        },
-
-        // --- 6. UPLOAD & LIVE ---
-        upload: {
-            process: function() {
-                if(!app.user) return app.ui.openModal('modal-auth');
-                const file = document.getElementById('up-file').files[0];
-                const thumb = document.getElementById('up-thumb').files[0];
-                const title = document.getElementById('up-title').value;
-                
-                if(!file || !title) return alert("Fichier et titre requis.");
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const vidUrl = e.target.result;
-                    // Durée
-                    const temp = document.createElement('video');
-                    temp.src = vidUrl;
-                    temp.onloadedmetadata = () => {
-                        const d = Math.floor(temp.duration);
-                        const durStr = `${Math.floor(d/60)}:${d%60<10?'0'+(d%60):d%60}`;
-                        
-                        if(thumb) {
-                            const rt = new FileReader();
-                            rt.onload = (ev) => app.upload.finish(title, vidUrl, ev.target.result, durStr);
-                            rt.readAsDataURL(thumb);
-                        } else {
-                            app.upload.finish(title, vidUrl, "https://via.placeholder.com/640x360", durStr);
-                        }
-                    };
+    // --- UPLOAD ---
+    upload: {
+        process: function() {
+            if(!app.user) return app.ui.openModal('modal-auth');
+            const f = document.getElementById('up-file').files[0];
+            const t = document.getElementById('up-title').value;
+            if(!f || !t) return alert("Fichier manquant");
+            const r = new FileReader();
+            r.onload = (e) => {
+                const u = e.target.result; // DataURL
+                const vid = document.createElement('video'); vid.src=u;
+                vid.onloadedmetadata = () => {
+                    const d = Math.floor(vid.duration);
+                    const ds = `${Math.floor(d/60)}:${d%60<10?'0'+(d%60):d%60}`;
+                    const th = document.getElementById('up-thumb').files[0];
+                    if(th) {
+                        const rt = new FileReader();
+                        rt.onload=(ev)=>app.upload.fin(t,u,ev.target.result,ds);
+                        rt.readAsDataURL(th);
+                    } else app.upload.fin(t,u,"https://via.placeholder.com/640x360",ds);
                 };
-                reader.readAsDataURL(file);
-            },
-            finish: function(t, u, th, d) {
-                app.data.videos.unshift({
-                    id: Date.now(), title: t, desc: document.getElementById('up-desc').value,
-                    author: app.user, url: u, thumb: th, duration: d,
-                    views: 0, likes: 0, date: Date.now(), 
-                    isShort: document.getElementById('up-short').checked, comments: [], voters: []
-                });
-                app.save();
-                app.ui.closeModals();
-                app.nav('home');
-            }
+            };
+            r.readAsDataURL(f);
         },
+        fin: function(t,u,th,d) {
+            app.data.videos.unshift({
+                id:Date.now(), title:t, desc:document.getElementById('up-desc').value,
+                author:app.user, url:u, thumb:th, dur:d, views:0, likes:0, date:Date.now(),
+                isShort:document.getElementById('up-short').checked, comments:[], voters:[]
+            });
+            app.save(); app.ui.closeModals(); app.nav('home');
+        }
+    },
 
-        live: {
-            init: async function(type) {
-                try {
-                    if(type === 'cam') app.stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
-                    else app.stream = await navigator.mediaDevices.getDisplayMedia({video:true, audio:true});
-                    document.getElementById('live-preview').srcObject = app.stream;
-                } catch(e) { alert("Erreur: " + e); }
-            },
-            goLive: function() {
-                if(!app.stream) return alert("Activez une source !");
-                const title = document.getElementById('live-title').value;
-                app.data.videos.unshift({
-                    id: Date.now(), title: "🔴 " + title, author: app.user, isLive: true,
-                    streamRef: app.stream, thumb: "", views: 0, likes: 0, date: Date.now(), comments: []
-                });
-                document.getElementById('live-studio').style.display = 'grid';
-                document.getElementById('live-monitor').srcObject = app.stream;
-                app.save();
-                app.ui.closeModals();
-            },
-            stop: function() {
-                if(app.stream) app.stream.getTracks().forEach(t => t.stop());
-                document.getElementById('live-studio').style.display = 'none';
-                app.nav('home');
-            },
-            sendMessage: function() {
-                const i = document.getElementById('live-chat-input');
-                document.getElementById('live-chat-msgs').innerHTML += `<div class="chat-msg"><b>${app.user}:</b> ${i.value}</div>`;
-                i.value = "";
-            }
+    // --- LIVE ---
+    live: {
+        init: async function(m) {
+            try {
+                if(m==='cam') app.stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+                else app.stream = await navigator.mediaDevices.getDisplayMedia({video:true, audio:true});
+                document.getElementById('pre-live').srcObject = app.stream;
+            } catch(e){alert(e);}
         },
-
-        // --- 7. PROFIL ---
-        profile: {
-            load: function(u) {
-                if(!u) return;
-                if(!app.data.users[u]) app.data.users[u] = { pp:"", banner:"", bio:"Nouveau", subs:[], followers:[] };
-                const user = app.data.users[u];
-                
-                document.getElementById('prof-name').innerText = u;
-                document.getElementById('prof-stats').innerText = user.followers.length + " abonnés";
-                document.getElementById('prof-pp').innerHTML = app.utils.avatar(u, 140);
-                if(user.banner) document.getElementById('prof-banner').style.backgroundImage = `url(${user.banner})`;
-                
-                const isMe = (u === app.user);
-                document.getElementById('prof-action-btn').innerText = isMe ? "PERSONNALISER" : "S'ABONNER";
-                document.getElementById('prof-action-btn').className = isMe ? "btn btn-primary" : "btn btn-danger";
-                
-                if(!isMe && app.data.users[app.user]?.subs.includes(u)) {
-                    document.getElementById('prof-action-btn').innerText = "ABONNÉ";
-                    document.getElementById('prof-action-btn').className = "btn btn-secondary";
-                }
-                this.switchTab('videos');
-            },
-            handleAction: function() {
-                const u = document.getElementById('prof-name').innerText;
-                if(u === app.user) app.ui.openModal('modal-custom');
-                else app.social.toggleSubscribe();
-            },
-            save: function() {
-                const pp = document.getElementById('cust-pp').files[0];
-                const bn = document.getElementById('cust-banner').files[0];
-                const bio = document.getElementById('cust-bio').value;
-                const u = app.data.users[app.user];
-                u.bio = bio;
-
-                const finish = () => { app.save(); app.ui.closeModals(); app.profile.load(app.user); app.auth.updateHeader(); };
-                
-                if(pp) {
-                    const r = new FileReader();
-                    r.onload = (e) => { u.pp = e.target.result; if(bn) loadBn(); else finish(); };
-                    r.readAsDataURL(pp);
-                } else if(bn) loadBn(); else finish();
-
-                function loadBn() {
-                    const r = new FileReader();
-                    r.onload = (e) => { u.banner = e.target.result; finish(); };
-                    r.readAsDataURL(bn);
-                }
-            },
-            switchTab: function(t) {
-                const c = document.getElementById('prof-content');
-                const u = document.getElementById('prof-name').innerText;
-                const vids = app.data.videos.filter(v => v.author === u);
-                document.querySelectorAll('.nav-link').forEach(e => e.classList.remove('active'));
-                event.target.classList.add('active');
-
-                if(t === 'videos') c.innerHTML = vids.filter(v => !v.isShort).map(v => app.createCard(v)).join('');
-                if(t === 'zapps') c.innerHTML = vids.filter(v => v.isShort).map(v => app.createCard(v)).join('');
-                if(t === 'posts') c.innerHTML = app.data.posts.filter(p => p.author === u).map(p => `<div style="background:var(--bg-secondary); padding:15px; margin-bottom:10px; border-radius:10px;">${p.text}</div>`).join('');
-                if(t === 'about') c.innerHTML = `<div style="padding:20px;">${app.data.users[u].bio || "Pas de bio"}</div>`;
-            }
+        go: function() {
+            if(!app.stream) return;
+            const t = document.getElementById('live-title').value;
+            app.data.videos.unshift({
+                id:Date.now(), title:"🔴 "+t, author:app.user, isLive:true, streamRef:app.stream,
+                thumb:"", views:0, likes:0, date:Date.now(), comments:[]
+            });
+            document.getElementById('live-studio').style.display='grid';
+            document.getElementById('live-monitor').srcObject = app.stream;
+            app.save(); app.ui.closeModals();
         },
-
-        // --- 8. ADMIN ---
-        admin: {
-            render: function() {
-                const list = document.getElementById('admin-video-list');
-                list.innerHTML = app.data.videos.map(v => `
-                    <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #333; background:var(--bg-secondary);">
-                        <span>${v.title} (${v.author})</span>
-                        <button class="btn btn-danger" style="padding:5px 10px;" onclick="app.admin.delVid(${v.id})">SUPPRIMER</button>
-                    </div>
-                `).join('');
-            },
-            delVid: function(id) {
-                if(confirm("Supprimer cette vidéo définitivement ?")) {
-                    app.data.videos = app.data.videos.filter(v => v.id !== id);
-                    app.save();
-                    this.render();
-                }
-            },
-            addThanks: function() {
-                app.data.thanks.push(document.getElementById('admin-thx-name').value);
-                app.save(); alert("Ajouté !");
-            },
-            postAnnouncement: function() {
-                app.data.annonces.unshift(document.getElementById('admin-ann-txt').value);
-                app.save(); alert("Publié !");
-            }
-        },
-
-        // --- 9. AUTH & UTILS ---
-        auth: {
-            login: function() {
-                const u = document.getElementById('login-user').value;
-                if(!u) return;
-                if(!app.data.users[u]) app.data.users[u] = { pp:"", banner:"", bio:"Nouveau", subs:[], followers:[], role:"user" };
-                app.user = u;
-                localStorage.setItem('titan_user', u);
-                app.ui.closeModals();
-                app.init();
-            },
-            logout: function() {
-                localStorage.removeItem('titan_user');
-                location.reload();
-            },
-            updateHeader: function() {
-                const area = document.getElementById('auth-area');
-                const menu = document.getElementById('user-menu');
-                if(app.user) {
-                    area.innerHTML = `<div onclick="app.ui.toggleMenu()">${app.utils.avatar(app.user, 36)}</div>`;
-                    document.getElementById('menu-avatar').innerHTML = app.utils.avatar(app.user, 40);
-                    document.getElementById('menu-username').innerText = app.user;
-                    if(app.user === "Edonis" || app.data.users[app.user].role === "admin") {
-                        document.getElementById('admin-link').style.display = "block";
-                    }
-                    this.updateSidebar();
-                } else {
-                    area.innerHTML = `<button class="auth-btn" onclick="app.ui.openModal('modal-auth')">CONNEXION</button>`;
-                }
-            },
-            updateSidebar: function() {
-                if(!app.user) return;
-                const subs = app.data.users[app.user].subs;
-                document.getElementById('subs-list').innerHTML = subs.map(s => `
-                    <div class="nav-link" onclick="app.goProfile('${s}')">${app.utils.avatar(s, 20)} ${s}</div>
-                `).join('');
-            }
-        },
-
-        // --- 10. HELPERS ---
-        ui: {
-            openModal: function(id) { document.getElementById(id).style.display = 'flex'; },
-            closeModals: function() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); },
-            toggleSidebar: function() { document.getElementById('sidebar').classList.toggle('closed'); },
-            toggleMenu: function() { 
-                const m = document.getElementById('user-menu'); 
-                m.style.display = (m.style.display === 'none') ? 'block' : 'none'; 
-            },
-            switchUploadTab: function(t) {
-                document.getElementById('form-upload').style.display = (t === 'upload') ? 'block' : 'none';
-                document.getElementById('form-live').style.display = (t === 'live') ? 'block' : 'none';
-            }
-        },
-
-        utils: {
-            avatar: function(u, s=40) {
-                const user = app.data.users[u];
-                if(user && user.pp) return `<img src="${user.pp}" style="width:${s}px; height:${s}px; border-radius:50%; object-fit:cover;">`;
-                const c = '#'+Math.floor(Math.random()*16777215).toString(16);
-                return `<div style="width:${s}px; height:${s}px; border-radius:50%; background:${c}; display:flex; align-items:center; justify-content:center; font-weight:bold; color:white; font-size:${s/2}px;">${u[0].toUpperCase()}</div>`;
-            },
-            ago: function(ts) {
-                const s = Math.floor((Date.now() - ts)/1000);
-                if(s < 60) return "À l'instant";
-                const m = Math.floor(s/60); if(m < 60) return m + " min";
-                const h = Math.floor(m/60); if(h < 24) return h + " h";
-                return Math.floor(h/24) + " j";
-            }
-        },
-
-        // --- EASTER EGGS ---
-        eggs: {
-            logoClick: function() {
-                this.c++;
-                if(this.c >= 10) { document.body.classList.add('theme-christmas'); alert("🎅 HO HO HO !"); }
-            },
-            clickVersion: function() { document.body.classList.toggle('theme-matrix'); },
-            c: 0
-        },
-
-        // Raccourcis globaux
-        goProfile: function(u) { app.profile.load(u); app.nav('profile'); },
-        goMyProfile: function() { app.profile.load(app.user); app.nav('profile'); },
-        navToAuthor: function() { app.player.close(); app.profile.load(app.activeVid.author); app.nav('profile'); },
-        addPost: function() {
-            const t = document.getElementById('post-txt').value;
-            app.data.posts.unshift({author: app.user, text: t, date: Date.now()});
-            app.save(); app.renderPosts();
-        },
-        search: function() {
-            const q = document.getElementById('search-input').value.toLowerCase();
-            const res = app.data.videos.filter(v => v.title.toLowerCase().includes(q));
-            document.getElementById('home-grid').innerHTML = res.map(v => app.createCard(v)).join('');
+        stop: function() {
+            app.stream.getTracks().forEach(x=>x.stop());
+            document.getElementById('live-studio').style.display='none';
             app.nav('home');
         },
-        history: { clear: function() { localStorage.removeItem('titan_hist'); app.renderHistory(); } }
-    };
+        send: function() {
+            const i = document.getElementById('live-input');
+            document.getElementById('live-chat').innerHTML += `<div class="chat-msg"><b>${app.user}:</b> ${i.value}</div>`;
+            i.value="";
+        }
+    },
 
-    // DÉMARRAGE
-    window.onload = function() { app.init(); };
-    </script>
+    // --- SOCIAL ---
+    social: {
+        vote: function() {
+            if(!app.user) return app.ui.openModal('modal-auth');
+            const v = app.activeVid;
+            if(!v.voters) v.voters=[];
+            if(v.voters.includes(app.user)) return alert("Déjà voté");
+            v.likes++; v.voters.push(app.user); app.save();
+            document.getElementById('p-likes').innerText = v.likes;
+        },
+        subPlayer: function() { app.social.doSub(app.activeVid.author); app.social.updBtn(); },
+        toggleSubscribe: function() { const t=document.getElementById('prof-name').innerText; app.social.doSub(t); app.profile.load(t); },
+        doSub: function(t) {
+            if(!app.user) return app.ui.openModal('modal-auth');
+            if(t===app.user) return alert("Impossible");
+            const me=app.data.users[app.user]; const them=app.data.users[t];
+            if(me.subs.includes(t)) {
+                me.subs=me.subs.filter(x=>x!==t); them.followers=them.followers.filter(x=>x!==app.user);
+            } else { me.subs.push(t); them.followers.push(app.user); }
+            app.save(); app.auth.updSide();
+        },
+        updBtn: function() {
+            const t=app.activeVid.author;
+            const sub=app.data.users[app.user]?.subs.includes(t);
+            const b=document.getElementById('p-sub-btn');
+            b.innerText=sub?"ABONNÉ":"S'ABONNER"; b.className=sub?"btn btn-gray":"btn btn-red";
+        },
+        comment: function() {
+            const t = document.getElementById('com-input').value;
+            if(!t) return;
+            app.activeVid.comments.unshift({a:app.user, t:t, d:Date.now()});
+            app.save(); this.renderComs(); document.getElementById('com-input').value="";
+        },
+        renderComs: function() {
+            document.getElementById('com-list').innerHTML = (app.activeVid.comments||[]).map(c=>`<div style="margin-bottom:10px;"><b>${c.a}</b>: ${c.t}</div>`).join('');
+        }
+    },
+
+    // --- PROFIL ---
+    profile: {
+        load: function(u) {
+            if(!app.data.users[u]) app.data.users[u]={pp:"",banner:"",bio:"Nouveau",subs:[],followers:[]};
+            const usr = app.data.users[u];
+            document.getElementById('prof-name').innerText=u;
+            document.getElementById('prof-subs').innerText=usr.followers.length+" abonnés";
+            document.getElementById('prof-pp').innerHTML=app.utils.av(u,120);
+            if(usr.banner) document.getElementById('prof-banner').style.backgroundImage = `url(${usr.banner})`;
+            
+            const me=u===app.user;
+            const btn=document.getElementById('prof-btn');
+            if(me) { btn.innerText="EDITER"; btn.onclick=()=>app.ui.openModal('modal-custom'); btn.className="btn btn-blue"; }
+            else { 
+                const sub=app.data.users[app.user]?.subs.includes(u);
+                btn.innerText=sub?"ABONNÉ":"S'ABONNER"; btn.className=sub?"btn btn-gray":"btn btn-red";
+                btn.onclick=()=>app.social.toggleSubscribe();
+            }
+            this.tab('videos');
+        },
+        save: function() {
+            const pp=document.getElementById('cust-pp').files[0];
+            const bn=document.getElementById('cust-banner').files[0];
+            const u=app.data.users[app.user];
+            u.bio=document.getElementById('cust-bio').value;
+            const end=()=>{app.save(); app.ui.closeModals(); app.profile.load(app.user); app.auth.updateUI();};
+            const r1=new FileReader();
+            if(pp) { r1.onload=(e)=>{u.pp=e.target.result; if(bn) loadBn(); else end();}; r1.readAsDataURL(pp); }
+            else if(bn) loadBn(); else end();
+            function loadBn() { const r2=new FileReader(); r2.onload=(e)=>{u.banner=e.target.result; end();}; r2.readAsDataURL(bn); }
+        },
+        tab: function(t) {
+            const u=document.getElementById('prof-name').innerText;
+            const c=document.getElementById('prof-content');
+            document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active')); event.target.classList.add('active');
+            if(t==='videos') c.innerHTML = app.data.videos.filter(v=>v.author===u && !v.isShort).map(v=>app.card(v)).join('');
+            if(t==='zapps') c.innerHTML = app.data.videos.filter(v=>v.author===u && v.isShort).map(v=>app.card(v)).join('');
+            if(t==='posts') c.innerHTML = app.data.posts.filter(p=>p.author===u).map(p=>`<div style="background:#222; padding:10px; margin-bottom:10px;">${p.text}</div>`).join('');
+            if(t==='about') c.innerHTML = `<div style="padding:20px;">${app.data.users[u].bio}</div>`;
+        },
+        action: function() { /* Géré dans load() */ }
+    },
+
+    // --- ADMIN ---
+    admin: {
+        render: function() {
+            const t = document.getElementById('adm-vids');
+            t.innerHTML = app.data.videos.map(v=>`<div class="admin-row"><span>${v.title}</span><button class="btn btn-red" onclick="app.admin.del(${v.id})">SUPPR</button></div>`).join('');
+        },
+        del: function(id) {
+            if(confirm('Supprimer ?')) { app.data.videos = app.data.videos.filter(v=>v.id!=id); app.save(); this.render(); }
+        },
+        postAnn: function() { app.data.annonces.unshift(document.getElementById('adm-ann').value); app.save(); alert("Publié"); },
+        addThx: function() { app.data.thanks.push(document.getElementById('adm-thx').value); app.save(); alert("Ajouté"); }
+    },
+
+    // --- AUTH ---
+    auth: {
+        login: function() {
+            const u=document.getElementById('auth-user').value;
+            if(!u) return;
+            if(!app.data.users[u]) app.data.users[u]={pp:"",banner:"",bio:"Nouveau",subs:[],followers:[],role:"user"};
+            app.user=u; localStorage.setItem('titan_user',u);
+            app.ui.closeModals(); app.init();
+        },
+        logout: function() { localStorage.removeItem('titan_user'); location.reload(); },
+        updateUI: function() {
+            const a=document.getElementById('auth-area');
+            if(app.user) {
+                a.innerHTML=`<div onclick="document.getElementById('user-menu').style.display='block'">${app.utils.av(app.user,36)}</div>`;
+                document.getElementById('menu-username').innerText=app.user;
+                if(app.user==="Edonis") document.getElementById('admin-link').style.display='block';
+                this.updSide();
+            } else { a.innerHTML=`<button class="btn btn-blue" onclick="app.ui.openModal('modal-auth')">CONNEXION</button>`; }
+        },
+        updSide: function() {
+            if(!app.user) return;
+            document.getElementById('sidebar-subs').innerHTML = app.data.users[app.user].subs.map(s=>`<div class="nav-item" onclick="app.goProfile('${s}')">${app.utils.av(s,20)} ${s}</div>`).join('');
+        }
+    },
+
+    // --- UTILS & HELPERS ---
+    utils: {
+        av: function(u,s=40) {
+            const user=app.data.users[u];
+            if(user&&user.pp) return `<img src="${user.pp}" style="width:${s}px; height:${s}px; border-radius:50%; object-fit:cover;">`;
+            const c='#'+Math.floor(Math.random()*16777215).toString(16);
+            return `<div style="width:${s}px; height:${s}px; border-radius:50%; background:${c}; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff;">${u?u[0].toUpperCase():'?'}</div>`;
+        },
+        ago: function(d) {
+            const m=Math.floor((Date.now()-d)/60000);
+            if(m<60) return m+" min";
+            const h=Math.floor(m/60); if(h<24) return h+" h";
+            return Math.floor(h/24)+" j";
+        }
+    },
+    ui: {
+        openModal: function(id) { document.getElementById(id).style.display='flex'; },
+        closeModals: function() { document.querySelectorAll('.modal').forEach(e=>e.style.display='none'); },
+        tab: function(t) { document.getElementById('tab-up').style.display=t==='up'?'block':'none'; document.getElementById('tab-live').style.display=t==='live'?'block':'none'; }
+    },
+    eggs: { clickLogo: function() { this.c++; if(this.c===10) { document.body.classList.add('christmas'); alert("🎅 HO HO HO"); } }, clickVersion: function() { document.body.classList.toggle('rainbow'); }, c:0 },
+    history: { clear: function() { localStorage.removeItem('titan_h'); app.renderHist(); } },
+    addPost: function() { const t=document.getElementById('pf-txt').value; app.data.posts.unshift({author:app.user, text:t, date:Date.now()}); app.save(); app.renderPosts(); },
+    search: function() {
+        const q=document.getElementById('search-input').value.toLowerCase();
+        if(q==='titan') document.body.classList.toggle('gold-mode');
+        const r=app.data.videos.filter(v=>v.title.toLowerCase().includes(q));
+        document.getElementById('home-grid').innerHTML = r.map(x=>app.card(x)).join('');
+        app.nav('home');
+    },
+    goProfile: function(u) { app.profile.load(u); app.nav('profile'); },
+    goMyProfile: function() { app.profile.load(app.user); app.nav('profile'); },
+    navToAuthor: function() { app.player.close(); app.profile.load(app.activeVid.author); app.nav('profile'); }
+};
+
+window.onload = function() { app.init(); };
+</script>
 </body>
 </html>
